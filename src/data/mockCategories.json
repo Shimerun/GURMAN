@@ -1,0 +1,10 @@
+[
+  { "id": "dairy", "title": "Молочні продукти", "icon": "milk" },
+  { "id": "produce", "title": "Овочі та фрукти", "icon": "apple" },
+  { "id": "meat-fish", "title": "М'ясо та риба", "icon": "beef" },
+  { "id": "bakery", "title": "Хліб та випічка", "icon": "croissant" },
+  { "id": "grocery", "title": "Бакалія", "icon": "wheat" },
+  { "id": "drinks", "title": "Напої", "icon": "cup-soda" },
+  { "id": "snacks", "title": "Снеки та солодощі", "icon": "cookie" },
+  { "id": "frozen", "title": "Заморожені продукти", "icon": "snowflake" }
+]

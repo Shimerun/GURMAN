@@ -1,0 +1,50 @@
+[
+  {
+    "id": "kyiv-podil",
+    "name": "GURMAN Поділ",
+    "city": "Київ",
+    "address": "вул. Ярославська, 12",
+    "phone": "+380 44 000 11 01",
+    "hours": { "open": "07:00", "close": "23:00" }
+  },
+  {
+    "id": "kyiv-pechersk",
+    "name": "GURMAN Печерськ",
+    "city": "Київ",
+    "address": "бульв. Лесі Українки, 28",
+    "phone": "+380 44 000 11 02",
+    "hours": { "open": "00:00", "close": "24:00" }
+  },
+  {
+    "id": "lviv-center",
+    "name": "GURMAN Городоцька",
+    "city": "Львів",
+    "address": "вул. Городоцька, 45",
+    "phone": "+380 32 000 22 01",
+    "hours": { "open": "08:00", "close": "22:00" }
+  },
+  {
+    "id": "lviv-sykhiv",
+    "name": "GURMAN Сихів",
+    "city": "Львів",
+    "address": "просп. Червоної Калини, 60",
+    "phone": "+380 32 000 22 02",
+    "hours": { "open": "08:00", "close": "21:00" }
+  },
+  {
+    "id": "kharkiv-center",
+    "name": "GURMAN Сумська",
+    "city": "Харків",
+    "address": "вул. Сумська, 51",
+    "phone": "+380 57 000 33 01",
+    "hours": { "open": "09:00", "close": "21:00" }
+  },
+  {
+    "id": "kharkiv-saltivka",
+    "name": "GURMAN Салтівка",
+    "city": "Харків",
+    "address": "просп. Тракторобудівників, 85",
+    "phone": "+380 57 000 33 02",
+    "hours": { "open": "08:00", "close": "22:00" }
+  }
+]
