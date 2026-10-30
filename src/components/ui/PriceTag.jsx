@@ -21,9 +21,10 @@ export default function PriceTag({ product, size = 'md', className }) {
         {hasDiscount && <span className="sr-only">Ціна зі знижкою: </span>}
         {formatPrice(product.price)}
       </span>
-      <span className={cn('text-slate-500', sizeClasses.unit)}>/ {product.unit}</span>
+      {/* slate-600, not 500: 500 drops to 4.3:1 on the cream page background (product page). */}
+      <span className={cn('text-slate-600', sizeClasses.unit)}>/ {product.unit}</span>
       {hasDiscount && (
-        <span className={cn('tabular-nums text-slate-500 line-through', sizeClasses.oldPrice)}>
+        <span className={cn('tabular-nums text-slate-600 line-through', sizeClasses.oldPrice)}>
           <span className="sr-only">Звичайна ціна: </span>
           {formatPrice(product.oldPrice ?? product.price)}
         </span>
