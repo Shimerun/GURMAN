@@ -24,9 +24,9 @@ import { cn } from '../lib/utils';
 
 const STATS = [
   { value: '2014', label: 'рік відкриття першого магазину' },
-  { value: '4', label: `магазини ${IN_CITY}` },
+  { value: '2', label: `магазини ${IN_CITY}` },
   { value: '120+', label: 'фермерів і виробників-партнерів' },
-  { value: '24/7', label: 'працює магазин на Бердичівській' },
+  { value: '7:00–22:00', label: 'щодня, без вихідних' },
 ];
 
 const VALUES = [
@@ -68,7 +68,7 @@ const SUPPLIERS = [
   {
     icon: Croissant,
     title: 'Власна пекарня',
-    description: 'Хліб на заквасці та випічку печемо самі щоранку з 5:00 — без покращувачів і консервантів.',
+    description: 'Хліб на заквасці та випічку печемо самі щоранку — без покращувачів і консервантів.',
   },
 ];
 
@@ -93,17 +93,13 @@ const GUARANTEES = [
 const MILESTONES = [
   {
     year: '2014',
-    title: 'Перший магазин на Михайлівській',
+    title: 'Перший магазин на Грушевського',
     description: 'Невелика крамниця з фермерськими продуктами та власною пекарнею.',
   },
   { year: '2017', title: 'Власна пекарня й кулінарія', description: 'Почали випікати хліб на заквасці та ліпити вареники щоранку.' },
   { year: '2020', title: 'Картка GURMAN', description: 'Запустили програму лояльності з бонусами та персональними знижками.' },
-  {
-    year: '2023',
-    title: 'Цілодобовий магазин',
-    description: 'Відкрили магазин на Великій Бердичівській, що працює без перерв і вихідних.',
-  },
-  { year: '2026', title: 'Новий сайт і застосунок', description: 'Каталог, акції та наявність товарів — у кількох дотиках.' },
+  { year: '2023', title: 'Другий магазин', description: 'Відкрили магазин на вулиці Гагаріна.' },
+  { year: '2026', title: 'Новий сайт', description: 'Каталог із цінами, акції тижня й адреси магазинів — в одному місці.' },
 ];
 
 /** @param {{ items: { icon: import('lucide-react').LucideIcon, title: string, description: string }[], columnsClassName: string }} props */
@@ -126,7 +122,7 @@ function FeatureCards({ items, columnsClassName }) {
 }
 
 export default function AboutPage() {
-  useDocumentTitle('Про нас');
+  useDocumentTitle('Про нас', `Історія GURMAN — мережі з двох супермаркетів свіжих продуктів ${IN_CITY}: місцеві постачальники, власна пекарня й гарантія якості.`);
 
   return (
     <div className="space-y-12 sm:space-y-16">
@@ -141,11 +137,11 @@ export default function AboutPage() {
         <div className="grid items-center gap-8 lg:grid-cols-2">
           <div className="space-y-4 text-base leading-relaxed text-slate-600">
             <p>
-              Усе почалося з невеликої крамниці на Михайлівській, де ми продавали овочі від знайомих фермерів і хліб, який пекли самі.
+              Усе почалося з невеликої крамниці на Грушевського, де ми продавали овочі від знайомих фермерів і хліб, який пекли самі.
               Покупці поверталися не лише по продукти, а й по пораду: що приготувати на вечерю та який сир обрати до вина.
             </p>
             <p>
-              Сьогодні в GURMAN чотири магазини {IN_CITY}, але принцип лишився той самий: ми особисто знаємо постачальників, перевіряємо
+              Сьогодні в GURMAN два магазини {IN_CITY}, але принцип лишився той самий: ми особисто знаємо постачальників, перевіряємо
               кожну партію та не продаємо те, що не купили б для своєї родини.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
@@ -177,8 +173,8 @@ export default function AboutPage() {
             <Target className="h-7 w-7" aria-hidden="true" />
           </span>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">Місія</p>
-            <h2 id="mission-heading" className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Місія</p>
+            <h2 id="mission-heading" className="mt-1 font-display text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
               Свіжа місцева їжа — щодня й за чесною ціною
             </h2>
             <p className="mt-3 max-w-3xl text-slate-600">
@@ -190,7 +186,7 @@ export default function AboutPage() {
       </section>
 
       <section aria-labelledby="why-heading" className="rounded-3xl bg-emerald-800 px-6 py-8 text-white shadow-soft sm:px-10">
-        <h2 id="why-heading" className="text-xl font-bold sm:text-2xl">
+        <h2 id="why-heading" className="font-display text-lg font-bold sm:text-xl">
           Чому покупці обирають GURMAN
         </h2>
         <dl className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -241,7 +237,7 @@ export default function AboutPage() {
       </section>
 
       <section aria-labelledby="about-cta-heading" className="rounded-3xl bg-amber-50 p-6 text-center ring-1 ring-amber-100 sm:p-10">
-        <h2 id="about-cta-heading" className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        <h2 id="about-cta-heading" className="font-display text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
           Спробуйте самі
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-slate-600">Перегляньте каталог і акції тижня — або завітайте до найближчого магазину.</p>

@@ -12,7 +12,7 @@ import { useProductFilters } from '../hooks/useProductFilters';
 import { useCategory, useProducts } from '../hooks/useProducts';
 import { buttonClassName } from '../lib/buttonStyles';
 import { PRODUCT_FORMS, pluralize } from '../lib/format';
-import { ROUTES } from '../lib/routes';
+import { ROUTES, getCatalogPath } from '../lib/routes';
 import { withImageWidth } from '../lib/utils';
 import { isNotFoundError } from '../services/simulateNetworkLatency';
 
@@ -23,25 +23,25 @@ const CATALOG_CRUMB = { label: 'Каталог', to: ROUTES.catalog };
 /** @param {{ category: Category }} props */
 function CategoryBanner({ category }) {
   return (
-    <section aria-labelledby="category-title" className="relative mt-4 overflow-hidden rounded-3xl bg-emerald-900 shadow-soft">
+    <section aria-labelledby="category-title" className="relative mt-3 overflow-hidden rounded-3xl bg-emerald-900 shadow-soft">
       <SafeImage
         src={withImageWidth(category.image, 1400)}
         alt=""
         isEager
         fetchpriority="high"
-        className="absolute inset-0 h-full w-full object-cover opacity-40 md:left-auto md:w-3/5 md:opacity-100"
+        className="absolute inset-0 h-full w-full object-cover opacity-30 md:left-auto md:w-3/5 md:opacity-100"
       />
       <div
         className="absolute inset-0 bg-gradient-to-r from-emerald-950 via-emerald-900/90 to-emerald-900/30 md:via-emerald-900 md:via-45% md:to-transparent"
         aria-hidden="true"
       />
-      <div className="relative max-w-2xl p-6 text-white sm:p-10">
-        <p className="text-xs font-semibold uppercase tracking-wider text-amber-300">Категорія</p>
-        <h1 id="category-title" className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
+      <div className="relative max-w-2xl p-5 text-white sm:p-10">
+        <p className="text-xs font-semibold uppercase tracking-wider text-amber-300">Категорія товарів</p>
+        <h1 id="category-title" className="mt-1.5 font-display font-display text-xl font-bold tracking-tight sm:text-2xl lg:text-4xl">
           {category.title}
         </h1>
-        <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/85 sm:text-base">{category.description}</p>
-        <ul className="mt-6 flex flex-wrap gap-2 text-sm">
+        <p className="mt-2 line-clamp-2 max-w-xl text-sm leading-relaxed text-white sm:mt-3 sm:line-clamp-none sm:text-base">{category.description}</p>
+        <ul className="mt-4 flex flex-wrap gap-2 text-sm sm:mt-6">
           <li className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 font-medium backdrop-blur-sm">
             <PackageOpen className="h-4 w-4 text-amber-300" aria-hidden="true" />
             {pluralize(category.productCount, PRODUCT_FORMS)}
@@ -100,9 +100,16 @@ function CategoryListing({ category }) {
                 title="Немає товарів за цими фільтрами"
                 description={`У категорії «${category.title}» є ${pluralize(category.productCount, PRODUCT_FORMS)} — спробуйте розширити ціновий діапазон або вимкнути фільтри.`}
                 action={
-                  <button type="button" onClick={filterState.resetFilters} className={buttonClassName()}>
-                    Скинути фільтри
-                  </button>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    <button type="button" onClick={filterState.resetFilters} className={buttonClassName()}>
+                      Скинути фільтри
+                    </button>
+                    {filterState.appliedSearch && (
+                      <Link to={getCatalogPath({ search: filterState.appliedSearch })} className={buttonClassName({ variant: 'secondary' })}>
+                        Шукати «{filterState.appliedSearch}» в усьому каталозі
+                      </Link>
+                    )}
+                  </div>
                 }
               />
             )
@@ -118,7 +125,10 @@ function CategoryContent({ categoryId }) {
   const { data: category, isLoading, error, refetch } = useCategory(categoryId);
   const isMissing = isNotFoundError(error);
 
-  useDocumentTitle(category?.title ?? (isMissing ? 'Категорію не знайдено' : undefined));
+  useDocumentTitle(
+    category?.title ?? (isMissing ? 'Категорію не знайдено' : undefined),
+    category ? `${category.title} у GURMAN, Житомир: ${category.description}` : undefined,
+  );
 
   if (isLoading) return <CategoryBannerSkeleton />;
 
@@ -134,7 +144,7 @@ function CategoryContent({ categoryId }) {
     );
   }
 
-  if (!category) return <ErrorState title="Не вдалося завантажити категорію" onRetry={refetch} />;
+  if (!category) return <ErrorState title="Не вдалося завантажити категорію" onRetry={refetch} headingAs="h1" />;
 
   return <CategoryListing category={category} />;
 }

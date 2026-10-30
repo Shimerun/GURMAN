@@ -44,6 +44,155 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes swoosh-draw {
+  from {
+    opacity: 0;
+    stroke-dashoffset: 1;
+  }
+  15% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes logo-basket-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes logo-produce-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes logo-wordmark-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes logo-tagline-write {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/*
+ * One-off logo intro (~1.4s): the basket pops in, baguette, leaf and orange drop into it, the
+ * wordmark slides in, the swoosh draws and "смачно щодня" writes itself left to right.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .logo-intro .logo-basket {
+    /* One shared origin (bottom centre of the basket in viewBox units) keeps handle and body aligned while scaling. */
+    transform-box: view-box;
+    transform-origin: 32px 57px;
+    animation: logo-basket-pop 450ms ease-out both;
+  }
+
+  .logo-intro .logo-produce {
+    animation: logo-produce-drop 450ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  }
+
+  .logo-intro .logo-produce-1 {
+    animation-delay: 250ms;
+  }
+
+  .logo-intro .logo-produce-2 {
+    animation-delay: 370ms;
+  }
+
+  .logo-intro .logo-produce-3 {
+    animation-delay: 490ms;
+  }
+
+  .logo-intro .logo-wordmark {
+    animation: logo-wordmark-in 400ms ease-out 150ms both;
+  }
+
+  .logo-intro .logo-swoosh {
+    stroke-dasharray: 1;
+    animation: swoosh-draw 500ms ease-in-out 650ms both;
+  }
+
+  .logo-intro .logo-tagline {
+    animation: logo-tagline-write 600ms ease-out 900ms both;
+  }
+}
+
+/*
+ * Scroll-linked rather than timer-based: content already on screen renders finished (no delayed
+ * first paint), re-rendered grids never replay, and browsers without scroll-driven animations or
+ * users who prefer reduced motion simply get the final state.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .scroll-reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+
+    /* Cards in one row arrive a beat apart instead of as a single block. */
+    .scroll-reveal:nth-child(4n + 2) {
+      animation-range: entry 6% entry 66%;
+    }
+
+    .scroll-reveal:nth-child(4n + 3) {
+      animation-range: entry 12% entry 72%;
+    }
+
+    .scroll-reveal:nth-child(4n + 4) {
+      animation-range: entry 18% entry 78%;
+    }
+
+    /* Requires pathLength="1" on the path so the dash spans the whole stroke. */
+    .swoosh-draw {
+      stroke-dasharray: 1;
+      animation: swoosh-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 40% cover 40%;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

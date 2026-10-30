@@ -1,14 +1,18 @@
+import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import SiteLayout from './components/layout/SiteLayout';
-import AboutPage from './pages/AboutPage';
-import CartPage from './pages/CartPage';
-import CatalogPage from './pages/CatalogPage';
-import CategoryPage from './pages/CategoryPage';
-import ContactsPage from './pages/ContactsPage';
 import HomePage from './pages/HomePage';
-import NotFoundPage from './pages/NotFoundPage';
-import ProductPage from './pages/ProductPage';
 import RouteErrorPage from './pages/RouteErrorPage';
+
+// Home ships in the entry chunk (most visits start there); every other page loads on demand.
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const CartPage = lazy(() => import('./pages/CartPage'));
+const CatalogPage = lazy(() => import('./pages/CatalogPage'));
+const CategoryPage = lazy(() => import('./pages/CategoryPage'));
+const ContactsPage = lazy(() => import('./pages/ContactsPage'));
+const DeliveryPage = lazy(() => import('./pages/DeliveryPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const ProductPage = lazy(() => import('./pages/ProductPage'));
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +29,7 @@ export const router = createBrowserRouter([
           { path: 'product/:productId', element: <ProductPage /> },
           { path: 'cart', element: <CartPage /> },
           { path: 'about', element: <AboutPage /> },
+          { path: 'delivery', element: <DeliveryPage /> },
           { path: 'contacts', element: <ContactsPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],

@@ -24,7 +24,9 @@ export default function Rating({ rating, reviewsCount, size = 'sm', isCompact = 
   const filledStars = Math.round(rating);
 
   return (
-    <p className={cn('flex items-center gap-1.5', sizeClasses.text, className)} aria-label={label}>
+    // aria-label is ignored on a plain <p>, so the spoken version is real (visually hidden) text.
+    <p className={cn('flex items-center gap-1.5', sizeClasses.text, className)}>
+      <span className="sr-only">{label}</span>
       <span className="flex items-center gap-0.5" aria-hidden="true">
         {isCompact ? (
           <Star className={cn(sizeClasses.star, 'fill-amber-400 text-amber-400')} />

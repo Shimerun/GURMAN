@@ -1,30 +1,16 @@
 [
   {
-    "id": "zhytomyr-mykhailivska",
-    "name": "GURMAN Михайлівська",
-    "address": "вул. Михайлівська, 10",
+    "id": "zhytomyr-hrushevskoho",
+    "name": "GURMAN Грушевського",
+    "address": "вул. Михайла Грушевського, 62",
     "phone": "+380 412 00 11 01",
-    "hours": { "open": "07:00", "close": "23:00" }
+    "hours": { "open": "07:00", "close": "22:00" }
   },
   {
-    "id": "zhytomyr-berdychivska",
-    "name": "GURMAN Бердичівська",
-    "address": "вул. Велика Бердичівська, 41",
+    "id": "zhytomyr-haharina",
+    "name": "GURMAN Гагаріна",
+    "address": "вул. Гагаріна, 13/67",
     "phone": "+380 412 00 11 02",
-    "hours": { "open": "00:00", "close": "24:00" }
-  },
-  {
-    "id": "zhytomyr-myru",
-    "name": "GURMAN Корбутівка",
-    "address": "просп. Миру, 27",
-    "phone": "+380 412 00 11 03",
-    "hours": { "open": "08:00", "close": "22:00" }
-  },
-  {
-    "id": "zhytomyr-pokrovska",
-    "name": "GURMAN Покровська",
-    "address": "вул. Покровська, 96",
-    "phone": "+380 412 00 11 04",
-    "hours": { "open": "08:00", "close": "22:00" }
+    "hours": { "open": "07:00", "close": "22:00" }
   }
 ]

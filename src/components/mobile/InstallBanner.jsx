@@ -2,6 +2,7 @@ import { Download, X } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useInstallPrompt } from '../../hooks/useInstallPrompt';
+import { buttonClassName } from '../../lib/buttonStyles';
 
 const DISMISSED_STORAGE_KEY = 'gurman-install-dismissed';
 
@@ -39,7 +40,7 @@ export default function InstallBanner() {
 
   return (
     <aside aria-label="Встановлення застосунку" className="flex items-center gap-3 rounded-2xl bg-white p-3 shadow-soft ring-1 ring-emerald-100">
-      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-emerald-600 text-white">
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-emerald-700 text-white">
         <Download className="h-5 w-5" aria-hidden="true" />
       </span>
       <div className="min-w-0 flex-1">
@@ -49,7 +50,7 @@ export default function InstallBanner() {
       <button
         type="button"
         onClick={handleInstall}
-        className="min-h-11 shrink-0 rounded-full bg-emerald-600 px-4 text-sm font-semibold text-white active:scale-95"
+        className={buttonClassName({ size: 'sm', className: 'shrink-0' })}
       >
         Встановити
       </button>
@@ -57,7 +58,7 @@ export default function InstallBanner() {
         type="button"
         onClick={handleDismiss}
         aria-label="Закрити пропозицію встановлення"
-        className="-ml-1 grid min-h-11 min-w-11 shrink-0 place-items-center rounded-full text-slate-400 active:scale-95"
+        className="-ml-1 grid min-h-11 min-w-11 shrink-0 place-items-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"
       >
         <X className="h-5 w-5" aria-hidden="true" />
       </button>

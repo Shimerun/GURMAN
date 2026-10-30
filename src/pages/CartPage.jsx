@@ -1,19 +1,33 @@
-import { ArrowLeft, Info, ShieldCheck, ShoppingBasket, Store, Trash2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ArrowLeft, MapPin, ShieldCheck, ShoppingBasket, Store, Tag, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import CartItem from '../components/cart/CartItem';
 import CartTotals from '../components/cart/CartTotals';
+import CheckoutDialog from '../components/cart/CheckoutDialog';
 import EmptyState from '../components/ui/EmptyState';
 import PageHeader from '../components/ui/PageHeader';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useHasMounted } from '../hooks/useHasMounted';
-import { CHECKOUT_UNAVAILABLE_MESSAGE, useCheckoutNotice } from '../hooks/useCheckoutNotice';
 import { buttonClassName } from '../lib/buttonStyles';
+import { IN_CITY, PROMO_LISTING_QUERY } from '../lib/constants';
 import { PRODUCT_FORMS, pluralize } from '../lib/format';
-import { ROUTES } from '../lib/routes';
-import { IN_CITY } from '../lib/constants';
+import { ROUTES, getCatalogPath } from '../lib/routes';
 import { selectTotalItems, selectTotalPrice, selectTotalSavings, useCartStore } from '../store/useCartStore';
 
 const CART_CRUMBS = [{ label: 'Кошик' }];
+
+/** Opened from the cart drawer's checkout button via router state; consumed once so Back doesn't reopen it. */
+function useCheckoutDialogState() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(() => location.state?.openCheckout === true);
+
+  useEffect(() => {
+    if (location.state?.openCheckout) navigate(`${location.pathname}${location.search}`, { replace: true, state: null, preventScrollReset: true });
+  }, [location, navigate]);
+
+  return [isCheckoutOpen, setIsCheckoutOpen];
+}
 
 export default function CartPage() {
   const items = useCartStore((state) => state.items);
@@ -21,10 +35,12 @@ export default function CartPage() {
   const totalItems = useCartStore(selectTotalItems);
   const totalPrice = useCartStore(selectTotalPrice);
   const totalSavings = useCartStore(selectTotalSavings);
-  const showCheckoutNotice = useCheckoutNotice();
   const hasMounted = useHasMounted();
+  const [isCheckoutOpen, setIsCheckoutOpen] = useCheckoutDialogState();
 
-  useDocumentTitle('Кошик');
+  useDocumentTitle('Кошик', `Кошик GURMAN: перевірте товари й суму перед покупкою в магазинах ${IN_CITY}.`);
+
+  const checkoutDialog = isCheckoutOpen && <CheckoutDialog onClose={() => setIsCheckoutOpen(false)} />;
 
   // Persisted cart is read synchronously, but waiting one frame matches the header badge and avoids a flash.
   if (!hasMounted) return <PageHeader title="Кошик" breadcrumbs={CART_CRUMBS} />;
@@ -36,33 +52,48 @@ export default function CartPage() {
         <EmptyState
           icon={ShoppingBasket}
           title="Кошик порожній"
-          description="Додайте товари з каталогу або з акцій тижня — кошик збережеться, навіть якщо ви закриєте сторінку."
+          headingAs="h2"
+          description="Почніть з акцій тижня або загляньте в каталог — кошик збережеться, навіть якщо ви закриєте сторінку."
           className="py-16"
           action={
-            <Link to={ROUTES.catalog} className={buttonClassName({ size: 'lg' })}>
-              Перейти до каталогу
-            </Link>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Link to={getCatalogPath(PROMO_LISTING_QUERY)} className={buttonClassName({ variant: 'accent', size: 'lg' })}>
+                <Tag className="h-5 w-5" aria-hidden="true" />
+                Акції тижня
+              </Link>
+              <Link to={ROUTES.catalog} className={buttonClassName({ size: 'lg' })}>
+                Перейти до каталогу
+              </Link>
+              <Link to={ROUTES.contacts} className={buttonClassName({ variant: 'secondary', size: 'lg' })}>
+                <MapPin className="h-5 w-5" aria-hidden="true" />
+                Магазини
+              </Link>
+            </div>
           }
         />
+        {checkoutDialog}
       </>
     );
   }
 
   return (
     <>
-      <PageHeader title="Кошик" breadcrumbs={CART_CRUMBS} description={`У кошику ${pluralize(totalItems, PRODUCT_FORMS)}`}>
+      <PageHeader title="Кошик" breadcrumbs={CART_CRUMBS} description={`У кошику ${pluralize(totalItems, PRODUCT_FORMS)}.`}>
         <button
           type="button"
           onClick={clearCart}
-          className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-medium text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600"
+          className="inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-700"
         >
           <Trash2 className="h-4 w-4" aria-hidden="true" />
           Очистити кошик
         </button>
       </PageHeader>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-8">
-        <section aria-label="Товари в кошику" className="rounded-2xl bg-white px-4 shadow-soft ring-1 ring-slate-100 sm:px-6">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start lg:gap-8">
+        <section aria-labelledby="cart-items-heading" className="rounded-2xl bg-white px-4 shadow-soft ring-1 ring-slate-100 sm:px-6">
+          <h2 id="cart-items-heading" className="sr-only">
+            Товари в кошику
+          </h2>
           <ul className="divide-y divide-slate-100">
             {items.map((item) => (
               <CartItem key={item.product.id} item={item} />
@@ -70,47 +101,45 @@ export default function CartPage() {
           </ul>
         </section>
 
-        <aside aria-labelledby="order-summary-heading" className="lg:sticky lg:top-36">
-          <div className="rounded-2xl bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-6">
+        <aside aria-labelledby="order-summary-heading" className="space-y-3 lg:sticky lg:top-36">
+          <div className="rounded-2xl bg-white p-5 shadow-soft ring-2 ring-emerald-100 sm:p-6">
             <h2 id="order-summary-heading" className="text-lg font-bold text-slate-900">
-              Ваше замовлення
+              Підсумок
             </h2>
-            <CartTotals
-              totalPrice={totalPrice}
-              totalSavings={totalSavings}
-              totalItems={totalItems}
-              className="mt-4 border-t border-slate-100 pt-4"
-            />
+            <CartTotals totalPrice={totalPrice} totalSavings={totalSavings} totalItems={totalItems} className="mt-4" />
 
-            <button type="button" onClick={showCheckoutNotice} className={buttonClassName({ size: 'lg', className: 'mt-5 w-full' })}>
-              Оформити замовлення
+            <button type="button" onClick={() => setIsCheckoutOpen(true)} aria-haspopup="dialog" className={buttonClassName({ size: 'lg', className: 'mt-5 w-full' })}>
+              Оформити демо-замовлення
             </button>
-            <p className="mt-3 flex gap-2 rounded-xl bg-sky-50 p-3 text-xs leading-relaxed text-sky-900">
-              <Info className="h-4 w-4 shrink-0" aria-hidden="true" />
-              {CHECKOUT_UNAVAILABLE_MESSAGE}
-            </p>
-
-            <ul className="mt-5 space-y-2.5 border-t border-slate-100 pt-4 text-sm text-slate-600">
-              <li className="flex items-center gap-2">
-                <Store className="h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
-                Ціни такі ж, як у магазинах GURMAN {IN_CITY}
-              </li>
-              <li className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
-                Заміна або повернення, якщо щось не так
-              </li>
-            </ul>
+            <p className="mt-2 text-center text-xs text-slate-600">Демо-режим: без оплати й передачі замовлення в магазин.</p>
           </div>
 
-          <Link
-            to={ROUTES.catalog}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-50"
-          >
+          <div className="rounded-2xl bg-emerald-50 p-5 text-sm text-emerald-950 ring-1 ring-emerald-100">
+            <p className="flex items-center gap-2 font-bold">
+              <Store className="h-5 w-5 text-emerald-700" aria-hidden="true" />
+              Як отримати товари
+            </p>
+            <p className="mt-1.5 leading-relaxed">
+              Купуйте ці товари в будь-якому з двох магазинів GURMAN {IN_CITY} — ціни такі самі, як на сайті.
+            </p>
+            <Link to={ROUTES.contacts} className={buttonClassName({ variant: 'secondary', size: 'sm', className: 'mt-3' })}>
+              <MapPin className="h-4 w-4" aria-hidden="true" />
+              Адреси та маршрут
+            </Link>
+          </div>
+
+          <p className="flex items-center gap-2 px-1 text-sm text-slate-600">
+            <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+            Заміна або повернення грошей, якщо товар не сподобався
+          </p>
+
+          <Link to={ROUTES.catalog} className={buttonClassName({ variant: 'ghost', size: 'sm' })}>
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Продовжити покупки
           </Link>
         </aside>
       </div>
+      {checkoutDialog}
     </>
   );
 }

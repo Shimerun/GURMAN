@@ -6,6 +6,7 @@ import { getCatalogPath } from '../../lib/routes';
 import ProductGrid from '../products/ProductGrid';
 import EmptyState from '../ui/EmptyState';
 import SectionHeader from '../ui/SectionHeader';
+import { buttonClassName } from '../../lib/buttonStyles';
 
 // Module-level so the query key is stable across renders.
 const POPULAR_QUERY = { sort: 'popular', inStockOnly: true };
@@ -21,7 +22,7 @@ export default function PopularProducts() {
       <SectionHeader id="popular-heading" eyebrow="Обирають найчастіше" title="Популярні товари">
         <Link
           to={getCatalogPath({ sort: 'popular' })}
-          className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-50"
+          className={buttonClassName({ variant: 'ghost', size: 'sm' })}
         >
           Дивитися всі
           <ArrowRight className="h-4 w-4" aria-hidden="true" />

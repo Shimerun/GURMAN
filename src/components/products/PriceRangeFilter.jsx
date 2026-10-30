@@ -10,7 +10,7 @@ const PRICE_PRESETS = [
 ];
 
 const INPUT_CLASS_NAME =
-  'mt-1 block h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm tabular-nums text-slate-800 transition-colors placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20';
+  'mt-1 block h-11 w-full min-w-0 rounded-xl border border-slate-300 bg-white px-3 text-base tabular-nums sm:text-sm text-slate-800 transition-colors placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20';
 
 /** @param {string} value @returns {number | undefined} */
 function parsePriceInput(value) {
@@ -44,7 +44,7 @@ export default function PriceRangeFilter({ minPrice, maxPrice, onApply }) {
   return (
     <div>
       <form onSubmit={handleSubmit} className="flex items-end gap-2">
-        <label htmlFor={`${fieldId}-min`} className="flex-1 text-xs font-medium text-slate-500">
+        <label htmlFor={`${fieldId}-min`} className="flex-1 text-xs font-medium text-slate-600">
           Від, ₴
           <input
             id={`${fieldId}-min`}
@@ -57,10 +57,10 @@ export default function PriceRangeFilter({ minPrice, maxPrice, onApply }) {
             className={INPUT_CLASS_NAME}
           />
         </label>
-        <span className="pb-2.5 text-slate-400" aria-hidden="true">
+        <span className="pb-3 text-slate-500" aria-hidden="true">
           –
         </span>
-        <label htmlFor={`${fieldId}-max`} className="flex-1 text-xs font-medium text-slate-500">
+        <label htmlFor={`${fieldId}-max`} className="flex-1 text-xs font-medium text-slate-600">
           До, ₴
           <input
             id={`${fieldId}-max`}

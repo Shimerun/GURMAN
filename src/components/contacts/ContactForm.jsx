@@ -10,6 +10,8 @@ const MIN_MESSAGE_LENGTH = 10;
 
 const EMPTY_FORM = { name: '', email: '', topic: TOPICS[0], message: '' };
 
+const FIELD_LABELS = { name: 'Ім’я', email: 'Електронна пошта', topic: 'Тема звернення', message: 'Повідомлення' };
+
 /** @typedef {typeof EMPTY_FORM} ContactFormValues */
 /** @typedef {Partial<Record<keyof ContactFormValues, string>>} ContactFormErrors */
 
@@ -25,7 +27,7 @@ function validateContactForm(values) {
 }
 
 const FIELD_CLASS_NAME =
-  'mt-1.5 block w-full rounded-xl border bg-white px-3.5 text-base text-slate-800 transition-colors placeholder:text-slate-400 focus:outline-none focus:ring-2 sm:text-sm';
+  'mt-1.5 block w-full rounded-xl border bg-white px-3.5 text-base text-slate-800 transition-colors placeholder:text-slate-500 focus:outline-none focus:ring-2 sm:text-sm';
 
 /** @param {boolean} hasError */
 const getFieldClassName = (hasError) =>
@@ -33,7 +35,7 @@ const getFieldClassName = (hasError) =>
     FIELD_CLASS_NAME,
     hasError
       ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-      : 'border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20',
+      : 'border-slate-300 focus:border-emerald-600 focus:ring-emerald-600/20',
   );
 
 /** Demo form: validates on the client and shows an inline confirmation; nothing is sent anywhere. */
@@ -73,13 +75,15 @@ export default function ContactForm() {
     setValues(EMPTY_FORM);
   };
 
+  const errorEntries = Object.entries(errors).filter(([, message]) => Boolean(message));
+
   /** @param {keyof ContactFormValues} name */
   const describedBy = (name) => (errors[name] ? `${fieldId}-${name}-error` : undefined);
 
   /** @param {keyof ContactFormValues} name */
   const renderError = (name) =>
     errors[name] && (
-      <p id={`${fieldId}-${name}-error`} className="mt-1.5 text-xs font-medium text-red-600">
+      <p id={`${fieldId}-${name}-error`} className="mt-1.5 text-sm font-medium text-red-700">
         {errors[name]}
       </p>
     );
@@ -106,10 +110,23 @@ export default function ContactForm() {
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} noValidate className="space-y-4">
+    <form ref={formRef} onSubmit={handleSubmit} noValidate className="space-y-4" aria-describedby={`${fieldId}-required`}>
+      <p id={`${fieldId}-required`} className="text-sm text-slate-600">
+        Усі поля обов’язкові.
+      </p>
+      {errorEntries.length > 0 && (
+        <div role="alert" className="rounded-2xl bg-red-50 p-4 text-sm text-red-900 ring-1 ring-red-200">
+          <p className="font-semibold">Перевірте {errorEntries.length === 1 ? 'поле' : 'поля'}:</p>
+          <ul className="mt-1 list-inside list-disc">
+            {errorEntries.map(([name]) => (
+              <li key={name}>{FIELD_LABELS[name]}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor={`${fieldId}-name`} className="text-sm font-medium text-slate-700">
+          <label htmlFor={`${fieldId}-name`} className="text-sm font-semibold text-slate-800">
             Ім’я
           </label>
           <input
@@ -125,7 +142,7 @@ export default function ContactForm() {
           {renderError('name')}
         </div>
         <div>
-          <label htmlFor={`${fieldId}-email`} className="text-sm font-medium text-slate-700">
+          <label htmlFor={`${fieldId}-email`} className="text-sm font-semibold text-slate-800">
             Електронна пошта
           </label>
           <input
@@ -145,7 +162,7 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor={`${fieldId}-topic`} className="text-sm font-medium text-slate-700">
+        <label htmlFor={`${fieldId}-topic`} className="text-sm font-semibold text-slate-800">
           Тема звернення
         </label>
         <select
@@ -162,7 +179,7 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor={`${fieldId}-message`} className="text-sm font-medium text-slate-700">
+        <label htmlFor={`${fieldId}-message`} className="text-sm font-semibold text-slate-800">
           Повідомлення
         </label>
         <textarea
@@ -183,7 +200,7 @@ export default function ContactForm() {
           <Send className="h-4 w-4" aria-hidden="true" />
           Надіслати
         </button>
-        <p className="text-xs text-slate-500">Демо-форма: повідомлення не надсилається на сервер.</p>
+        <p className="text-sm text-slate-600">Демо-форма: повідомлення не надсилається на сервер.</p>
       </div>
     </form>
   );

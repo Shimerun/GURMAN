@@ -6,7 +6,7 @@ import PriceRangeFilter from './PriceRangeFilter';
 function FilterSection({ title, children }) {
   return (
     <fieldset className="border-t border-slate-100 pt-4 first:border-t-0 first:pt-0">
-      <legend className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">{title}</legend>
+      <legend className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-600">{title}</legend>
       {children}
     </fieldset>
   );
@@ -15,14 +15,14 @@ function FilterSection({ title, children }) {
 /** @param {{ label: string, description: string, isChecked: boolean, onChange: (isChecked: boolean) => void }} props */
 function ToggleRow({ label, description, isChecked, onChange }) {
   return (
-    <label className="flex cursor-pointer items-start justify-between gap-3 rounded-xl py-1">
+    <label className="flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-xl py-1">
       <span>
         <span className="block text-sm font-medium text-slate-800">{label}</span>
-        <span className="block text-xs text-slate-500">{description}</span>
+        <span className="block text-xs text-slate-600">{description}</span>
       </span>
       <input
         type="checkbox"
-        className="toggle toggle-primary toggle-sm mt-0.5 shrink-0"
+        className="toggle toggle-primary shrink-0"
         checked={isChecked}
         onChange={(event) => onChange(event.target.checked)}
       />

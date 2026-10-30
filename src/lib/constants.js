@@ -15,15 +15,17 @@ export const SECTION_IDS = {
   promo: 'promo',
   stores: 'stores',
   loyalty: 'loyalty',
-  app: 'app',
 };
 
 export const NAV_LINKS = [
   { label: 'Головна', to: ROUTES.home },
   { label: 'Каталог', to: ROUTES.catalog },
+  { label: 'Як купити', to: ROUTES.delivery },
   { label: 'Про нас', to: ROUTES.about },
-  { label: 'Контакти', to: ROUTES.contacts },
+  { label: 'Магазини', to: ROUTES.contacts },
 ];
+
+export const PROMO_LISTING_QUERY = { onlyPromo: true, sort: 'discount' };
 
 /** @type {{ value: import('../services/productService').ProductSort, label: string }[]} */
 export const SORT_OPTIONS = [
@@ -42,9 +44,9 @@ export const STORE_CONTACTS = {
   phoneHref: 'tel:0800000800',
   email: 'hello@gurman.example',
   emailHref: 'mailto:hello@gurman.example',
-  address: `${CITY}, вул. Михайлівська, 10`,
+  address: `${CITY}, вул. Михайла Грушевського, 62`,
   supportHours: 'Щодня 08:00–22:00',
-  storeHours: 'Щодня 07:00–23:00, магазин на Бердичівській — цілодобово',
+  storeHours: 'Щодня 07:00–22:00',
 };
 
 /** Payment accepted at the checkout counter in every store. */

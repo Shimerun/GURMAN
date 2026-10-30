@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -28,7 +28,7 @@ export default function SiteLayout() {
     <div className="flex min-h-screen flex-col pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:shadow-lg"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-white focus:px-5 focus:py-3 focus:font-semibold focus:text-emerald-800 focus:shadow-lg"
       >
         Перейти до основного вмісту
       </a>
@@ -37,7 +37,9 @@ export default function SiteLayout() {
       <Navbar isMobileMenuOpen={isMobileMenuOpen} onOpenMobileMenu={() => setIsMobileMenuOpen(true)} />
 
       <main id="main" tabIndex={-1} className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 focus:outline-none sm:px-6 sm:py-8 lg:px-8">
-        <Outlet />
+        <Suspense fallback={<PageFallback />}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <Footer />
@@ -52,6 +54,17 @@ export default function SiteLayout() {
         containerClassName={isMobile ? '!top-[calc(env(safe-area-inset-top)+0.75rem)]' : undefined}
       />
       <ScrollRestoration getKey={getScrollRestorationKey} />
+    </div>
+  );
+}
+
+/** Shown for the split second a lazy page chunk loads; same rhythm as a page header so nothing jumps. */
+function PageFallback() {
+  return (
+    <div aria-busy="true" aria-label="Завантаження сторінки">
+      <div className="skeleton h-5 w-48 rounded" />
+      <div className="skeleton mt-4 h-10 w-2/3 max-w-md rounded" />
+      <div className="skeleton mt-6 h-64 w-full rounded-3xl" />
     </div>
   );
 }

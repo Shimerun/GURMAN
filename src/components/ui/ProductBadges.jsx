@@ -1,20 +1,34 @@
+import { getDiscountPercent } from '../../lib/format';
 import { cn } from '../../lib/utils';
 
-/** @type {Record<import('../../services/productService').ProductBadge, { label: string, className: string }>} */
-const BADGES = {
-  sale: { label: 'Акція', className: 'bg-amber-400 text-slate-900' },
-  popular: { label: 'Хіт продажів', className: 'bg-emerald-600 text-white' },
+/** @typedef {import('../../services/productService').Product} Product */
+
+const BADGE_CLASSES = {
+  sale: 'bg-amber-400 text-slate-900',
+  popular: 'bg-emerald-700 text-white',
 };
 
-/** @param {{ badges: import('../../services/productService').ProductBadge[], className?: string }} props */
-export default function ProductBadges({ badges, className }) {
-  if (badges.length === 0) return null;
+/** @param {import('../../services/productService').ProductBadge} badge @param {Product} product */
+function getBadgeLabel(badge, product) {
+  if (badge === 'popular') return 'Хіт продажів';
+  const discountPercent = getDiscountPercent(product.price, product.oldPrice);
+  return discountPercent > 0 ? `−${discountPercent}%` : 'Акція';
+}
+
+/**
+ * Image-corner badges. On promo items the sale badge shows the actual discount, which is the
+ * single place a card states it (PriceTag only strikes through the old price).
+ * @param {{ product: Product, className?: string }} props
+ */
+export default function ProductBadges({ product, className }) {
+  if (product.badges.length === 0) return null;
 
   return (
     <ul className={cn('flex flex-wrap gap-1.5', className)} aria-label="Позначки товару">
-      {badges.map((badge) => (
-        <li key={badge} className={cn('rounded-full px-2.5 py-1 text-[11px] font-bold leading-none shadow-sm', BADGES[badge].className)}>
-          {BADGES[badge].label}
+      {product.badges.map((badge) => (
+        <li key={badge} className={cn('rounded-full px-2.5 py-1 text-xs font-bold leading-none shadow-sm', BADGE_CLASSES[badge])}>
+          {badge === 'sale' && <span className="sr-only">Знижка </span>}
+          {getBadgeLabel(badge, product)}
         </li>
       ))}
     </ul>

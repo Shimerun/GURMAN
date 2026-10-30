@@ -29,7 +29,8 @@ export default function ProductGrid({
   skeletonCount = 10,
   gridClassName = GRID_CLASS_NAME,
 }) {
-  if (isLoading) {
+  // An empty stale result while a new query is in flight would flash "nothing found" for the new query.
+  if (isLoading || (products.length === 0 && isFetching && !error)) {
     return (
       <ul className={gridClassName} aria-busy="true" aria-label="Завантаження товарів">
         {Array.from({ length: skeletonCount }, (_, index) => (
@@ -52,7 +53,7 @@ export default function ProductGrid({
       aria-busy={isFetching}
     >
       {products.map((product, index) => (
-        <li key={product.id}>
+        <li key={product.id} className="scroll-reveal">
           <ProductCard product={product} isImageEager={index < eagerImageCount} />
         </li>
       ))}

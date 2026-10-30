@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils';
 import CategoryIcon from '../ui/CategoryIcon';
 
 const PILL_CLASS_NAME =
-  'flex shrink-0 snap-start items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-colors';
+  'flex min-h-11 shrink-0 snap-start items-center gap-2 whitespace-nowrap rounded-full border px-4 text-sm font-medium transition-colors';
 
 /** @param {{ to: { pathname: string, search: string }, isActive: boolean, children: import('react').ReactNode }} props */
 function CategoryPill({ to, isActive, children }) {
@@ -17,8 +17,8 @@ function CategoryPill({ to, isActive, children }) {
       className={cn(
         PILL_CLASS_NAME,
         isActive
-          ? 'border-emerald-600 bg-emerald-600 text-white shadow-sm'
-          : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-400 hover:text-emerald-700',
+          ? 'border-emerald-700 bg-emerald-700 text-white shadow-sm'
+          : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-500 hover:text-emerald-800',
       )}
     >
       {children}
@@ -44,7 +44,7 @@ export default function ListingControls({ filterState, activeCategory }) {
       <form role="search" onSubmit={(event) => event.preventDefault()}>
         <label className="relative block">
           <span className="sr-only">{activeCategory ? `Пошук у категорії «${activeCategory.title}»` : 'Пошук товарів у каталозі'}</span>
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" aria-hidden="true" />
           {/* text-base (16px) prevents iOS Safari from zooming into the field on focus. */}
           <input
             type="search"
@@ -54,14 +54,14 @@ export default function ListingControls({ filterState, activeCategory }) {
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
             placeholder={activeCategory ? `Шукати в «${activeCategory.title}»` : 'Назва товару або виробника: молоко, «Полісся», банани…'}
-            className="h-12 w-full rounded-2xl border border-slate-200 bg-white pl-12 pr-12 text-base text-slate-800 shadow-soft transition-colors placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 [&::-webkit-search-cancel-button]:hidden"
+            className="h-12 w-full rounded-2xl border border-slate-300 bg-white pl-12 pr-12 text-base text-slate-800 shadow-soft transition-colors placeholder:text-slate-500 hover:border-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20 [&::-webkit-search-cancel-button]:hidden"
           />
           {searchInput && (
             <button
               type="button"
               onClick={() => setSearchInput('')}
               aria-label="Очистити пошук"
-              className="absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+              className="absolute right-1 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"
             >
               <X className="h-5 w-5" aria-hidden="true" />
             </button>
@@ -73,7 +73,7 @@ export default function ListingControls({ filterState, activeCategory }) {
         {isCategoriesLoading ? (
           <div className="flex gap-2 overflow-hidden" aria-busy="true" aria-label="Завантаження категорій">
             {Array.from({ length: 6 }, (_, index) => (
-              <div key={index} className="skeleton h-10 w-36 shrink-0 rounded-full" />
+              <div key={index} className="skeleton h-11 w-36 shrink-0 rounded-full" />
             ))}
           </div>
         ) : (

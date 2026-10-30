@@ -1,4 +1,4 @@
-import { BadgeCheck, Factory, Globe, Leaf, RotateCcw } from 'lucide-react';
+import { BadgeCheck, Factory, Globe, RotateCcw, Scale, Store, Tag } from 'lucide-react';
 import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ProductGrid from '../components/products/ProductGrid';
@@ -14,9 +14,12 @@ import SectionHeader from '../components/ui/SectionHeader';
 import StockBadge from '../components/ui/StockBadge';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useProduct, useProducts } from '../hooks/useProducts';
+import { IN_CITY, PROMO_VALID_UNTIL } from '../lib/constants';
+import { formatDayMonth, formatPrice, getDiscountPercent } from '../lib/format';
 import { ROUTES, getCategoryPath } from '../lib/routes';
 import { cn, withImageWidth } from '../lib/utils';
 import { isNotFoundError } from '../services/simulateNetworkLatency';
+import { buttonClassName } from '../lib/buttonStyles';
 
 /** @typedef {import('../services/productService').Product} Product */
 
@@ -24,9 +27,9 @@ const MAX_RECOMMENDATIONS = 4;
 const RECOMMENDATIONS_GRID_CLASS_NAME = 'grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4';
 
 const SERVICE_PROMISES = [
-  { icon: Leaf, title: 'Свіжість щодня', description: 'Оновлюємо вітрину щоранку' },
-  { icon: BadgeCheck, title: 'Гарантія якості', description: 'Перевіряємо кожну партію' },
-  { icon: RotateCcw, title: 'Легке повернення', description: 'Замінимо або повернемо гроші' },
+  { icon: Store, label: 'Купуйте в магазинах GURMAN' },
+  { icon: BadgeCheck, label: 'Перевіряємо кожну партію' },
+  { icon: RotateCcw, label: 'Заміна або повернення грошей' },
 ];
 
 /** @param {{ title: string, children: import('react').ReactNode }} props */
@@ -34,7 +37,7 @@ function DetailsSection({ title, children }) {
   return (
     <section className="rounded-2xl bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-6">
       <h2 className="text-lg font-bold text-slate-900">{title}</h2>
-      <div className="mt-3 text-sm leading-relaxed text-slate-600">{children}</div>
+      <div className="mt-3 text-sm leading-relaxed text-slate-700">{children}</div>
     </section>
   );
 }
@@ -54,7 +57,7 @@ function RecommendedProducts({ product }) {
       <SectionHeader id="recommended-heading" eyebrow="Вам також сподобається" title="Рекомендовані товари">
         <Link
           to={getCategoryPath(product.category)}
-          className="rounded-full px-3 py-1.5 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-50"
+          className={buttonClassName({ variant: 'ghost', size: 'sm' })}
         >
           Усі «{product.categoryTitle}»
         </Link>
@@ -73,13 +76,44 @@ function RecommendedProducts({ product }) {
   );
 }
 
+/** @type {Record<import('../services/productService').Unit, string>} */
+const UNIT_EXPLANATIONS = {
+  кг: 'Ваговий товар: ціна за 1 кг, у кошик додається з кроком 1 кг',
+  шт: 'Ціна за 1 штуку',
+  л: 'Ціна за 1 літр',
+  уп: 'Ціна за 1 упаковку',
+};
+
+const PACKAGING_KEY_PATTERN = /^(Маса|Об'єм|Кількість|Вага)/;
+
+/** The packaging line ("Маса: 900 г") from characteristics, when the product has one. @param {Product} product */
+const getPackaging = (product) => Object.entries(product.characteristics).find(([label]) => PACKAGING_KEY_PATTERN.test(label));
+
+/** @param {{ product: Product }} props */
+function PromoNotice({ product }) {
+  const discountPercent = getDiscountPercent(product.price, product.oldPrice);
+  if (!product.isPromo || discountPercent === 0) return null;
+
+  return (
+    <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-950 ring-1 ring-amber-200">
+      <Tag className="h-4 w-4 shrink-0 text-amber-700" aria-hidden="true" />
+      <span className="font-bold">Акція −{discountPercent}%</span>
+      <span>
+        економія {formatPrice((product.oldPrice ?? product.price) - product.price)} на кожному {product.unit} · до {formatDayMonth(PROMO_VALID_UNTIL)}
+      </span>
+    </p>
+  );
+}
+
 /** @param {{ product: Product }} props */
 function ProductDetails({ product }) {
   const isOutOfStock = product.stockStatus === 'out_of_stock' || product.stockQty <= 0;
   const characteristics = Object.entries(product.characteristics);
+  const packaging = getPackaging(product);
 
   return (
-    <>
+    // Bottom padding on phones keeps the sticky purchase bar from covering the last section.
+    <div className="pb-16 md:pb-0">
       <Breadcrumbs
         items={[
           { label: 'Каталог', to: ROUTES.catalog },
@@ -88,10 +122,10 @@ function ProductDetails({ product }) {
         ]}
       />
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2 lg:gap-10">
+      <div className="mt-4 grid gap-6 lg:mt-6 lg:grid-cols-2 lg:gap-10">
         <div className="lg:sticky lg:top-36 lg:self-start">
           <div className="relative overflow-hidden rounded-3xl bg-emerald-50 shadow-soft ring-1 ring-slate-100">
-            <ProductBadges badges={product.badges} className="absolute left-4 top-4 z-[1]" />
+            <ProductBadges product={product} className="absolute left-4 top-4 z-[1]" />
             <SafeImage
               src={withImageWidth(product.image, 900)}
               alt={product.title}
@@ -99,7 +133,7 @@ function ProductDetails({ product }) {
               fetchpriority="high"
               width={900}
               height={900}
-              className={cn('aspect-square w-full object-cover', isOutOfStock && 'opacity-60 grayscale')}
+              className={cn('aspect-[4/3] w-full object-cover sm:aspect-square', isOutOfStock && 'opacity-60 grayscale')}
             />
           </div>
         </div>
@@ -107,51 +141,71 @@ function ProductDetails({ product }) {
         <div className="min-w-0">
           <Link
             to={getCategoryPath(product.category)}
-            className="text-sm font-semibold text-emerald-700 transition-colors hover:text-emerald-800 hover:underline"
+            className="inline-flex min-h-8 items-center text-sm font-semibold text-emerald-800 underline-offset-4 transition-colors hover:underline"
           >
             {product.categoryTitle}
           </Link>
-          <h1 className="mt-2 text-2xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
-            {product.title}
-          </h1>
+          <h1 className="mt-1 text-2xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">{product.title}</h1>
+          <Rating rating={product.rating} reviewsCount={product.reviewsCount} size="lg" className="mt-3" />
 
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-            <Rating rating={product.rating} reviewsCount={product.reviewsCount} size="lg" />
-            <StockBadge status={product.stockStatus} />
+          <div className="mt-5">
+            <PriceTag product={product} size="lg" />
+            <PromoNotice product={product} />
           </div>
 
-          <PriceTag product={product} size="lg" className="mt-5" />
-          <p className="mt-1 text-sm text-slate-500">Ціна вказана за 1 {product.unit}</p>
+          <dl className="mt-4 space-y-2 text-sm">
+            <div>
+              <dt className="sr-only">Наявність</dt>
+              <dd className="flex flex-wrap items-center gap-2">
+                <StockBadge status={product.stockStatus} />
+                {product.stockStatus === 'low_stock' && (
+                  <span className="font-medium text-amber-900">
+                    Залишилось {product.stockQty} {product.unit}
+                  </span>
+                )}
+                {product.stockStatus === 'in_stock' && <span className="text-slate-600">У магазинах GURMAN {IN_CITY}</span>}
+              </dd>
+            </div>
+            <div className="flex items-start gap-2 text-slate-700">
+              <dt className="sr-only">Одиниця продажу</dt>
+              <Scale className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+              <dd>
+                {UNIT_EXPLANATIONS[product.unit]}
+                {packaging && (
+                  <span className="block font-semibold text-slate-900">
+                    {packaging[0]}: {packaging[1]}
+                  </span>
+                )}
+              </dd>
+            </div>
+          </dl>
 
-          <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
+          <div className="mt-5">
+            <ProductPurchasePanel product={product} />
+          </div>
+
+          <dl className="mt-5 grid gap-3 rounded-2xl bg-white p-4 text-sm ring-1 ring-slate-100 sm:grid-cols-2">
             <div className="flex items-start gap-2">
-              <Globe className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
+              <Globe className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
               <div>
-                <dt className="text-slate-500">Походження</dt>
-                <dd className="font-medium text-slate-800">{product.origin}</dd>
+                <dt className="text-slate-600">Походження</dt>
+                <dd className="font-semibold text-slate-900">{product.origin}</dd>
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <Factory className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
+              <Factory className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
               <div>
-                <dt className="text-slate-500">Виробник</dt>
-                <dd className="font-medium text-slate-800">{product.producer}</dd>
+                <dt className="text-slate-600">Виробник</dt>
+                <dd className="font-semibold text-slate-900">{product.producer}</dd>
               </div>
             </div>
           </dl>
 
-          <div className="mt-6">
-            <ProductPurchasePanel product={product} />
-          </div>
-
-          <ul className="mt-6 grid gap-3 sm:grid-cols-3">
-            {SERVICE_PROMISES.map(({ icon: Icon, title, description }) => (
-              <li key={title} className="flex items-start gap-2.5 rounded-2xl bg-white p-3 ring-1 ring-slate-100">
-                <Icon className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" aria-hidden="true" />
-                <span>
-                  <span className="block text-sm font-semibold text-slate-800">{title}</span>
-                  <span className="block text-xs text-slate-500">{description}</span>
-                </span>
+          <ul className="mt-4 grid gap-2 text-sm text-slate-700 sm:grid-cols-3">
+            {SERVICE_PROMISES.map(({ icon: Icon, label }) => (
+              <li key={label} className="flex items-center gap-2">
+                <Icon className="h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+                {label}
               </li>
             ))}
           </ul>
@@ -165,47 +219,41 @@ function ProductDetails({ product }) {
 
         <DetailsSection title={product.ingredients ? 'Склад' : 'Про продукт'}>
           <p>{product.ingredients ?? 'Свіжий продукт без обробки та добавок. Перед вживанням рекомендуємо промити під проточною водою.'}</p>
-          <p className="mt-3">
-            <span className="font-medium text-slate-800">Походження:</span> {product.origin}.{' '}
-            <span className="font-medium text-slate-800">Виробник:</span> {product.producer}.
-          </p>
         </DetailsSection>
 
         <DetailsSection title="Зберігання">
           <dl className="space-y-2">
             <div>
-              <dt className="font-medium text-slate-800">Умови</dt>
+              <dt className="font-semibold text-slate-800">Умови</dt>
               <dd>{product.storage.conditions}</dd>
             </div>
             {product.storage.shelfLife && (
               <div>
-                <dt className="font-medium text-slate-800">Термін придатності</dt>
+                <dt className="font-semibold text-slate-800">Термін придатності</dt>
                 <dd>{product.storage.shelfLife}</dd>
               </div>
             )}
           </dl>
         </DetailsSection>
 
-        <div>
-          <DetailsSection title="Характеристики">
-            <dl className="divide-y divide-slate-100">
-              {characteristics.map(([label, value]) => (
-                <div key={label} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-4 py-2.5 sm:grid-cols-[14rem_minmax(0,1fr)]">
-                  <dt className="text-slate-500">{label}</dt>
-                  <dd className="font-medium text-slate-800">{value}</dd>
-                </div>
-              ))}
-              <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-4 py-2.5 sm:grid-cols-[14rem_minmax(0,1fr)]">
-                <dt className="text-slate-500">Одиниця продажу</dt>
-                <dd className="font-medium text-slate-800">{product.unit}</dd>
+        <DetailsSection title="Характеристики">
+          <dl className="divide-y divide-slate-100">
+            {characteristics.map(([label, value]) => (
+              <div key={label} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-4 py-2.5 sm:grid-cols-[12rem_minmax(0,1fr)]">
+                <dt className="text-slate-600">{label}</dt>
+                <dd className="font-semibold text-slate-900">{value}</dd>
               </div>
-            </dl>
-          </DetailsSection>
-        </div>
+            ))}
+            <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-4 py-2.5 sm:grid-cols-[12rem_minmax(0,1fr)]">
+              <dt className="text-slate-600">Одиниця продажу</dt>
+              <dd className="font-semibold text-slate-900">{product.unit}</dd>
+            </div>
+          </dl>
+        </DetailsSection>
       </div>
 
       <RecommendedProducts product={product} />
-    </>
+    </div>
   );
 }
 
@@ -233,7 +281,10 @@ function ProductContent({ productId }) {
   const { data: product, isLoading, error, refetch } = useProduct(productId);
   const isMissing = isNotFoundError(error);
 
-  useDocumentTitle(product?.title ?? (isMissing ? 'Товар не знайдено' : undefined));
+  useDocumentTitle(
+    product?.title ?? (isMissing ? 'Товар не знайдено' : undefined),
+    product ? `${product.title}: ${formatPrice(product.price)} / ${product.unit} у магазинах GURMAN ${IN_CITY}. ${product.shortDescription}` : undefined,
+  );
 
   if (isLoading) return <ProductPageSkeleton />;
 
@@ -249,7 +300,7 @@ function ProductContent({ productId }) {
     );
   }
 
-  if (!product) return <ErrorState title="Не вдалося завантажити товар" onRetry={refetch} />;
+  if (!product) return <ErrorState title="Не вдалося завантажити товар" onRetry={refetch} headingAs="h1" />;
 
   return <ProductDetails product={product} />;
 }

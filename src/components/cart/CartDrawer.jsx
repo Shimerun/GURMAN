@@ -1,12 +1,12 @@
-import { ArrowRight, ShoppingBasket, X } from 'lucide-react';
+import { ArrowRight, ShoppingBasket, Store, Tag, X } from 'lucide-react';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
-import { useCheckoutNotice } from '../../hooks/useCheckoutNotice';
 import { buttonClassName } from '../../lib/buttonStyles';
+import { IN_CITY, PROMO_LISTING_QUERY } from '../../lib/constants';
 import { PRODUCT_FORMS, pluralize } from '../../lib/format';
-import { ROUTES } from '../../lib/routes';
+import { OPEN_CHECKOUT_STATE, ROUTES, getCatalogPath } from '../../lib/routes';
 import { selectTotalItems, selectTotalPrice, selectTotalSavings, useCartStore } from '../../store/useCartStore';
 import EmptyState from '../ui/EmptyState';
 import CartItem from './CartItem';
@@ -21,7 +21,6 @@ export default function CartDrawer() {
   const totalItems = useCartStore(selectTotalItems);
   const totalPrice = useCartStore(selectTotalPrice);
   const totalSavings = useCartStore(selectTotalSavings);
-  const showCheckoutNotice = useCheckoutNotice();
   const panelRef = useRef(null);
 
   useFocusTrap(panelRef, { isActive: isOpen, onEscape: closeCart });
@@ -33,29 +32,32 @@ export default function CartDrawer() {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      <div className="absolute inset-0 animate-fade-in bg-slate-900/40" onClick={closeCart} aria-hidden="true" />
+      <div className="absolute inset-0 animate-fade-in bg-slate-900/50" onClick={closeCart} aria-hidden="true" />
 
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="cart-title"
+        aria-describedby="cart-summary"
         tabIndex={-1}
         className="relative flex h-full w-screen animate-slide-in-right flex-col overflow-y-auto overscroll-contain bg-white shadow-2xl focus:outline-none sm:w-full sm:max-w-md"
       >
-        <div className="sticky top-0 z-10 border-b border-slate-200/70 bg-white/80 px-5 py-4 backdrop-blur-md">
+        <div className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 px-5 py-3 backdrop-blur-md">
           <div className="flex items-center justify-between">
             <div>
               <h2 id="cart-title" className="text-lg font-bold text-slate-900">
                 Кошик
               </h2>
-              <p className="text-xs text-slate-500">{pluralize(totalItems, PRODUCT_FORMS)}</p>
+              <p id="cart-summary" className="text-sm text-slate-600">
+                {pluralize(totalItems, PRODUCT_FORMS)}
+              </p>
             </div>
             <button
               type="button"
               onClick={closeCart}
               aria-label="Закрити кошик"
-              className="grid h-10 w-10 place-items-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              className="-mr-2 grid h-11 w-11 place-items-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
             >
               <X className="h-5 w-5" aria-hidden="true" />
             </button>
@@ -68,11 +70,17 @@ export default function CartDrawer() {
               className="mt-8 shadow-none ring-0"
               icon={ShoppingBasket}
               title="Кошик порожній"
-              description="Додайте товари з каталогу або з акцій тижня."
+              description="Почніть з акцій тижня або загляньте в каталог — кошик збережеться навіть після закриття сторінки."
               action={
-                <Link to={ROUTES.catalog} className={buttonClassName()}>
-                  Перейти до каталогу
-                </Link>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Link to={getCatalogPath(PROMO_LISTING_QUERY)} className={buttonClassName({ variant: 'accent' })}>
+                    <Tag className="h-4 w-4" aria-hidden="true" />
+                    Акції тижня
+                  </Link>
+                  <Link to={ROUTES.catalog} className={buttonClassName({ variant: 'secondary' })}>
+                    Каталог
+                  </Link>
+                </div>
               }
             />
           ) : (
@@ -85,23 +93,24 @@ export default function CartDrawer() {
         </div>
 
         {!isEmpty && (
-          <div className="sticky bottom-0 border-t border-slate-200/70 bg-white/90 px-5 py-4 backdrop-blur-md">
+          <div className="pb-safe sticky bottom-0 border-t border-slate-200 bg-white/95 px-5 pt-4 backdrop-blur-md">
             <CartTotals totalPrice={totalPrice} totalSavings={totalSavings} />
-            <button type="button" onClick={showCheckoutNotice} className={buttonClassName({ size: 'lg', className: 'mt-4 w-full' })}>
-              Оформити замовлення
-            </button>
-            <div className="mt-2 flex items-center justify-between gap-2">
-              <Link
-                to={ROUTES.cart}
-                className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-50"
-              >
+            <p className="mt-3 flex items-start gap-2 text-xs text-slate-600">
+              <Store className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+              Купуйте ці товари в магазинах GURMAN {IN_CITY}. Оформлення працює в демо-режимі.
+            </p>
+            <Link to={ROUTES.cart} state={OPEN_CHECKOUT_STATE} className={buttonClassName({ size: 'lg', className: 'mt-3 w-full' })}>
+              Оформити демо-замовлення
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+            <div className="flex items-center justify-between gap-2 py-2">
+              <Link to={ROUTES.cart} className={buttonClassName({ variant: 'ghost', size: 'sm' })}>
                 Відкрити кошик
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
               <button
                 type="button"
                 onClick={clearCart}
-                className="rounded-full px-3 py-2 text-sm font-medium text-slate-500 transition-colors hover:text-red-600"
+                className="inline-flex h-11 items-center rounded-full px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-700"
               >
                 Очистити кошик
               </button>

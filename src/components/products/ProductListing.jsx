@@ -1,4 +1,4 @@
-import { SlidersHorizontal, X } from 'lucide-react';
+import { RotateCcw, SlidersHorizontal, X } from 'lucide-react';
 import { useState } from 'react';
 import { SORT_OPTIONS } from '../../lib/constants';
 import { PRODUCT_FORMS, formatPrice, pluralize } from '../../lib/format';
@@ -40,10 +40,10 @@ function ActiveFilterChips({ filterState }) {
           <button
             type="button"
             onClick={chip.onRemove}
-            className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-emerald-50 py-1.5 pl-3 pr-2 text-xs font-medium text-emerald-800 ring-1 ring-emerald-100 transition-colors hover:bg-emerald-100"
+            className="inline-flex min-h-10 max-w-full items-center gap-1.5 rounded-full bg-emerald-50 pl-3.5 pr-2.5 text-sm font-medium text-emerald-900 ring-1 ring-emerald-200 transition-colors hover:bg-emerald-100"
           >
             <span className="truncate">{chip.label}</span>
-            <X className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            <X className="h-4 w-4 shrink-0" aria-hidden="true" />
             <span className="sr-only">— прибрати фільтр</span>
           </button>
         </li>
@@ -63,11 +63,9 @@ function ActiveFilterChips({ filterState }) {
  */
 export default function ProductListing({ filterState, productsQuery, emptyState }) {
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-  const { filters, setSort, activeFilterCount, isSearchPending } = filterState;
+  const { filters, setSort, activeFilterCount, isSearchPending, hasActiveFilters, resetFilters } = filterState;
   const { data: products, isLoading, isFetching, error, refetch } = productsQuery;
   const isUpdating = isFetching || isSearchPending;
-
-  const resultLabel = isLoading ? 'Завантаження товарів…' : error ? 'Не вдалося завантажити' : `Знайдено ${pluralize(products.length, PRODUCT_FORMS)}`;
 
   return (
     <div className="lg:grid lg:grid-cols-[17rem_minmax(0,1fr)] lg:items-start lg:gap-8">
@@ -78,31 +76,40 @@ export default function ProductListing({ filterState, productsQuery, emptyState 
       </aside>
 
       <div className="min-w-0">
-        <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl bg-white p-3 shadow-soft ring-1 ring-slate-100 sm:px-4">
-          <p className="mr-auto text-sm font-medium text-slate-600" aria-live="polite">
-            {resultLabel}
+        <div className="mb-4 flex flex-wrap items-center gap-2 rounded-2xl bg-white p-2 pl-4 shadow-soft ring-1 ring-slate-100">
+          <p className="mr-auto min-h-11 py-2.5 text-sm text-slate-700" aria-live="polite">
+            {isLoading ? (
+              'Завантаження товарів…'
+            ) : error ? (
+              'Не вдалося завантажити товари'
+            ) : (
+              <>
+                Знайдено <span className="font-bold text-slate-900">{pluralize(products.length, PRODUCT_FORMS)}</span>
+              </>
+            )}
           </p>
 
           <button
             type="button"
             onClick={() => setIsFilterSheetOpen(true)}
+            aria-haspopup="dialog"
             className={buttonClassName({ variant: 'secondary', size: 'sm', className: 'lg:hidden' })}
           >
             <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
             Фільтри
             {activeFilterCount > 0 && (
-              <span className="grid h-5 min-w-5 place-items-center rounded-full bg-emerald-600 px-1 text-[11px] font-bold text-white">
+              <span className="grid h-5 min-w-5 place-items-center rounded-full bg-emerald-700 px-1 text-xs font-bold text-white">
                 {activeFilterCount}
                 <span className="sr-only"> активних</span>
               </span>
             )}
           </button>
 
-          <label className="flex items-center gap-2 text-sm text-slate-500">
+          <label className="flex items-center gap-2 text-sm text-slate-600">
             <span className="hidden sm:inline">Сортування</span>
             <span className="sr-only sm:hidden">Сортування</span>
             <select
-              className="select select-bordered select-sm rounded-full text-slate-800"
+              className="select select-bordered h-11 min-h-11 rounded-full border-slate-300 text-sm text-slate-800"
               value={filters.sort}
               onChange={(event) => setSort(/** @type {import('../../services/productService').ProductSort} */ (event.target.value))}
             >
@@ -113,9 +120,19 @@ export default function ProductListing({ filterState, productsQuery, emptyState 
               ))}
             </select>
           </label>
+
+          {hasActiveFilters && (
+            <button type="button" onClick={resetFilters} className={buttonClassName({ variant: 'ghost', size: 'sm' })}>
+              <RotateCcw className="h-4 w-4" aria-hidden="true" />
+              Скинути
+              <span className="sr-only"> пошук, фільтри та сортування</span>
+            </button>
+          )}
         </div>
 
         <ActiveFilterChips filterState={filterState} />
+
+        <h2 className="sr-only">Товари</h2>
 
         <ProductGrid
           products={products}
