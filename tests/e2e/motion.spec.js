@@ -43,6 +43,16 @@ test.describe('motion', () => {
     expect(await page.evaluate(() => window.__viewTransitions)).toEqual([1]);
   });
 
+  test('going back mid-transition is not an uncaught error', async ({ page }) => {
+    await open(page, '/category/dairy');
+    await page.locator('#main article').first().hover();
+    await page.locator('#main article h3 a').first().click();
+    // Back while the 350ms morph is still running: react-router skips the in-flight transition.
+    await page.goBack();
+    await expect.poll(() => currentPath(page)).toBe('/category/dairy');
+    await page.waitForTimeout(600);
+  });
+
   test('sorting glides cards to their new places', async ({ page }) => {
     await open(page, '/catalog');
     await page.locator('#main select').selectOption('price_asc');

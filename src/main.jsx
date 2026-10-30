@@ -6,7 +6,10 @@ import '@fontsource/unbounded/latin-700.css';
 import '@fontsource/unbounded/cyrillic-700.css';
 import '@fontsource/caveat/cyrillic-600.css';
 import App from './App';
+import { handleSkippedViewTransitions } from './lib/viewTransitions';
 import './index.css';
+
+handleSkippedViewTransitions();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
