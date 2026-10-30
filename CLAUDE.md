@@ -1,6 +1,7 @@
 <project_context>
 Stack: React 18 + Vite (JavaScript, JSX), react-router-dom 7, Tailwind CSS 3.4 + DaisyUI 4, Zustand (persist), lucide-react, react-hot-toast, vite-plugin-pwa.
 Goal: Frontend MVP for "GURMAN", a fictional supermarket chain operating only in Zhytomyr (`Житомир`, single city, no delivery): promo-first homepage, catalog, product pages, cart, stores. All brand assets and copy are original; never imitate a real retailer.
+Business facts (owner decision, 2026-10-30): two stores — вул. Михайла Грушевського, 62 and вул. Гагаріна, 13/67 — both daily 07:00–22:00 (`src/data/mockStores.json`, `STORE_CONTACTS.storeHours`). UI copy must NOT mention delivery, round-the-clock stores or bread "from 5:00" (bread is simply "щоранку"). Checkout is a demo that clears the cart.
 Data: mock JSON in `src/data/`, served only through `src/services/*Service.js`. Swapping services for a real API must require ZERO component changes.
 </project_context>
 
@@ -20,7 +21,7 @@ Data: mock JSON in `src/data/`, served only through `src/services/*Service.js`. 
   <architecture>
   - Principles: KISS, DRY, YAGNI, SOLID. High cohesion, low coupling.
   - Data flow: components -> hooks (`useProducts`, `useStores`, built on `useAsyncData`) -> services. Components NEVER import services directly. `useAsyncData` exposes `{ data, isLoading, isFetching, error, refetch }` so it can be replaced by React Query later without touching components.
-  - State Boundaries: Server/mock data lives in the hooks layer only. Zustand (`useCartStore`) holds cart items, city and transient UI state (cart open). NEVER copy fetched data into Zustand. Derived values are selectors (`selectTotalItems`, `selectTotalPrice`), not stored fields.
+  - State Boundaries: Server/mock data lives in the hooks layer only. Zustand (`useCartStore`) holds cart items and transient UI state (cart open); the city is a constant (`CITY`), not state. NEVER copy fetched data into Zustand. Derived values are selectors (`selectTotalItems`, `selectTotalPrice`), not stored fields.
   - Listing filters live in the URL query (`useProductFilters`), so they are shareable and survive reloads.
   - Naming: Descriptive, verb-first functions (e.g., `getProducts`, `isStoreOpen`). No abbreviations.
   - Structure: pages in `src/pages/`, routes in `src/router.jsx` + `src/lib/routes.js`, reusable UI in `src/components/ui/`, domain components in `src/components/<domain>/`.
@@ -35,12 +36,23 @@ Data: mock JSON in `src/data/`, served only through `src/services/*Service.js`. 
 
   <react_and_tailwind>
   - Components: Functional components only. Extract complex business logic into custom hooks.
-  - Styling: Tailwind utilities + DaisyUI components (`badge`, `toggle`, `select`, `skeleton`, `progress`). Brand: emerald primary, amber promo accent, `gray-50` page, `slate-800` text.
+  - Styling: Tailwind utilities + DaisyUI components (`badge`, `toggle`, `select`, `skeleton`, `progress`).
+  - Brand (from the logo sheet): `tailwind.config.cjs` REPLACES the stock `emerald` scale with the logo's forest green (`emerald-700` = #1F4B3A) and `amber` with the basket orange (`amber-400` = #E8A33D); `gray-50` is the cream page (#F6F4EF). Keep using `emerald-*` (primary) / `amber-*` (promo accent) classes — they are the brand. Body text `slate-800`.
+  - Contrast on cream: secondary text is `slate-600` minimum (`slate-500` is only 4.3:1 on `gray-50`). Primary buttons/eyebrows use `emerald-700`. The e2e suite checks WCAG contrast and the 12px minimum on every page.
+  - Fonts (self-hosted `@fontsource`, subsets imported in `src/main.jsx`): `font-display` = Unbounded 700 for the wordmark and h1/h2 headings only; `font-script` = Caveat 600 (Cyrillic only) for the "смачно щодня" tagline only. Body uses the system stack. Adding a weight or subset means adding its import.
+  - Logo: `BrandLogo` (lockup, `isIntroAnimated` only in the header) and `BrandMark` (SVG basket, `isEmpty` variant). `BasketIllustration` (`empty` | `spilled` | `filled` | `loading`) is the illustration for empty cart, 404, checkout success and the lazy-page fallback. `logo-*` classes inside the mark are animation hooks for `index.css`.
+  - DaisyUI CSS trap: Tailwind scans ALL source text (identifiers, strings, comments) and DaisyUI emits a component's full CSS whenever a token equals its class name. Avoid bare words like `collapse`, `step`, `steps`, `timeline`, `card`, `tabs`, `drawer`, `modal`, `alert`, `stack` in code and comments unless you use that component; compare CSS size in `npm run build` output after changes.
   - Classes: join with `cn()` from `src/lib/utils.js`. It is a plain join (no tailwind-merge), so never pass conflicting utilities. Buttons use `buttonClassName()` from `src/lib/buttonStyles.js`.
   - Images: always `SafeImage` (lazy by default, SVG placeholder on error); `isEager` only for above-the-fold images.
   - Avoid inline styles (exception: per-frame values like drag offsets).
   - Accessibility: `aria-label` on icon-only buttons; dialogs use `useFocusTrap` + `useBodyScrollLock`; respect `prefers-reduced-motion`; must work at 375px.
   </react_and_tailwind>
+
+  <motion>
+  - No animation libraries. Use CSS (scroll-linked `animation-timeline: view()` inside `@supports`, so unsupported browsers just show the final state) or the Web Animations API. Every effect must be disabled or reduced to its final state under `prefers-reduced-motion`; never hide above-the-fold content behind an animation.
+  - Reuse before adding: `.scroll-reveal` (cards entering), `.swoosh-draw` (logo swoosh under `SectionHeader`), `useIsScrollingDown` (compact mobile header), `useAnimatedNumber` (rolling totals), `useFlipAnimation` (list reordering, items need `data-flip-key`), `useTypingPlaceholder`, `flyToCart` (targets `[data-cart-target]`), `showRemovedFromCartToast` (undo), `SafeImage` fade (`data-image-state`).
+  - View transitions: product card → product page via react-router `viewTransition` + `useViewTransitionState`. A `view-transition-name` must be unique per page: only the card being opened carries `product-image`; grids on a product page pass `hasImageTransition={false}`. `src/lib/pageLoaders.js` prefetches the product chunk on card intent so the transition never captures the Suspense fallback.
+  </motion>
 
   <error_handling>
   - Fail fast: services throw `ServiceError` (`service`, `operation`, `code`) with actionable messages.
@@ -59,5 +71,8 @@ Data: mock JSON in `src/data/`, served only through `src/services/*Service.js`. 
 - Dev: npm run dev
 - Build: npm run build
 - Preview: npm run preview
-- No test or lint scripts exist yet; verify with `npm run build` and in the browser.
+- Test: npm test — Playwright e2e suite in `tests/e2e/` against the production build (`vite preview`, port 4173) using the installed Google Chrome (`channel: 'chrome'`). `npm run test:ui` for the interactive runner.
+- Tests stub Unsplash images and fail on any console error. Use `tests/e2e/fixtures.js` (`test`, `open`, `waitForData`, `cartBadge`, `currentPath`). New behaviour gets a test; time-dependent checks use `page.clock`.
+- CI: `.github/workflows/ci.yml` runs `npm ci`, build and `npm test` on every push and on PRs to `main`.
+- No lint script yet.
 </commands>
