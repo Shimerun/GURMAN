@@ -27,6 +27,9 @@ export const NAV_LINKS = [
 
 export const PROMO_LISTING_QUERY = { onlyPromo: true, sort: 'discount' };
 
+/** Example queries: typed into the header search placeholder and offered on empty results. */
+export const SEARCH_SUGGESTIONS = ['молоко', 'хліб', 'сир', 'яйця', 'банани'];
+
 /** @type {{ value: import('../services/productService').ProductSort, label: string }[]} */
 export const SORT_OPTIONS = [
   { value: 'recommended', label: 'Рекомендовані' },

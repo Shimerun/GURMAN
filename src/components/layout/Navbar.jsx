@@ -1,10 +1,12 @@
 import { LayoutGrid, Menu, Phone, Search, ShoppingCart, Tag, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useAnimatedNumber } from '../../hooks/useAnimatedNumber';
 import { useHasMounted } from '../../hooks/useHasMounted';
 import { useIsScrollingDown } from '../../hooks/useIsScrollingDown';
+import { useTypingPlaceholder } from '../../hooks/useTypingPlaceholder';
 import { useCategories } from '../../hooks/useProducts';
-import { MOBILE_MENU_ID, NAV_LINKS, PROMO_LISTING_QUERY, STORE_CONTACTS } from '../../lib/constants';
+import { MOBILE_MENU_ID, NAV_LINKS, PROMO_LISTING_QUERY, SEARCH_SUGGESTIONS, STORE_CONTACTS } from '../../lib/constants';
 import { PRODUCT_FORMS, formatPrice, pluralize } from '../../lib/format';
 import { ROUTES, getCatalogPath, isNavLinkActive, isPromoListing } from '../../lib/routes';
 import { cn } from '../../lib/utils';
@@ -13,6 +15,7 @@ import BrandLogo from '../ui/BrandLogo';
 import MegaMenu from './MegaMenu';
 
 const MEGA_MENU_ID = 'catalog-mega-menu';
+const SEARCH_PLACEHOLDER = 'Знайти продукти: молоко, сир, банани…';
 const PROMO_PATH = getCatalogPath(PROMO_LISTING_QUERY);
 
 function DesktopNavLinks() {
@@ -46,6 +49,7 @@ function DesktopNavLinks() {
 export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu }) {
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const megaMenuTriggerRef = useRef(null);
   const megaMenuPanelRef = useRef(null);
   const navigate = useNavigate();
@@ -58,8 +62,16 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu }) {
   const hasMounted = useHasMounted();
   const badgeCount = hasMounted ? totalItems : 0;
   const subtotal = hasMounted ? totalPrice : 0;
+  // Animated from the persisted total (not from the pre-mount 0), so page loads don't count up.
+  const animatedTotalPrice = useAnimatedNumber(totalPrice);
   const isOnPromo = isPromoListing(pathname, search);
   const isCompact = useIsScrollingDown();
+  const searchPlaceholder = useTypingPlaceholder({
+    prefix: 'Знайти: ',
+    words: SEARCH_SUGGESTIONS,
+    fallback: SEARCH_PLACEHOLDER,
+    isPaused: isSearchFocused || searchQuery !== '',
+  });
 
   useEffect(() => {
     if (!isMegaMenuOpen) return undefined;
@@ -139,7 +151,9 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu }) {
               type="search"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Знайти продукти: молоко, сир, банани…"
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
+              placeholder={searchPlaceholder}
               autoComplete="off"
               enterKeyHint="search"
               className="h-11 w-full rounded-full border border-slate-300 bg-slate-50 pl-12 pr-12 text-base text-slate-800 transition-colors placeholder:text-slate-500 hover:border-slate-400 focus:border-emerald-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600/20 md:text-sm [&::-webkit-search-cancel-button]:hidden"
@@ -186,7 +200,7 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu }) {
               {badgeCount}
             </span>
           </span>
-          <span className="hidden text-sm font-semibold tabular-nums text-slate-900 sm:inline">{formatPrice(subtotal)}</span>
+          <span className="hidden text-sm font-semibold tabular-nums text-slate-900 sm:inline">{formatPrice(hasMounted ? animatedTotalPrice : 0)}</span>
         </button>
       </div>
 

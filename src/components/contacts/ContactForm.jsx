@@ -1,4 +1,4 @@
-import { CircleCheck, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { buttonClassName } from '../../lib/buttonStyles';
 import { cn } from '../../lib/utils';
@@ -24,6 +24,26 @@ function validateContactForm(values) {
   if (values.message.trim().length < MIN_MESSAGE_LENGTH)
     errors.message = `Опишіть питання детальніше (щонайменше ${MIN_MESSAGE_LENGTH} символів).`;
   return errors;
+}
+
+const SHAKE_KEYFRAMES = [
+  { transform: 'none' },
+  { transform: 'translateX(-6px)' },
+  { transform: 'translateX(5px)' },
+  { transform: 'translateX(-3px)' },
+  { transform: 'translateX(2px)' },
+  { transform: 'none' },
+];
+
+/**
+ * A short sideways shake on each invalid field, so the problem is noticed where it is, not
+ * only in the summary. Skipped under reduced motion.
+ * @param {HTMLFormElement | null} form
+ * @param {string[]} fieldNames
+ */
+function shakeFields(form, fieldNames) {
+  if (!form || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  for (const name of fieldNames) form.querySelector(`[name="${name}"]`)?.animate(SHAKE_KEYFRAMES, { duration: 360, easing: 'ease-out' });
 }
 
 const FIELD_CLASS_NAME =
@@ -65,9 +85,10 @@ export default function ContactForm() {
     const nextErrors = validateContactForm(values);
     setErrors(nextErrors);
 
-    const firstInvalidField = Object.keys(nextErrors)[0];
-    if (firstInvalidField) {
-      formRef.current?.querySelector(`[name="${firstInvalidField}"]`)?.focus();
+    const invalidFields = Object.keys(nextErrors);
+    if (invalidFields.length > 0) {
+      formRef.current?.querySelector(`[name="${invalidFields[0]}"]`)?.focus();
+      shakeFields(formRef.current, invalidFields);
       return;
     }
 
@@ -96,7 +117,11 @@ export default function ContactForm() {
         tabIndex={-1}
         className="flex flex-col items-start gap-3 rounded-2xl bg-emerald-50 p-6 ring-1 ring-emerald-100 focus:outline-none"
       >
-        <CircleCheck className="h-8 w-8 text-emerald-600" aria-hidden="true" />
+        {/* Circle and tick draw themselves (index.css `.check-draw`); static with reduced motion. */}
+        <svg viewBox="0 0 32 32" className="check-draw h-10 w-10" aria-hidden="true" focusable="false">
+          <circle cx="16" cy="16" r="13.5" pathLength="1" fill="none" strokeWidth="2.5" className="check-circle stroke-emerald-600" />
+          <path d="M10 16.5l4 4 8-8.5" pathLength="1" fill="none" strokeWidth="2.75" strokeLinecap="round" strokeLinejoin="round" className="check-tick stroke-emerald-700" />
+        </svg>
         <h3 className="text-lg font-semibold text-slate-900">Дякуємо, {submittedName}!</h3>
         <p className="text-sm text-slate-600">
           Форма заповнена правильно. Це демо-версія сайту, тому повідомлення нікуди не надіслано — для швидкої відповіді зателефонуйте на

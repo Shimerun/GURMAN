@@ -314,6 +314,97 @@
   }
 }
 
+/* SafeImage: hidden until the file arrives, then a one-off fade (see SafeImage.jsx). */
+img[data-image-state='loading'] {
+  opacity: 0;
+}
+
+@keyframes image-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes check-pop {
+  from {
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes badge-shine {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(120%);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* `to` is omitted, so the fade ends at the image's own opacity (e.g. dimmed out-of-stock photos). */
+  img[data-image-state='loaded'] {
+    animation: image-fade-in 300ms ease-out;
+  }
+
+  /* Contact form success: the circle and tick draw themselves. */
+  .check-draw {
+    animation: check-pop 400ms ease-out both;
+  }
+
+  .check-draw .check-circle,
+  .check-draw .check-tick {
+    stroke-dasharray: 1;
+    animation: swoosh-draw 450ms ease-out both;
+  }
+
+  .check-draw .check-tick {
+    animation-delay: 300ms;
+  }
+
+  ::view-transition-group(product-image) {
+    animation-duration: 350ms;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 200ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* Loyalty card: tilts toward the pointer with a moving glare (values set by LoyaltyBlock). */
+.loyalty-tilt {
+  transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform 250ms ease-out;
+}
+
+.loyalty-glare {
+  background: radial-gradient(circle at var(--glare-x, 50%) var(--glare-y, 50%), rgb(255 255 255 / 0.45), transparent 50%);
+  opacity: 0;
+  transition: opacity 250ms ease-out;
+}
+
+.loyalty-tilt:hover .loyalty-glare {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loyalty-tilt {
+    transform: none;
+  }
+}
+
 /* Logo hover: the orange hops and the leaf sways (pointer devices only). */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .brand-logo:hover .logo-orange {
@@ -351,6 +442,17 @@
 
     .scroll-reveal:nth-child(4n + 4) {
       animation-range: entry 18% entry 78%;
+    }
+
+    /* Discount badges catch a single glint as their card scrolls in. */
+    .badge-shine::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.75) 50%, transparent 70%);
+      animation: badge-shine linear both;
+      animation-timeline: view();
+      animation-range: entry 80% cover 45%;
     }
 
     /* Requires pathLength="1" on the path so the dash spans the whole stroke. */

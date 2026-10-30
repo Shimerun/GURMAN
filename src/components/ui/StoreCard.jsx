@@ -20,7 +20,10 @@ export default function StoreCard({ store }) {
             isOpen ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800',
           )}
         >
-          <span className={cn('h-1.5 w-1.5 rounded-full', isOpen ? 'bg-emerald-600' : 'bg-red-600')} aria-hidden="true" />
+          <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
+            {isOpen && <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75 motion-safe:animate-ping-slow" />}
+            <span className={cn('relative inline-flex h-1.5 w-1.5 rounded-full', isOpen ? 'bg-emerald-600' : 'bg-red-600')} />
+          </span>
           {isOpen ? 'Відкрито зараз' : 'Зараз зачинено'}
         </span>
       </div>

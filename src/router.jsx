@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import SiteLayout from './components/layout/SiteLayout';
+import { loadProductPage } from './lib/pageLoaders';
 import HomePage from './pages/HomePage';
 import RouteErrorPage from './pages/RouteErrorPage';
 
@@ -12,7 +13,7 @@ const CategoryPage = lazy(() => import('./pages/CategoryPage'));
 const ContactsPage = lazy(() => import('./pages/ContactsPage'));
 const DeliveryPage = lazy(() => import('./pages/DeliveryPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
-const ProductPage = lazy(() => import('./pages/ProductPage'));
+const ProductPage = lazy(loadProductPage);
 
 export const router = createBrowserRouter([
   {

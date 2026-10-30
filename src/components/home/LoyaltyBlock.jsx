@@ -10,6 +10,31 @@ const BENEFITS = [
   { icon: Cake, title: 'Подарунок до дня народження', description: 'Подвійні бонуси протягом тижня святкування.' },
 ];
 
+const MAX_TILT_DEG = 10;
+const TILT_PROPERTIES = ['--tilt-x', '--tilt-y', '--glare-x', '--glare-y'];
+
+/**
+ * Tilts the decorative loyalty-card mock-up toward a mouse pointer and moves its glare (.loyalty-tilt in
+ * index.css). Per-frame values go straight to CSS variables, so React never re-renders.
+ * @param {import('react').PointerEvent<HTMLDivElement>} event
+ */
+function handleCardPointerMove(event) {
+  if (event.pointerType !== 'mouse') return;
+  const tiltTarget = event.currentTarget;
+  const rect = tiltTarget.getBoundingClientRect();
+  const x = (event.clientX - rect.left) / rect.width;
+  const y = (event.clientY - rect.top) / rect.height;
+  tiltTarget.style.setProperty('--tilt-x', `${(0.5 - y) * 2 * MAX_TILT_DEG}deg`);
+  tiltTarget.style.setProperty('--tilt-y', `${(x - 0.5) * 2 * MAX_TILT_DEG}deg`);
+  tiltTarget.style.setProperty('--glare-x', `${x * 100}%`);
+  tiltTarget.style.setProperty('--glare-y', `${y * 100}%`);
+}
+
+/** @param {import('react').PointerEvent<HTMLDivElement>} event */
+function handleCardPointerLeave(event) {
+  for (const property of TILT_PROPERTIES) event.currentTarget.style.removeProperty(property);
+}
+
 const showCardComingSoon = () =>
   toast('Онлайн-оформлення картки скоро запрацює. Поки що картку можна отримати на касі будь-якого магазину.', {
     icon: <Info className="h-5 w-5 shrink-0 text-sky-600" aria-hidden="true" />,
@@ -56,7 +81,12 @@ export default function LoyaltyBlock() {
           </button>
         </div>
 
-        <div className="mx-auto w-full max-w-sm" aria-hidden="true">
+        <div
+          className="loyalty-tilt mx-auto w-full max-w-sm"
+          aria-hidden="true"
+          onPointerMove={handleCardPointerMove}
+          onPointerLeave={handleCardPointerLeave}
+        >
           <div className="relative aspect-[1.586] rotate-[-4deg] overflow-hidden rounded-3xl bg-amber-400 p-6 text-emerald-900 shadow-2xl motion-reduce:rotate-0">
             <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/20" />
             <div className="relative flex h-full flex-col justify-between">
@@ -70,6 +100,7 @@ export default function LoyaltyBlock() {
               </div>
               <p className="font-mono text-sm tracking-[0.3em] text-emerald-900/80">•••• •••• 2048</p>
             </div>
+            <div className="loyalty-glare pointer-events-none absolute inset-0" />
           </div>
         </div>
       </div>

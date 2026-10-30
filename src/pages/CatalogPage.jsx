@@ -8,9 +8,8 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useProductFilters } from '../hooks/useProductFilters';
 import { useProducts } from '../hooks/useProducts';
 import { buttonClassName } from '../lib/buttonStyles';
+import { SEARCH_SUGGESTIONS } from '../lib/constants';
 import { getCatalogPath } from '../lib/routes';
-
-const SEARCH_SUGGESTIONS = ['молоко', 'хліб', 'сир', 'яйця', 'банани'];
 
 export default function CatalogPage() {
   const filterState = useProductFilters();

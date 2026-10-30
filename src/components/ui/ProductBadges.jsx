@@ -4,7 +4,8 @@ import { cn } from '../../lib/utils';
 /** @typedef {import('../../services/productService').Product} Product */
 
 const BADGE_CLASSES = {
-  sale: 'bg-amber-400 text-slate-900',
+  // `badge-shine` (index.css) sweeps a glint across it once as the card scrolls into view.
+  sale: 'badge-shine relative overflow-hidden bg-amber-400 text-slate-900',
   popular: 'bg-emerald-700 text-white',
 };
 

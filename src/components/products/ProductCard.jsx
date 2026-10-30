@@ -1,8 +1,9 @@
 import { ShoppingCart } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useViewTransitionState } from 'react-router-dom';
 import { buttonClassName } from '../../lib/buttonStyles';
 import { flyToCart } from '../../lib/flyToCart';
+import { loadProductPage } from '../../lib/pageLoaders';
 import { getProductPath } from '../../lib/routes';
 import { cn } from '../../lib/utils';
 import { selectItemQuantity, useCartStore } from '../../store/useCartStore';
@@ -13,14 +14,19 @@ import Rating from '../ui/Rating';
 import SafeImage from '../ui/SafeImage';
 import StockBadge from '../ui/StockBadge';
 
-/** @param {{ product: import('../../services/productService').Product, isImageEager?: boolean }} props */
-export default function ProductCard({ product, isImageEager = false }) {
+/**
+ * @param {{ product: import('../../services/productService').Product, isImageEager?: boolean, hasImageTransition?: boolean }} props
+ * `hasImageTransition` lets the image morph into the product page's main image on navigation.
+ */
+export default function ProductCard({ product, isImageEager = false, hasImageTransition = true }) {
   const quantity = useCartStore(selectItemQuantity(product.id));
   const addItem = useCartStore((state) => state.addItem);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
 
   const isOutOfStock = product.stockStatus === 'out_of_stock' || product.stockQty <= 0;
   const productPath = getProductPath(product.id);
+  // Only the card being opened (or returned to) may carry the shared name: names must be unique per page.
+  const isImageMorphing = useViewTransitionState(productPath) && hasImageTransition;
 
   // The add button is only rendered when the product isn't in the cart yet,
   // so this toast fires exactly once per first add.
@@ -32,8 +38,13 @@ export default function ProductCard({ product, isImageEager = false }) {
   };
 
   return (
-    <article className="group relative flex h-full flex-col rounded-2xl bg-white p-3 shadow-soft ring-1 ring-slate-100 transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md focus-within:ring-2 focus-within:ring-emerald-600 motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:p-4">
-      <div className="relative overflow-hidden rounded-xl bg-emerald-50">
+    // Warming the product-page chunk on intent keeps the image morph from catching a loading fallback.
+    <article
+      onPointerEnter={loadProductPage}
+      onTouchStart={loadProductPage}
+      onFocus={loadProductPage}
+      className="group relative flex h-full flex-col rounded-2xl bg-white p-3 shadow-soft ring-1 ring-slate-100 transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md focus-within:ring-2 focus-within:ring-emerald-600 motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:p-4">
+      <div className={cn('relative overflow-hidden rounded-xl bg-emerald-50', isImageMorphing && '[view-transition-name:product-image]')}>
         {/* pointer-events-none keeps the stretched product link clickable through the badges. */}
         <ProductBadges product={product} className="pointer-events-none absolute left-2 top-2 z-[1]" />
         {product.stockStatus !== 'in_stock' && (
@@ -62,6 +73,7 @@ export default function ProductCard({ product, isImageEager = false }) {
         <h3 className="mt-1.5">
           <Link
             to={productPath}
+            viewTransition={hasImageTransition}
             className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-5 text-slate-800 transition-colors after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus:outline-none group-hover:text-emerald-800"
           >
             {product.title}

@@ -70,6 +70,7 @@ function RecommendedProducts({ product }) {
         onRetry={refetch}
         skeletonCount={MAX_RECOMMENDATIONS}
         gridClassName={RECOMMENDATIONS_GRID_CLASS_NAME}
+        hasImageTransition={false}
         emptyState={null}
       />
     </section>
@@ -124,7 +125,8 @@ function ProductDetails({ product }) {
 
       <div className="mt-4 grid gap-6 lg:mt-6 lg:grid-cols-2 lg:gap-10">
         <div className="lg:sticky lg:top-36 lg:self-start">
-          <div className="relative overflow-hidden rounded-3xl bg-emerald-50 shadow-soft ring-1 ring-slate-100">
+          {/* Shared view-transition name: the product card's image morphs into this one. */}
+          <div className="relative overflow-hidden rounded-3xl bg-emerald-50 shadow-soft ring-1 ring-slate-100 [view-transition-name:product-image]">
             <ProductBadges product={product} className="absolute left-4 top-4 z-[1]" />
             <SafeImage
               src={withImageWidth(product.image, 900)}

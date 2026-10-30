@@ -82,6 +82,8 @@ module.exports = {
         'slide-in-left': 'slide-in-left 250ms ease-out',
         'fade-in': 'fade-in 200ms ease-out',
         'sheet-up': 'sheet-up 280ms cubic-bezier(0.32, 0.72, 0, 1)',
+        // Slower than the stock `ping`: a calm "live" indicator, not an alert.
+        'ping-slow': 'ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite',
       },
     },
   },
