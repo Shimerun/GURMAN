@@ -22,7 +22,10 @@ test.describe('mobile', () => {
     await page.locator('#main button', { hasText: 'Фільтри' }).click();
     const sheet = page.locator('[role="dialog"]', { has: page.locator('h2', { hasText: 'Фільтри' }) });
     await expect(sheet).toBeVisible();
-    await sheet.locator('input[type="checkbox"]').first().check();
+    // click + assertion rather than check(): the toggle follows the URL, updated in a transition.
+    const toggle = sheet.locator('input[type="checkbox"]').first();
+    await toggle.click();
+    await expect(toggle).toBeChecked();
     await waitForData(page);
     await sheet.locator('button', { hasText: 'Показати' }).click();
     await expect(page.locator('#main button[aria-haspopup="dialog"]')).toContainText('1');

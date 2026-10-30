@@ -5,6 +5,9 @@ test.describe('catalog and filters', () => {
     await open(page, '/');
     await page.locator('a[href="/category/vegetables"]').first().click();
     await expect.poll(() => currentPath(page)).toBe('/category/vegetables');
+    // The URL changes first; react-router keeps showing the home page until the category chunk
+    // has loaded, so wait for the category itself before clicking a card.
+    await expect(page.locator('h1')).toContainText('Овочі');
     await waitForData(page);
     await page.locator('#main article button', { hasText: 'У кошик' }).first().click();
     await expect.poll(() => cartBadge(page)).toBe(1);
@@ -28,7 +31,11 @@ test.describe('catalog and filters', () => {
     await open(page, '/category/fruits');
     const all = await page.locator('#main article').count();
 
-    await page.locator('aside input[type="checkbox"]').first().check();
+    // click + assertion rather than check(): the toggle mirrors the URL, which react-router
+    // updates in a transition, so on a slow machine the checked state lands a moment later.
+    const inStockToggle = page.locator('aside input[type="checkbox"]').first();
+    await inStockToggle.click();
+    await expect(inStockToggle).toBeChecked();
     await expect.poll(() => currentPath(page)).toContain('stock=1');
     await expect(page.locator('#main article')).toHaveCount(all - 1);
 
@@ -39,6 +46,8 @@ test.describe('catalog and filters', () => {
 
     await page.locator('nav[aria-label="Категорії каталогу"] a', { hasText: 'Напої' }).click();
     await expect.poll(() => currentPath(page)).toMatch(/^\/category\/drinks\?(?=.*stock=1)(?=.*max=50)/);
+    // "Скинути" exists on the previous category too; act only once the drinks page is shown.
+    await expect(page.locator('h1')).toContainText('Напої');
 
     await page.locator('#main button', { hasText: 'Скинути' }).first().click();
     await expect.poll(() => currentPath(page)).toBe('/category/drinks');
