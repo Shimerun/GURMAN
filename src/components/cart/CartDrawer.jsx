@@ -1,4 +1,4 @@
-import { ArrowRight, ShoppingBasket, Store, Tag, X } from 'lucide-react';
+import { ArrowRight, Store, Tag, X } from 'lucide-react';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
@@ -8,6 +8,7 @@ import { IN_CITY, PROMO_LISTING_QUERY } from '../../lib/constants';
 import { PRODUCT_FORMS, pluralize } from '../../lib/format';
 import { OPEN_CHECKOUT_STATE, ROUTES, getCatalogPath } from '../../lib/routes';
 import { selectTotalItems, selectTotalPrice, selectTotalSavings, useCartStore } from '../../store/useCartStore';
+import BasketIllustration from '../ui/BasketIllustration';
 import EmptyState from '../ui/EmptyState';
 import CartItem from './CartItem';
 import CartTotals from './CartTotals';
@@ -68,7 +69,7 @@ export default function CartDrawer() {
           {isEmpty ? (
             <EmptyState
               className="mt-8 shadow-none ring-0"
-              icon={ShoppingBasket}
+              illustration={<BasketIllustration variant="empty" />}
               title="Кошик порожній"
               description="Почніть з акцій тижня або загляньте в каталог — кошик збережеться навіть після закриття сторінки."
               action={

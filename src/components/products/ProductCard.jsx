@@ -2,6 +2,7 @@ import { ShoppingCart } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { buttonClassName } from '../../lib/buttonStyles';
+import { flyToCart } from '../../lib/flyToCart';
 import { getProductPath } from '../../lib/routes';
 import { cn } from '../../lib/utils';
 import { selectItemQuantity, useCartStore } from '../../store/useCartStore';
@@ -23,7 +24,9 @@ export default function ProductCard({ product, isImageEager = false }) {
 
   // The add button is only rendered when the product isn't in the cart yet,
   // so this toast fires exactly once per first add.
-  const handleAddToCart = () => {
+  /** @param {import('react').MouseEvent<HTMLButtonElement>} event */
+  const handleAddToCart = (event) => {
+    flyToCart(event.currentTarget);
     addItem(product);
     toast.success(`«${product.title}» у кошику`);
   };

@@ -1,7 +1,8 @@
-import { LayoutGrid, SearchX } from 'lucide-react';
+import { LayoutGrid } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { buttonClassName } from '../../lib/buttonStyles';
 import { ROUTES } from '../../lib/routes';
+import BasketIllustration from './BasketIllustration';
 import EmptyState from './EmptyState';
 
 /**
@@ -11,7 +12,7 @@ import EmptyState from './EmptyState';
 export default function NotFoundState({ title, description }) {
   return (
     <EmptyState
-      icon={SearchX}
+      illustration={<BasketIllustration variant="spilled" />}
       title={title}
       description={description}
       className="py-16"

@@ -1,9 +1,10 @@
-import { ArrowLeft, MapPin, ShieldCheck, ShoppingBasket, Store, Tag, Trash2 } from 'lucide-react';
+import { ArrowLeft, MapPin, ShieldCheck, Store, Tag, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import CartItem from '../components/cart/CartItem';
 import CartTotals from '../components/cart/CartTotals';
 import CheckoutDialog from '../components/cart/CheckoutDialog';
+import BasketIllustration from '../components/ui/BasketIllustration';
 import EmptyState from '../components/ui/EmptyState';
 import PageHeader from '../components/ui/PageHeader';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -50,7 +51,7 @@ export default function CartPage() {
       <>
         <PageHeader title="Кошик" breadcrumbs={CART_CRUMBS} />
         <EmptyState
-          icon={ShoppingBasket}
+          illustration={<BasketIllustration variant="empty" />}
           title="Кошик порожній"
           headingAs="h2"
           description="Почніть з акцій тижня або загляньте в каталог — кошик збережеться, навіть якщо ви закриєте сторінку."

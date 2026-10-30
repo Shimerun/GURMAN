@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { buttonClassName } from '../../lib/buttonStyles';
 import { STORE_CONTACTS } from '../../lib/constants';
+import { flyToCart } from '../../lib/flyToCart';
 import { formatPrice } from '../../lib/format';
 import { ROUTES, getCategoryPath } from '../../lib/routes';
 import { selectItemQuantity, useCartStore } from '../../store/useCartStore';
@@ -75,9 +76,11 @@ export default function ProductPurchasePanel({ product }) {
   const quantityToAdd = Math.min(selectedQuantity, Math.max(availableToAdd, 1));
   const canAdd = !isOutOfStock && availableToAdd > 0;
 
-  const handleAddToCart = () => {
+  /** @param {import('react').MouseEvent<HTMLButtonElement>} event */
+  const handleAddToCart = (event) => {
     if (!canAdd) return;
 
+    flyToCart(event.currentTarget);
     if (quantityInCart === 0) {
       addItem(product);
       if (quantityToAdd > 1) updateQuantity(product.id, quantityToAdd);

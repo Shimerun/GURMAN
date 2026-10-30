@@ -50,7 +50,7 @@ export default function BottomNav() {
                   isActive ? 'text-emerald-800' : 'text-slate-600 hover:text-slate-900',
                 )}
               >
-                <span className="relative">
+                <span className="relative" data-cart-target={id === 'cart' ? true : undefined}>
                   <Icon className="h-6 w-6" strokeWidth={isActive ? 2.25 : 1.75} aria-hidden="true" />
                   {id === 'cart' && cartCount > 0 && (
                     <span

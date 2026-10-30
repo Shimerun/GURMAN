@@ -6,6 +6,7 @@ import { TOAST_OPTIONS } from '../../lib/toastOptions';
 import { useCartStore } from '../../store/useCartStore';
 import CartDrawer from '../cart/CartDrawer';
 import BottomNav from '../mobile/BottomNav';
+import BasketIllustration from '../ui/BasketIllustration';
 import Footer from './Footer';
 import MobileMenu from './MobileMenu';
 import Navbar from './Navbar';
@@ -58,13 +59,11 @@ export default function SiteLayout() {
   );
 }
 
-/** Shown for the split second a lazy page chunk loads; same rhythm as a page header so nothing jumps. */
+/** Shown while a lazy page chunk loads; fades in only after a short delay, so fast loads show nothing. */
 function PageFallback() {
   return (
-    <div aria-busy="true" aria-label="Завантаження сторінки">
-      <div className="skeleton h-5 w-48 rounded" />
-      <div className="skeleton mt-4 h-10 w-2/3 max-w-md rounded" />
-      <div className="skeleton mt-6 h-64 w-full rounded-3xl" />
+    <div role="status" aria-busy="true" aria-label="Завантаження сторінки" className="page-fallback grid min-h-[50vh] place-items-center">
+      <BasketIllustration variant="loading" />
     </div>
   );
 }

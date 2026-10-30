@@ -157,6 +157,176 @@
   }
 }
 
+/* Orange thrown into the cart by lib/flyToCart.js; positioned entirely by its transform. */
+.cart-flyer {
+  position: fixed;
+  left: -9px;
+  top: -9px;
+  z-index: 60;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 35%, theme('colors.amber.300'), theme('colors.amber.500'));
+  box-shadow: 0 2px 6px rgb(15 23 42 / 0.25);
+  pointer-events: none;
+}
+
+.cart-flyer::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: 1px;
+  width: 8px;
+  height: 5px;
+  border-radius: 8px 0;
+  background: theme('colors.emerald.500');
+}
+
+/* Final poses, so the scenes read correctly even with motion turned off. */
+.basket-tipped {
+  transform: rotate(-24deg);
+  transform-origin: 20% 90%;
+}
+
+.page-fallback {
+  animation: page-fallback-in 200ms ease-out 250ms both;
+}
+
+@keyframes page-fallback-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes basket-sway {
+  0%,
+  100% {
+    transform: none;
+  }
+  25% {
+    transform: rotate(-7deg);
+  }
+  55% {
+    transform: rotate(5deg);
+  }
+  80% {
+    transform: rotate(-2deg);
+  }
+}
+
+@keyframes basket-tip-over {
+  from {
+    transform: none;
+  }
+  70% {
+    transform: rotate(-28deg);
+  }
+  to {
+    transform: rotate(-24deg);
+  }
+}
+
+@keyframes basket-orange-roll {
+  from {
+    opacity: 0;
+    transform: translateX(-48px) rotate(-240deg);
+  }
+  20% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes logo-produce-loop {
+  0% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  30%,
+  75% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes logo-orange-hop {
+  0%,
+  55%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translateY(-4px);
+  }
+  75% {
+    transform: translateY(-1.5px);
+  }
+}
+
+@keyframes logo-leaf-sway {
+  0%,
+  100% {
+    transform: none;
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  60% {
+    transform: rotate(7deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .basket-sway {
+    transform-origin: 50% 90%;
+    animation: basket-sway 900ms ease-in-out 200ms both;
+  }
+
+  .basket-tipped {
+    animation: basket-tip-over 600ms ease-out both;
+  }
+
+  .basket-orange-roll {
+    animation: basket-orange-roll 800ms cubic-bezier(0.25, 1, 0.5, 1) 350ms both;
+  }
+
+  /* Page-chunk loader: produce keeps dropping into the basket until the page arrives. */
+  .logo-loading .logo-produce {
+    animation: logo-produce-loop 1.4s ease-in-out infinite;
+  }
+
+  .logo-loading .logo-produce-2 {
+    animation-delay: 150ms;
+  }
+
+  .logo-loading .logo-produce-3 {
+    animation-delay: 300ms;
+  }
+}
+
+/* Logo hover: the orange hops and the leaf sways (pointer devices only). */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .brand-logo:hover .logo-orange {
+    animation: logo-orange-hop 600ms ease-out;
+  }
+
+  .brand-logo:hover .logo-leaf {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: logo-leaf-sway 700ms ease-in-out;
+  }
+}
+
 /*
  * Scroll-linked rather than timer-based: content already on screen renders finished (no delayed
  * first paint), re-rendered grids never replay, and browsers without scroll-driven animations or

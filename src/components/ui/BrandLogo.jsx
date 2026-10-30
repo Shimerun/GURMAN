@@ -24,7 +24,7 @@ export default function BrandLogo({ tone = 'light', showTagline = false, showSub
     <Link
       to={ROUTES.home}
       aria-label={`GURMAN — продуктовий магазин у місті ${CITY}, на головну`}
-      className={cn('flex min-h-11 shrink-0 items-center gap-2 rounded-xl', isIntroAnimated && 'logo-intro', className)}
+      className={cn('brand-logo flex min-h-11 shrink-0 items-center gap-2 rounded-xl', isIntroAnimated && 'logo-intro', className)}
     >
       <BrandMark tone={tone} className="h-11 w-11" />
       <span className="flex flex-col items-start" aria-hidden="true">

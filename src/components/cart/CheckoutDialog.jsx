@@ -6,6 +6,7 @@ import { IN_CITY } from '../../lib/constants';
 import { PRODUCT_FORMS, formatPrice, pluralize } from '../../lib/format';
 import { ROUTES } from '../../lib/routes';
 import { selectTotalItems, selectTotalPrice, useCartStore } from '../../store/useCartStore';
+import BasketIllustration from '../ui/BasketIllustration';
 import Modal from '../ui/Modal';
 
 /**
@@ -44,6 +45,7 @@ export default function CheckoutDialog({ onClose }) {
           </div>
         }
       >
+        <BasketIllustration variant="filled" className="mb-4" />
         <p role="status" className="flex items-start gap-3 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900 ring-1 ring-emerald-100">
           <CircleCheck className="h-6 w-6 shrink-0 text-emerald-700" aria-hidden="true" />
           <span>

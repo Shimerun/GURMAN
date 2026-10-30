@@ -168,6 +168,7 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu }) {
         <button
           type="button"
           onClick={openCart}
+          data-cart-target
           aria-label={`Кошик: ${pluralize(badgeCount, PRODUCT_FORMS)} на суму ${formatPrice(subtotal)}`}
           className="ml-auto flex h-11 shrink-0 items-center gap-2.5 rounded-full border border-slate-200 bg-white pl-3.5 pr-3.5 transition-colors hover:border-emerald-600 active:bg-slate-50 md:ml-0 sm:pr-4"
         >
