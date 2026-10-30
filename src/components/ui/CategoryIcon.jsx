@@ -1,9 +1,10 @@
-import { Apple, Beef, Cookie, Croissant, CupSoda, LayoutGrid, Milk, Snowflake, Wheat } from 'lucide-react';
+import { Apple, Beef, Carrot, Cookie, Croissant, CupSoda, LayoutGrid, Milk, Snowflake, Wheat } from 'lucide-react';
 
 // Services return icon keys (serializable), the UI owns the mapping to components.
 const CATEGORY_ICONS = {
   milk: Milk,
   apple: Apple,
+  carrot: Carrot,
   beef: Beef,
   croissant: Croissant,
   wheat: Wheat,

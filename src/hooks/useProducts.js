@@ -26,3 +26,9 @@ export function useCategories() {
   const query = useAsyncData(() => productService.getCategories(), 'categories');
   return { ...query, /** @type {Category[]} */ data: query.data ?? EMPTY_LIST };
 }
+
+/** @param {string} categoryId */
+export function useCategory(categoryId) {
+  const query = useAsyncData(() => productService.getCategoryById(categoryId), `category:${categoryId}`);
+  return { ...query, /** @type {Category | undefined} */ data: query.data };
+}

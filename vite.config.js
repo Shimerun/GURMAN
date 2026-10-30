@@ -13,7 +13,7 @@ export default defineConfig({
       manifest: {
         name: 'GURMAN',
         short_name: 'GURMAN',
-        description: 'Супермаркет GURMAN: акції тижня, каталог і доставка продуктів.',
+        description: 'Супермаркет GURMAN у Житомирі: акції тижня, каталог і магазини поруч.',
         lang: 'uk',
         display: 'standalone',
         orientation: 'portrait',

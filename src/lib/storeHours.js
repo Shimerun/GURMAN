@@ -1,7 +1,7 @@
 const MINUTES_IN_DAY = 24 * 60;
 
-// Store hours are local to Ukraine, so "open now" must not depend on the visitor's timezone.
-const createKyivTimeFormatter = () => {
+// Store hours are local to Ukraine (IANA zone "Europe/Kyiv" covers the whole country), so "open now" must not depend on the visitor's timezone.
+const createUkraineTimeFormatter = () => {
   const options = { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' };
   try {
     return new Intl.DateTimeFormat('en-GB', { ...options, timeZone: 'Europe/Kyiv' });
@@ -11,7 +11,7 @@ const createKyivTimeFormatter = () => {
   }
 };
 
-const kyivTimeFormatter = createKyivTimeFormatter();
+const ukraineTimeFormatter = createUkraineTimeFormatter();
 
 /** @param {string} time 'HH:MM' ('24:00' allowed as end of day) */
 const toMinutes = (time) => {
@@ -20,16 +20,15 @@ const toMinutes = (time) => {
 };
 
 /** @param {Date} date */
-const getKyivMinutes = (date) => {
-  const parts = kyivTimeFormatter.formatToParts(date);
+const getUkraineMinutes = (date) => {
+  const parts = ukraineTimeFormatter.formatToParts(date);
   const hour = Number(parts.find((part) => part.type === 'hour')?.value ?? 0);
   const minute = Number(parts.find((part) => part.type === 'minute')?.value ?? 0);
   return hour * 60 + minute;
 };
 
 /** @param {import('../services/storeService').StoreHours} hours */
-export const isOpenAroundTheClock = (hours) =>
-  toMinutes(hours.close) - toMinutes(hours.open) >= MINUTES_IN_DAY;
+export const isOpenAroundTheClock = (hours) => toMinutes(hours.close) - toMinutes(hours.open) >= MINUTES_IN_DAY;
 
 /**
  * @param {import('../services/storeService').StoreHours} hours
@@ -38,7 +37,7 @@ export const isOpenAroundTheClock = (hours) =>
 export function isStoreOpen(hours, date = new Date()) {
   if (isOpenAroundTheClock(hours)) return true;
 
-  const now = getKyivMinutes(date);
+  const now = getUkraineMinutes(date);
   const opensAt = toMinutes(hours.open);
   const closesAt = toMinutes(hours.close);
 
@@ -47,5 +46,4 @@ export function isStoreOpen(hours, date = new Date()) {
 }
 
 /** @param {import('../services/storeService').StoreHours} hours */
-export const formatStoreHours = (hours) =>
-  isOpenAroundTheClock(hours) ? 'Цілодобово' : `${hours.open}–${hours.close}`;
+export const formatStoreHours = (hours) => (isOpenAroundTheClock(hours) ? 'Цілодобово' : `${hours.open}–${hours.close}`);

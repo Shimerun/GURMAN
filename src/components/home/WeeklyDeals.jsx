@@ -1,7 +1,9 @@
 import { ArrowRight, Clock, Tag } from 'lucide-react';
 import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useProducts } from '../../hooks/useProducts';
 import { PROMO_VALID_UNTIL, SECTION_IDS } from '../../lib/constants';
+import { getCatalogPath } from '../../lib/routes';
 import { formatDayMonth } from '../../lib/format';
 import ProductGrid from '../products/ProductGrid';
 import EmptyState from '../ui/EmptyState';
@@ -12,8 +14,9 @@ const PROMO_QUERY = { onlyPromo: true, sort: 'discount' };
 const MAX_PROMO_CARDS = 8;
 const PROMO_GRID_CLASS_NAME = 'grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4';
 
-/** @param {{ onShowAll: () => void }} props */
-export default function WeeklyDeals({ onShowAll }) {
+const ALL_PROMOS_PATH = getCatalogPath({ onlyPromo: true, sort: 'discount' });
+
+export default function WeeklyDeals() {
   const { data, isLoading, isFetching, error, refetch } = useProducts(PROMO_QUERY);
   const promoProducts = useMemo(() => data.slice(0, MAX_PROMO_CARDS), [data]);
 
@@ -25,14 +28,13 @@ export default function WeeklyDeals({ onShowAll }) {
             <Clock className="h-4 w-4" aria-hidden="true" />
             Діє до {formatDayMonth(PROMO_VALID_UNTIL)}
           </p>
-          <button
-            type="button"
-            onClick={onShowAll}
+          <Link
+            to={ALL_PROMOS_PATH}
             className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-50"
           >
             Усі акції
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </button>
+          </Link>
         </div>
       </SectionHeader>
 
@@ -42,7 +44,6 @@ export default function WeeklyDeals({ onShowAll }) {
         isFetching={isFetching}
         error={error}
         onRetry={refetch}
-        eagerImageCount={4}
         skeletonCount={4}
         gridClassName={PROMO_GRID_CLASS_NAME}
         emptyState={

@@ -2,7 +2,7 @@ import { Check, ShoppingBasket, Smartphone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { SECTION_IDS } from '../../lib/constants';
 
-const FEATURES = ['Персональні акції щодня', 'Списки покупок і повторне замовлення', 'Відстеження кур’єра в реальному часі'];
+const FEATURES = ['Персональні акції щодня', 'Списки покупок і повторне замовлення', 'Наявність товарів у найближчому магазині'];
 
 const PLATFORMS = [
   { id: 'ios', caption: 'Завантажити для', label: 'iOS' },
@@ -55,7 +55,10 @@ export default function AppBanner() {
           </div>
         </div>
 
-        <div className="mx-auto hidden h-80 w-44 rounded-[2.25rem] border-[6px] border-slate-900 bg-white p-3 shadow-2xl md:block" aria-hidden="true">
+        <div
+          className="mx-auto hidden h-80 w-44 rounded-[2.25rem] border-[6px] border-slate-900 bg-white p-3 shadow-2xl md:block"
+          aria-hidden="true"
+        >
           <div className="mx-auto h-1.5 w-12 rounded-full bg-slate-200" />
           <div className="mt-4 flex items-center gap-1.5 text-sm font-extrabold text-slate-900">
             <span className="grid h-6 w-6 place-items-center rounded-lg bg-emerald-600 text-white">

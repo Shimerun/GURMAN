@@ -44,11 +44,6 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Mobile header is a fixed 7.25rem tall (see MobileHeader); sub-headers stick right below it. */
-.top-below-mobile-header {
-  top: calc(7.25rem + env(safe-area-inset-top));
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

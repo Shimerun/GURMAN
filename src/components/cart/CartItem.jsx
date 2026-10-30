@@ -1,5 +1,7 @@
 import { Trash } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { formatPrice } from '../../lib/format';
+import { getProductPath } from '../../lib/routes';
 import { useCartStore } from '../../store/useCartStore';
 import QuantityStepper from '../ui/QuantityStepper';
 import SafeImage from '../ui/SafeImage';
@@ -10,19 +12,26 @@ export default function CartItem({ item }) {
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
   const isAtStockLimit = quantity >= product.stockQty;
+  const productPath = getProductPath(product.id);
 
   return (
     <li className="flex gap-3 py-4">
-      <SafeImage
-        src={product.image}
-        alt=""
-        width={80}
-        height={80}
-        className="h-20 w-20 shrink-0 rounded-xl bg-emerald-50 object-cover"
-      />
+      <Link to={productPath} tabIndex={-1} aria-hidden="true" className="shrink-0">
+        <SafeImage
+          src={product.image}
+          alt=""
+          width={80}
+          height={80}
+          className="h-20 w-20 rounded-xl bg-emerald-50 object-cover transition-opacity hover:opacity-90"
+        />
+      </Link>
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="line-clamp-2 text-sm font-medium text-slate-800">{product.title}</h3>
+          <h3 className="line-clamp-2 text-sm font-medium text-slate-800">
+            <Link to={productPath} className="transition-colors hover:text-emerald-700">
+              {product.title}
+            </Link>
+          </h3>
           <button
             type="button"
             onClick={() => removeItem(product.id)}
@@ -38,6 +47,8 @@ export default function CartItem({ item }) {
         <div className="mt-auto flex items-center justify-between gap-3 pt-2">
           <QuantityStepper
             size="sm"
+            // Removal is the trash button's job, so minus stops at 1 instead of silently dropping the line.
+            minQuantity={1}
             quantity={quantity}
             maxQuantity={product.stockQty}
             onChange={(nextQuantity) => updateQuantity(product.id, nextQuantity)}

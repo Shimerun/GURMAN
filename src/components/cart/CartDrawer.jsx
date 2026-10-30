@@ -1,17 +1,18 @@
-import { ShoppingBasket, X } from 'lucide-react';
+import { ArrowRight, ShoppingBasket, X } from 'lucide-react';
 import { useRef } from 'react';
-import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
-import { SECTION_IDS } from '../../lib/constants';
-import { getDeliveryFee } from '../../lib/delivery';
-import { PRODUCT_FORMS, formatPrice, pluralize } from '../../lib/format';
-import { scrollToSection } from '../../lib/utils';
-import { selectTotalItems, selectTotalPrice, useCartStore } from '../../store/useCartStore';
-import DeliveryProgress from '../ui/DeliveryProgress';
+import { useCheckoutNotice } from '../../hooks/useCheckoutNotice';
+import { buttonClassName } from '../../lib/buttonStyles';
+import { PRODUCT_FORMS, pluralize } from '../../lib/format';
+import { ROUTES } from '../../lib/routes';
+import { selectTotalItems, selectTotalPrice, selectTotalSavings, useCartStore } from '../../store/useCartStore';
 import EmptyState from '../ui/EmptyState';
 import CartItem from './CartItem';
+import CartTotals from './CartTotals';
 
+/** Links inside close the drawer implicitly: SiteLayout closes it on every route change. */
 export default function CartDrawer() {
   const isOpen = useCartStore((state) => state.isCartOpen);
   const items = useCartStore((state) => state.items);
@@ -19,6 +20,8 @@ export default function CartDrawer() {
   const clearCart = useCartStore((state) => state.clearCart);
   const totalItems = useCartStore(selectTotalItems);
   const totalPrice = useCartStore(selectTotalPrice);
+  const totalSavings = useCartStore(selectTotalSavings);
+  const showCheckoutNotice = useCheckoutNotice();
   const panelRef = useRef(null);
 
   useFocusTrap(panelRef, { isActive: isOpen, onEscape: closeCart });
@@ -27,18 +30,6 @@ export default function CartDrawer() {
   if (!isOpen) return null;
 
   const isEmpty = items.length === 0;
-  const deliveryFee = getDeliveryFee(totalPrice);
-
-  const handleCheckout = () => {
-    toast.success('Замовлення прийнято!');
-    clearCart();
-    closeCart();
-  };
-
-  const handleBrowseCatalog = () => {
-    closeCart();
-    scrollToSection(SECTION_IDS.catalog);
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -69,8 +60,6 @@ export default function CartDrawer() {
               <X className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
-
-          {!isEmpty && <DeliveryProgress subtotal={totalPrice} className="mt-3" />}
         </div>
 
         <div className="flex-1 px-5">
@@ -81,13 +70,9 @@ export default function CartDrawer() {
               title="Кошик порожній"
               description="Додайте товари з каталогу або з акцій тижня."
               action={
-                <button
-                  type="button"
-                  onClick={handleBrowseCatalog}
-                  className="rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
-                >
+                <Link to={ROUTES.catalog} className={buttonClassName()}>
                   Перейти до каталогу
-                </button>
+                </Link>
               }
             />
           ) : (
@@ -101,34 +86,26 @@ export default function CartDrawer() {
 
         {!isEmpty && (
           <div className="sticky bottom-0 border-t border-slate-200/70 bg-white/90 px-5 py-4 backdrop-blur-md">
-            <dl className="space-y-1.5 text-sm">
-              <div className="flex justify-between text-slate-600">
-                <dt>Товари</dt>
-                <dd className="tabular-nums">{formatPrice(totalPrice)}</dd>
-              </div>
-              <div className="flex justify-between text-slate-600">
-                <dt>Доставка</dt>
-                <dd className="tabular-nums">{deliveryFee > 0 ? formatPrice(deliveryFee) : 'Безкоштовно'}</dd>
-              </div>
-              <div className="flex justify-between pt-1 text-base font-bold text-slate-900">
-                <dt>Разом</dt>
-                <dd className="tabular-nums">{formatPrice(totalPrice + deliveryFee)}</dd>
-              </div>
-            </dl>
-            <button
-              type="button"
-              onClick={handleCheckout}
-              className="mt-4 h-12 w-full rounded-full bg-emerald-600 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700"
-            >
+            <CartTotals totalPrice={totalPrice} totalSavings={totalSavings} />
+            <button type="button" onClick={showCheckoutNotice} className={buttonClassName({ size: 'lg', className: 'mt-4 w-full' })}>
               Оформити замовлення
             </button>
-            <button
-              type="button"
-              onClick={clearCart}
-              className="mt-2 w-full rounded-full py-2 text-sm font-medium text-slate-500 transition-colors hover:text-red-600"
-            >
-              Очистити кошик
-            </button>
+            <div className="mt-2 flex items-center justify-between gap-2">
+              <Link
+                to={ROUTES.cart}
+                className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-50"
+              >
+                Відкрити кошик
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <button
+                type="button"
+                onClick={clearCart}
+                className="rounded-full px-3 py-2 text-sm font-medium text-slate-500 transition-colors hover:text-red-600"
+              >
+                Очистити кошик
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -1,29 +1,58 @@
-export const CITIES = ['Київ', 'Львів', 'Харків', 'Одеса', 'Дніпро'];
-export const DEFAULT_CITY = CITIES[0];
+import { ROUTES } from './routes';
 
-export const FREE_DELIVERY_THRESHOLD = 800;
-export const DELIVERY_FEE = 79;
+/** GURMAN operates in a single city, so it is a constant rather than user-selectable state. */
+export const CITY = 'Житомир';
+/** Locative form for running text ("магазини у Житомирі"). */
+export const IN_CITY = 'у Житомирі';
 
 /** ISO date (local) until which the weekly promo is valid. */
 export const PROMO_VALID_UNTIL = '2026-11-04';
 
+export const MOBILE_MENU_ID = 'mobile-menu';
+
 export const SECTION_IDS = {
+  categories: 'categories',
   promo: 'promo',
-  catalog: 'catalog',
-  loyalty: 'loyalty',
   stores: 'stores',
+  loyalty: 'loyalty',
   app: 'app',
 };
 
 export const NAV_LINKS = [
-  { label: 'Акції', href: `#${SECTION_IDS.promo}` },
-  { label: 'Магазини', href: `#${SECTION_IDS.stores}` },
-  { label: 'Картка лояльності', href: `#${SECTION_IDS.loyalty}` },
+  { label: 'Головна', to: ROUTES.home },
+  { label: 'Каталог', to: ROUTES.catalog },
+  { label: 'Про нас', to: ROUTES.about },
+  { label: 'Контакти', to: ROUTES.contacts },
 ];
 
+/** @type {{ value: import('../services/productService').ProductSort, label: string }[]} */
 export const SORT_OPTIONS = [
-  { value: '', label: 'За замовчуванням' },
-  { value: 'price_asc', label: 'Ціна ↑' },
-  { value: 'price_desc', label: 'Ціна ↓' },
-  { value: 'discount', label: 'Знижка' },
+  { value: 'recommended', label: 'Рекомендовані' },
+  { value: 'popular', label: 'За популярністю' },
+  { value: 'rating', label: 'За рейтингом' },
+  { value: 'price_asc', label: 'Спочатку дешевші' },
+  { value: 'price_desc', label: 'Спочатку дорожчі' },
+  { value: 'discount', label: 'За розміром знижки' },
+];
+
+export const DEFAULT_SORT = 'recommended';
+
+export const STORE_CONTACTS = {
+  phone: '0 800 000 800',
+  phoneHref: 'tel:0800000800',
+  email: 'hello@gurman.example',
+  emailHref: 'mailto:hello@gurman.example',
+  address: `${CITY}, вул. Михайлівська, 10`,
+  supportHours: 'Щодня 08:00–22:00',
+  storeHours: 'Щодня 07:00–23:00, магазин на Бердичівській — цілодобово',
+};
+
+/** Payment accepted at the checkout counter in every store. */
+export const PAYMENT_METHODS = ['Банківська картка', 'Apple Pay / Google Pay', 'Готівка', 'Бонуси картки GURMAN'];
+
+export const SOCIAL_LINKS = [
+  { id: 'telegram', label: 'GURMAN у Telegram', href: 'https://t.me' },
+  { id: 'instagram', label: 'GURMAN в Instagram', href: 'https://www.instagram.com' },
+  { id: 'youtube', label: 'GURMAN на YouTube', href: 'https://www.youtube.com' },
+  { id: 'facebook', label: 'GURMAN у Facebook', href: 'https://www.facebook.com' },
 ];

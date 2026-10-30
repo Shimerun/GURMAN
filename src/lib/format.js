@@ -30,3 +30,4 @@ export const pluralize = (count, forms) => `${count} ${forms[pluralRules.select(
 
 export const PRODUCT_FORMS = { one: 'товар', few: 'товари', many: 'товарів', other: 'товару' };
 export const STORE_FORMS = { one: 'магазин', few: 'магазини', many: 'магазинів', other: 'магазину' };
+export const REVIEW_FORMS = { one: 'відгук', few: 'відгуки', many: 'відгуків', other: 'відгуку' };

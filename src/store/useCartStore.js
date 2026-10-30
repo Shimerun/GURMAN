@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { DEFAULT_CITY } from '../lib/constants';
 
 /** @typedef {import('../services/productService').Product} Product */
 
@@ -13,13 +12,11 @@ import { DEFAULT_CITY } from '../lib/constants';
 /**
  * @typedef {Object} CartState
  * @property {CartItem[]} items
- * @property {string} city
  * @property {boolean} isCartOpen
  * @property {(product: Product) => void} addItem
  * @property {(productId: string) => void} removeItem
  * @property {(productId: string, quantity: number) => void} updateQuantity
  * @property {() => void} clearCart
- * @property {(city: string) => void} setCity
  * @property {() => void} openCart
  * @property {() => void} closeCart
  */
@@ -35,7 +32,6 @@ export const useCartStore = create(
     /** @returns {CartState} */
     (set) => ({
       items: [],
-      city: DEFAULT_CITY,
       isCartOpen: false,
 
       addItem: (product) =>
@@ -47,9 +43,7 @@ export const useCartStore = create(
 
           return {
             items: state.items.map((item) =>
-              item.product.id === product.id
-                ? { ...item, quantity: capToStock(item.quantity + 1, item.product) }
-                : item,
+              item.product.id === product.id ? { ...item, quantity: capToStock(item.quantity + 1, item.product) } : item,
             ),
           };
         }),
@@ -68,15 +62,18 @@ export const useCartStore = create(
         }),
 
       clearCart: () => set({ items: [] }),
-      setCity: (city) => set({ city }),
       openCart: () => set({ isCartOpen: true }),
       closeCart: () => set({ isCartOpen: false }),
     }),
     {
       name: 'gurman-cart',
-      version: 1,
+      // v2 dropped the city selection (single-city store); older snapshots keep only their cart items.
+      version: 2,
+      migrate: (persistedState) => ({
+        items: Array.isArray(persistedState?.items) ? persistedState.items : [],
+      }),
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ items: state.items, city: state.city }),
+      partialize: (state) => ({ items: state.items }),
     },
   ),
 );
@@ -85,8 +82,14 @@ export const useCartStore = create(
 export const selectTotalItems = (state) => state.items.reduce((total, item) => total + item.quantity, 0);
 
 /** @param {CartState} state */
-export const selectTotalPrice = (state) =>
-  state.items.reduce((total, item) => total + item.product.price * item.quantity, 0);
+export const selectTotalPrice = (state) => state.items.reduce((total, item) => total + item.product.price * item.quantity, 0);
+
+/** Total saved versus pre-promo prices. @param {CartState} state */
+export const selectTotalSavings = (state) =>
+  state.items.reduce(
+    (total, { product, quantity }) => total + Math.max((product.oldPrice ?? product.price) - product.price, 0) * quantity,
+    0,
+  );
 
 /** @param {string} productId */
 export const selectItemQuantity = (productId) => (/** @type {CartState} */ state) =>

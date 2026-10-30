@@ -1,4 +1,5 @@
 import { Clock, MapPin, Phone } from 'lucide-react';
+import { CITY } from '../../lib/constants';
 import { formatStoreHours, isStoreOpen } from '../../lib/storeHours';
 import { cn } from '../../lib/utils';
 
@@ -23,7 +24,7 @@ export default function StoreCard({ store, children }) {
         <li className="flex items-start gap-2">
           <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
           <span>
-            {store.city}, {store.address}
+            {CITY}, {store.address}
           </span>
         </li>
         <li className="flex items-center gap-2">
