@@ -52,6 +52,32 @@ test.describe('motion', () => {
     expect(await page.evaluate(() => window.__viewTransitions)).toEqual([1]);
   });
 
+  test('a product shown in two home sections morphs from the card that was tapped only', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__morphSources = [];
+      const original = document.startViewTransition?.bind(document);
+      if (!original) return;
+      document.startViewTransition = (update) => {
+        const named = [...document.querySelectorAll('*')].filter((el) => getComputedStyle(el).viewTransitionName === 'product-image');
+        window.__morphSources.push(named.map((el) => el.closest('section')?.getAttribute('aria-labelledby')));
+        return original(update);
+      };
+    });
+    await open(page, '/');
+    // A product that is both among the weekly deals and the popular products.
+    const popularLinks = page.locator('section[aria-labelledby="popular-heading"] article h3 a');
+    const dealHrefs = await page.locator('section[aria-labelledby="promo-heading"] article h3 a').evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+    const popularHrefs = await popularLinks.evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+    const sharedHref = popularHrefs.find((href) => dealHrefs.includes(href));
+    expect(sharedHref, 'home shows a product in both sections').toBeTruthy();
+
+    const card = page.locator(`section[aria-labelledby="popular-heading"] article:has(h3 a[href="${sharedHref}"])`);
+    await card.hover();
+    await card.locator('h3 a').click();
+    await expect.poll(() => currentPath(page)).toBe(sharedHref);
+    expect(await page.evaluate(() => window.__morphSources)).toEqual([['popular-heading']]);
+  });
+
   test('going back mid-transition is not an uncaught error', async ({ page }) => {
     await open(page, '/category/dairy');
     await page.locator('#main article').first().hover();

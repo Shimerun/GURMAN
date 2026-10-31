@@ -391,6 +391,11 @@ img[data-image-state='loading'] {
   }
 }
 
+/* The one product card image picked for the card → product morph (lib/productImageMorph.js). */
+[data-morph-source] {
+  view-transition-name: product-image;
+}
+
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*),
   ::view-transition-old(*),

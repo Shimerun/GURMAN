@@ -1,5 +1,5 @@
 import { ShoppingCart } from 'lucide-react';
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useViewTransitionState } from 'react-router-dom';
 import { FEATURES } from '../../config/business';
@@ -8,6 +8,7 @@ import { resetCardTilt, tiltCardTowardsPointer } from '../../lib/cardTilt';
 import { flyToCart } from '../../lib/flyToCart';
 import { vibrateOnTap } from '../../lib/haptics';
 import { loadProductPage } from '../../lib/pageLoaders';
+import { isMorphSourceImage, rememberTappedCardImage } from '../../lib/productImageMorph';
 import { getProductPath } from '../../lib/routes';
 import { cn } from '../../lib/utils';
 import { selectItemQuantity, useCartStore } from '../../store/useCartStore';
@@ -30,8 +31,19 @@ export default function ProductCard({ product, isImageEager = false, hasImageTra
 
   const isOutOfStock = product.stockStatus === 'out_of_stock' || product.stockQty <= 0;
   const productPath = getProductPath(product.id);
-  // Only the card being opened (or returned to) may carry the shared name: names must be unique per page.
   const isImageMorphing = useViewTransitionState(productPath) && hasImageTransition;
+  const imageRef = useRef(/** @type {HTMLDivElement | null} */ (null));
+
+  // Every card of this product sees the transition; only one may carry the shared name (names must
+  // be unique per page), so the choice is made against the DOM before the browser takes its snapshot.
+  useLayoutEffect(() => {
+    const image = imageRef.current;
+    if (!isImageMorphing || !image || !isMorphSourceImage(image, product.id)) return undefined;
+    image.dataset.morphSource = '';
+    return () => {
+      delete image.dataset.morphSource;
+    };
+  }, [isImageMorphing, product.id]);
   // Set only by this card's own controls, so cards already in the cart on page load don't animate.
   const [cartControlMotion, setCartControlMotion] = useState(/** @type {'expand' | 'collapse' | null} */ (null));
 
@@ -56,7 +68,7 @@ export default function ProductCard({ product, isImageEager = false, hasImageTra
       onFocus={loadProductPage}
       className="group relative flex h-full flex-col rounded-2xl bg-white p-3 shadow-soft ring-1 ring-slate-100 card-tilt transition-[transform,box-shadow] duration-200 hover:shadow-md focus-within:ring-2 focus-within:ring-emerald-600 motion-reduce:transition-none sm:p-4">
       {/* overflow-clip keeps the badge glint's scroll timeline on the page (hidden would make this box its scroller). */}
-      <div className={cn('relative overflow-clip rounded-xl bg-emerald-50', isImageMorphing && '[view-transition-name:product-image]')}>
+      <div ref={imageRef} data-morph-product={hasImageTransition ? product.id : undefined} className="relative overflow-clip rounded-xl bg-emerald-50">
         {/* pointer-events-none keeps the stretched product link clickable through the badges. */}
         {/* right-12 keeps the badges clear of the heart: a second badge wraps below instead of hiding under it. */}
         <ProductBadges product={product} className="pointer-events-none absolute left-2 right-12 top-2 z-[1]" />
@@ -89,6 +101,7 @@ export default function ProductCard({ product, isImageEager = false, hasImageTra
           <Link
             to={productPath}
             viewTransition={hasImageTransition}
+            onClick={() => rememberTappedCardImage(imageRef.current)}
             className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-5 text-slate-800 transition-colors after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus:outline-none group-hover:text-emerald-800"
           >
             {product.title}
