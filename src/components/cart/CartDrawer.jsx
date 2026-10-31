@@ -113,7 +113,7 @@ export default function CartDrawer() {
               <button
                 type="button"
                 onClick={clearCart}
-                className="inline-flex h-11 items-center rounded-full px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-700"
+                className="inline-flex h-11 items-center rounded-lg px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-700"
               >
                 Очистити кошик
               </button>

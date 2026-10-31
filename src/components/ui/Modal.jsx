@@ -32,7 +32,7 @@ export default function Modal({ title, description, onClose, children, footer })
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
         tabIndex={-1}
-        className="pb-safe relative flex max-h-[90dvh] w-full animate-sheet-up flex-col overflow-y-auto overscroll-contain rounded-t-3xl bg-white shadow-2xl focus:outline-none sm:max-w-lg sm:animate-fade-in sm:rounded-3xl"
+        className="pb-safe relative flex max-h-[90dvh] w-full animate-sheet-up flex-col overflow-y-auto overscroll-contain rounded-t-xl bg-white shadow-2xl focus:outline-none sm:max-w-lg sm:animate-fade-in sm:rounded-xl"
       >
         <div className="flex items-start justify-between gap-4 px-5 pt-5 sm:px-6 sm:pt-6">
           <div className="min-w-0">

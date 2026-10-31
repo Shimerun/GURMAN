@@ -29,7 +29,7 @@ export default function PrintListButton({ isIconOnly = false, className }) {
         title={PRINT_LABEL}
         // Square twin of the secondary button, as tall as the large share button beside it.
         className={cn(
-          'grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white text-slate-800 shadow-sm ring-1 ring-slate-200 transition-colors hover:text-emerald-800 hover:ring-emerald-500',
+          'grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-white text-slate-800 shadow-sm ring-1 ring-slate-200 transition-colors hover:text-emerald-800 hover:ring-emerald-500',
           className,
         )}
       >

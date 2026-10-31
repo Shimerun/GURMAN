@@ -33,7 +33,7 @@ export default function RecentlyViewed({ excludeProductId, hasImageTransition = 
 
   return (
     <section aria-labelledby="recently-viewed-heading" className={className}>
-      <SectionHeader id="recently-viewed-heading" eyebrow="Ваша історія" title="Ви переглядали">
+      <SectionHeader id="recently-viewed-heading" title="Ви переглядали">
         <button type="button" onClick={clearViewedProducts} className={buttonClassName({ variant: 'ghost', size: 'sm' })}>
           Очистити історію
         </button>

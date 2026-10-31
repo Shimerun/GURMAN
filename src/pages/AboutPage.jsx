@@ -98,8 +98,8 @@ function FeatureCards({ items, columnsClassName }) {
   return (
     <ul className={cn('grid gap-4', columnsClassName)}>
       {items.map(({ icon: Icon, title, description }) => (
-        <li key={title} className="flex gap-4 rounded-2xl bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-6">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100">
+        <li key={title} className="flex gap-4 rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-6">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100">
             <Icon className="h-6 w-6" aria-hidden="true" />
           </span>
           <div>
@@ -120,7 +120,6 @@ export default function AboutPage() {
       <div>
         <PageHeader
           title="Про GURMAN"
-          eyebrow="Наша історія"
           breadcrumbs={[{ label: 'Про нас' }]}
           description={`GURMAN — супермаркет свіжих продуктів ${IN_CITY}. Ми віримо, що щоденні покупки можуть бути приємними: зрозумілий асортимент, чесні ціни та якість, за яку не соромно.`}
         />
@@ -144,7 +143,7 @@ export default function AboutPage() {
               </Link>
             </div>
           </div>
-          <div className="overflow-hidden rounded-3xl bg-emerald-50 shadow-soft ring-1 ring-slate-100">
+          <div className="overflow-hidden rounded-xl bg-emerald-50 shadow-soft ring-1 ring-slate-100">
             <SafeImage
               src={withImageWidth(STORE_PHOTO_URL, 1000)}
               sizes={IMAGE_SIZES.aboutPhoto}
@@ -158,9 +157,9 @@ export default function AboutPage() {
         </div>
       </div>
 
-      <section aria-labelledby="mission-heading" className="rounded-3xl bg-white p-6 shadow-soft ring-1 ring-slate-100 sm:p-10">
+      <section aria-labelledby="mission-heading" className="rounded-xl bg-white p-6 shadow-soft ring-1 ring-slate-100 sm:p-10">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-amber-100 text-amber-800">
+          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-lg bg-amber-100 text-amber-800">
             <Target className="h-7 w-7" aria-hidden="true" />
           </span>
           <div>
@@ -176,7 +175,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section aria-labelledby="why-heading" className="rounded-3xl bg-emerald-800 px-6 py-8 text-white shadow-soft sm:px-10">
+      <section aria-labelledby="why-heading" className="rounded-xl bg-emerald-800 px-6 py-8 text-white shadow-soft sm:px-10">
         <h2 id="why-heading" className="font-display text-lg font-bold sm:text-xl">
           Чому покупці обирають GURMAN
         </h2>
@@ -191,14 +190,13 @@ export default function AboutPage() {
       </section>
 
       <section aria-labelledby="values-heading">
-        <SectionHeader id="values-heading" eyebrow="У що ми віримо" title="Принципи якості" />
+        <SectionHeader id="values-heading" title="Принципи якості" />
         <FeatureCards items={VALUES} columnsClassName="sm:grid-cols-2" />
       </section>
 
       <section aria-labelledby="suppliers-heading">
         <SectionHeader
           id="suppliers-heading"
-          eyebrow="Постачальники"
           title="Звідки наші продукти"
           description={`Працюємо напряму з понад ${COMPANY_FACTS.partnerSupplierCount} господарствами та виробниками — без зайвих посередників.`}
         />
@@ -206,12 +204,12 @@ export default function AboutPage() {
       </section>
 
       <section aria-labelledby="guarantees-heading">
-        <SectionHeader id="guarantees-heading" eyebrow="Наші зобов’язання" title="Гарантії якості" />
+        <SectionHeader id="guarantees-heading" title="Гарантії якості" />
         <FeatureCards items={GUARANTEES} columnsClassName="md:grid-cols-3" />
       </section>
 
       <section aria-labelledby="history-heading">
-        <SectionHeader id="history-heading" eyebrow="Шлях GURMAN" title="Як ми зростали" />
+        <SectionHeader id="history-heading" title="Як ми зростали" />
         <ol className="relative space-y-6 border-l-2 border-emerald-100 pl-6 sm:pl-8">
           {COMPANY_MILESTONES.map((milestone) => (
             <li key={milestone.year} className="relative">
@@ -227,7 +225,7 @@ export default function AboutPage() {
         </ol>
       </section>
 
-      <section aria-labelledby="about-cta-heading" className="rounded-3xl bg-amber-50 p-6 text-center ring-1 ring-amber-100 sm:p-10">
+      <section aria-labelledby="about-cta-heading" className="rounded-xl bg-amber-50 p-6 text-center ring-1 ring-amber-100 sm:p-10">
         <h2 id="about-cta-heading" className="font-display text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
           Спробуйте самі
         </h2>

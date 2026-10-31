@@ -40,7 +40,7 @@ function ActiveFilterChips({ filterState }) {
           <button
             type="button"
             onClick={chip.onRemove}
-            className="inline-flex min-h-10 max-w-full items-center gap-1.5 rounded-full bg-emerald-50 pl-3.5 pr-2.5 text-sm font-medium text-emerald-900 ring-1 ring-emerald-200 transition-colors hover:bg-emerald-100"
+            className="inline-flex min-h-10 max-w-full items-center gap-1.5 rounded-lg bg-emerald-50 pl-3.5 pr-2.5 text-sm font-medium text-emerald-900 ring-1 ring-emerald-200 transition-colors hover:bg-emerald-100"
           >
             <span className="truncate">{chip.label}</span>
             <X className="h-4 w-4 shrink-0" aria-hidden="true" />
@@ -70,13 +70,13 @@ export default function ProductListing({ filterState, productsQuery, emptyState 
   return (
     <div className="lg:grid lg:grid-cols-[17rem_minmax(0,1fr)] lg:items-start lg:gap-8">
       <aside aria-label="Фільтри товарів" className="hidden lg:sticky lg:top-36 lg:block">
-        <div className="rounded-2xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+        <div className="rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-100">
           <ProductFilterPanel filterState={filterState} />
         </div>
       </aside>
 
       <div className="min-w-0">
-        <div className="mb-4 flex flex-wrap items-center gap-2 rounded-2xl bg-white p-2 pl-4 shadow-soft ring-1 ring-slate-100">
+        <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg bg-white p-2 pl-4 shadow-soft ring-1 ring-slate-100">
           <p className="mr-auto min-h-11 py-2.5 text-sm text-slate-700" aria-live="polite">
             {isLoading ? (
               'Завантаження товарів…'
@@ -109,7 +109,7 @@ export default function ProductListing({ filterState, productsQuery, emptyState 
             <span className="hidden sm:inline">Сортування</span>
             <span className="sr-only sm:hidden">Сортування</span>
             <select
-              className="select select-bordered h-11 min-h-11 rounded-full border-slate-300 text-sm text-slate-800"
+              className="select select-bordered h-11 min-h-11 rounded-lg border-slate-300 text-sm text-slate-800"
               value={filters.sort}
               onChange={(event) => setSort(/** @type {import('../../services/productService').ProductSort} */ (event.target.value))}
             >

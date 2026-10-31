@@ -65,9 +65,9 @@ export default function BottomSheet({ title, onClose, children, footer }) {
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="relative flex max-h-[90dvh] w-full animate-sheet-up flex-col overflow-y-auto overscroll-contain rounded-t-3xl bg-white shadow-2xl focus:outline-none"
+        className="relative flex max-h-[90dvh] w-full animate-sheet-up flex-col overflow-y-auto overscroll-contain rounded-t-xl bg-white shadow-2xl focus:outline-none"
       >
-        <div className="sticky top-0 z-10 rounded-t-3xl border-b border-slate-200/70 bg-white/80 backdrop-blur-md">
+        <div className="sticky top-0 z-10 rounded-t-xl border-b border-slate-200/70 bg-white/80 backdrop-blur-md">
           {/* Drag zone excludes the close button: pointer capture would otherwise swallow its click. */}
           <div
             className="cursor-grab touch-none select-none px-5 pb-3 pt-2.5 active:cursor-grabbing"

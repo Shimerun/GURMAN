@@ -46,17 +46,16 @@ export default function DeliveryPage() {
       <div>
         <PageHeader
           title="Як купити в GURMAN"
-          eyebrow="Покупки й оплата"
           breadcrumbs={[{ label: 'Як купити' }]}
           description={`Ми працюємо лише ${IN_CITY}. Сайт допомагає обрати товари й порівняти ціни, а купуєте ви — у магазині поруч.`}
         />
       </div>
 
       <section aria-labelledby="steps-heading">
-        <SectionHeader id="steps-heading" eyebrow="Три кроки" title="Як це працює" />
+        <SectionHeader id="steps-heading" title="Як це працює" />
         <ol className="grid gap-4 md:grid-cols-3">
           {STEPS.map(({ icon: Icon, title, description }, index) => (
-            <li key={title} className="rounded-2xl bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-6">
+            <li key={title} className="rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-6">
               <div className="flex items-center gap-3">
                 <span className="grid h-9 w-9 place-items-center rounded-full bg-emerald-700 text-sm font-bold text-white" aria-hidden="true">
                   {index + 1}
@@ -71,21 +70,21 @@ export default function DeliveryPage() {
       </section>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <section aria-labelledby="payment-heading" className="rounded-2xl bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-6">
+        <section aria-labelledby="payment-heading" className="rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-6">
           <h2 id="payment-heading" className="flex items-center gap-2 text-xl font-bold text-slate-900">
             <CreditCard className="h-5 w-5 text-emerald-700" aria-hidden="true" />
             Оплата на касі
           </h2>
           <ul className="mt-4 grid gap-2 sm:grid-cols-2">
             {PAYMENT_METHODS.map((method) => (
-              <li key={method} className="rounded-xl bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-800 ring-1 ring-slate-100">
+              <li key={method} className="rounded-lg bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-800 ring-1 ring-slate-100">
                 {method}
               </li>
             ))}
           </ul>
         </section>
 
-        <section aria-labelledby="returns-heading" className="rounded-2xl bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-6">
+        <section aria-labelledby="returns-heading" className="rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-6">
           <h2 id="returns-heading" className="flex items-center gap-2 text-xl font-bold text-slate-900">
             <RotateCcw className="h-5 w-5 text-emerald-700" aria-hidden="true" />
             Повернення та заміна
@@ -105,11 +104,11 @@ export default function DeliveryPage() {
       </div>
 
       <section aria-labelledby="faq-heading">
-        <SectionHeader id="faq-heading" eyebrow="Питання та відповіді" title="Часті запитання" />
+        <SectionHeader id="faq-heading" title="Часті запитання" />
         <div className="space-y-3">
           {FAQ.map((item) => (
-            <details key={item.question} className="group rounded-2xl bg-white shadow-soft ring-1 ring-slate-100 open:ring-emerald-200">
-              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded-2xl px-5 py-3 font-semibold text-slate-900 transition-colors hover:text-emerald-800 [&::-webkit-details-marker]:hidden">
+            <details key={item.question} className="group rounded-lg bg-white shadow-soft ring-1 ring-slate-100 open:ring-emerald-200">
+              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded-lg px-5 py-3 font-semibold text-slate-900 transition-colors hover:text-emerald-800 [&::-webkit-details-marker]:hidden">
                 {item.question}
                 <ChevronDown className="h-5 w-5 shrink-0 text-slate-500 transition-transform duration-200 group-open:rotate-180" aria-hidden="true" />
               </summary>

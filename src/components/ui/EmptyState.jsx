@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils';
  */
 export default function EmptyState({ icon: Icon, illustration, title, description, action, className, headingAs: Heading = 'h3' }) {
   return (
-    <div className={cn('flex flex-col items-center rounded-2xl bg-white px-6 py-12 text-center shadow-soft ring-1 ring-slate-100', className)}>
+    <div className={cn('flex flex-col items-center rounded-lg bg-white px-6 py-12 text-center shadow-soft ring-1 ring-slate-100', className)}>
       {illustration}
       {!illustration && Icon && (
         <span className="grid h-14 w-14 place-items-center rounded-full bg-emerald-50 text-emerald-600">

@@ -21,9 +21,9 @@ export default function WeeklyDeals() {
 
   return (
     <section id={SECTION_IDS.promo} aria-labelledby="promo-heading">
-      <SectionHeader id="promo-heading" eyebrow="Вигідно" title="Акції тижня">
+      <SectionHeader id="promo-heading" title="Акції тижня">
         <div className="flex flex-wrap items-center gap-3">
-          <p className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1.5 text-sm font-semibold text-amber-900">
+          <p className="inline-flex items-center gap-1.5 rounded-lg bg-amber-100 px-3 py-1.5 text-sm font-semibold text-amber-900">
             <Clock className="h-4 w-4" aria-hidden="true" />
             Діє до {formatDayMonth(PROMO_VALID_UNTIL)}
           </p>

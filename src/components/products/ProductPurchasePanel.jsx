@@ -1,4 +1,4 @@
-import { ArrowRight, CircleCheck, PackageX, Phone, ShoppingBasket } from 'lucide-react';
+import { ArrowRight, CircleCheck, PackageX, Phone } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
@@ -9,6 +9,7 @@ import { vibrateOnTap } from '../../lib/haptics';
 import { formatPrice } from '../../lib/format';
 import { ROUTES, getCategoryPath } from '../../lib/routes';
 import { selectItemQuantity, useCartStore } from '../../store/useCartStore';
+import BrandIcon from '../ui/BrandIcon';
 import QuantityStepper from '../ui/QuantityStepper';
 
 /** @typedef {import('../../services/productService').Product} Product */
@@ -34,7 +35,7 @@ function useIsFullyOnScreen(element) {
 /** @param {{ product: Product }} props */
 function OutOfStockNotice({ product }) {
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-soft ring-1 ring-red-100">
+    <div className="rounded-lg bg-white p-5 shadow-soft ring-1 ring-red-100">
       <p className="flex items-center gap-2 text-base font-bold text-slate-900">
         <PackageX className="h-5 w-5 text-red-700" aria-hidden="true" />
         Зараз немає в наявності
@@ -99,7 +100,7 @@ export default function ProductPurchasePanel({ product }) {
 
   return (
     <>
-      <div className="rounded-2xl bg-white p-4 shadow-soft ring-2 ring-emerald-100 sm:p-5">
+      <div className="border-t border-slate-200 pt-5">
         {canAdd ? (
           <>
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -119,19 +120,19 @@ export default function ProductPurchasePanel({ product }) {
               />
             </div>
             <button ref={setPrimaryActionElement} type="button" onClick={handleAddToCart} className={buttonClassName({ size: 'lg', className: 'mt-4 w-full' })}>
-              <ShoppingBasket className="h-5 w-5" aria-hidden="true" />
+              <BrandIcon name="basket" className="h-5 w-5" />
               Додати в кошик · {formatPrice(product.price * quantityToAdd)}
             </button>
           </>
         ) : (
-          <p ref={setPrimaryActionElement} className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
+          <p ref={setPrimaryActionElement} className="rounded-lg bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
             У кошику вся доступна кількість цього товару ({product.stockQty} {product.unit}).
           </p>
         )}
 
         <div role="status" aria-live="polite">
           {quantityInCart > 0 && (
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-emerald-50 px-4 py-3 ring-1 ring-emerald-100">
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-emerald-50 px-4 py-3 ring-1 ring-emerald-100">
               <p className="flex items-center gap-2 text-sm text-emerald-900">
                 <CircleCheck className="h-5 w-5 shrink-0 text-emerald-700" aria-hidden="true" />
                 <span>
@@ -163,7 +164,7 @@ export default function ProductPurchasePanel({ product }) {
             </p>
             {canAdd ? (
               <button type="button" onClick={handleAddToCart} className={buttonClassName({ size: 'sm', className: 'shrink-0' })}>
-                <ShoppingBasket className="h-4 w-4" aria-hidden="true" />
+                <BrandIcon name="basket" className="h-4 w-4" />
                 У кошик
               </button>
             ) : (

@@ -1,4 +1,3 @@
-import BenefitsSection from '../components/home/BenefitsSection';
 import CategoryCards from '../components/home/CategoryCards';
 import CoffeeToGo from '../components/home/CoffeeToGo';
 import ContactCta from '../components/home/ContactCta';
@@ -17,7 +16,6 @@ export default function HomePage() {
     <div className="space-y-10 sm:space-y-14">
       <div className="space-y-4">
         <HeroBanner />
-        <BenefitsSection />
         <InstallBanner />
       </div>
       <CoffeeToGo />

@@ -1,4 +1,4 @@
-import { Clock, MapPin } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCurrentTime } from '../../hooks/useCurrentTime';
 import { useStores } from '../../hooks/useStores';
@@ -6,6 +6,7 @@ import { CITY, STORE_CONTACTS } from '../../lib/constants';
 import { ROUTES } from '../../lib/routes';
 import { getStoresOpenStatus } from '../../lib/storeHours';
 import { cn } from '../../lib/utils';
+import BrandIcon from '../ui/BrandIcon';
 
 /**
  * "Open now · until 22:00" / "Closed · opens at 07:00"; the static hours until the stores load.
@@ -57,9 +58,9 @@ export default function TopStrip() {
         </p>
         <Link
           to={ROUTES.contacts}
-          className="flex min-h-8 shrink-0 items-center gap-1.5 rounded-full bg-emerald-900/60 py-1 pl-2 pr-3 font-semibold text-white transition-colors hover:bg-emerald-900"
+          className="flex min-h-8 shrink-0 items-center gap-1.5 rounded-lg bg-emerald-900/60 py-1 pl-2 pr-3 font-semibold text-white transition-colors hover:bg-emerald-900"
         >
-          <MapPin className="h-4 w-4 text-amber-300" aria-hidden="true" />
+          <BrandIcon name="pin" className="h-4 w-4 text-gray-50" />
           <span className="sr-only">Магазини, місто: </span>
           {CITY}
           <span className="hidden font-normal text-emerald-100 sm:inline">· 2 магазини</span>

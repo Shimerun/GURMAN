@@ -51,7 +51,8 @@ module.exports = {
         script: ['Caveat', 'cursive'],
       },
       boxShadow: {
-        soft: '0 2px 12px -2px rgb(15 23 42 / 0.08)',
+        // Hairline lift only: cards are separated by their ring, not by floating shadows.
+        soft: '0 1px 2px rgb(15 23 42 / 0.05)',
       },
       keyframes: {
         'basket-hop': {

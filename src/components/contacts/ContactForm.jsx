@@ -51,7 +51,7 @@ function shakeFields(form, fieldNames) {
 }
 
 const FIELD_CLASS_NAME =
-  'mt-1.5 block w-full rounded-xl border bg-white px-3.5 text-base text-slate-800 transition-colors placeholder:text-slate-500 focus:outline-none focus:ring-2 sm:text-sm';
+  'mt-1.5 block w-full rounded-lg border bg-white px-3.5 text-base text-slate-800 transition-colors placeholder:text-slate-500 focus:outline-none focus:ring-2 sm:text-sm';
 
 /** @param {boolean} hasError */
 const getFieldClassName = (hasError) =>
@@ -119,7 +119,7 @@ export default function ContactForm() {
         ref={successRef}
         role="status"
         tabIndex={-1}
-        className="flex flex-col items-start gap-3 rounded-2xl bg-emerald-50 p-6 ring-1 ring-emerald-100 focus:outline-none"
+        className="flex flex-col items-start gap-3 rounded-lg bg-emerald-50 p-6 ring-1 ring-emerald-100 focus:outline-none"
       >
         {/* Circle and tick draw themselves (index.css `.check-draw`); static with reduced motion. */}
         <svg viewBox="0 0 32 32" className="check-draw h-10 w-10" aria-hidden="true" focusable="false">
@@ -144,7 +144,7 @@ export default function ContactForm() {
         Усі поля обов’язкові.
       </p>
       {errorEntries.length > 0 && (
-        <div role="alert" className="rounded-2xl bg-red-50 p-4 text-sm text-red-900 ring-1 ring-red-200">
+        <div role="alert" className="rounded-lg bg-red-50 p-4 text-sm text-red-900 ring-1 ring-red-200">
           <p className="font-semibold">Перевірте {errorEntries.length === 1 ? 'поле' : 'поля'}:</p>
           <ul className="mt-1 list-inside list-disc">
             {errorEntries.map(([name]) => (

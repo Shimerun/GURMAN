@@ -1,4 +1,4 @@
-import { BadgeCheck, Factory, Globe, RotateCcw, Scale, Store, Tag } from 'lucide-react';
+import { Factory, Globe, Scale, Tag } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import FavoriteButton from '../components/products/FavoriteButton';
@@ -32,16 +32,10 @@ import { buttonClassName } from '../lib/buttonStyles';
 const MAX_RECOMMENDATIONS = 4;
 const RECOMMENDATIONS_GRID_CLASS_NAME = 'grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4';
 
-const SERVICE_PROMISES = [
-  { icon: Store, label: 'Купуйте в магазинах GURMAN' },
-  { icon: BadgeCheck, label: 'Перевіряємо кожну партію' },
-  { icon: RotateCcw, label: 'Заміна або повернення грошей' },
-];
-
 /** @param {{ title: string, children: import('react').ReactNode }} props */
 function DetailsSection({ title, children }) {
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-6">
+    <section className="border-t border-slate-200 pt-5">
       <h2 className="text-lg font-bold text-slate-900">{title}</h2>
       <div className="mt-3 text-sm leading-relaxed text-slate-700">{children}</div>
     </section>
@@ -60,7 +54,7 @@ function RecommendedProducts({ product }) {
 
   return (
     <section aria-labelledby="recommended-heading" className="mt-12 sm:mt-16">
-      <SectionHeader id="recommended-heading" eyebrow="Вам також сподобається" title="Рекомендовані товари">
+      <SectionHeader id="recommended-heading" title="Рекомендовані товари">
         <Link
           to={getCategoryPath(product.category)}
           className={buttonClassName({ variant: 'ghost', size: 'sm' })}
@@ -102,7 +96,7 @@ function PromoNotice({ product }) {
   if (!product.isPromo || discountPercent === 0) return null;
 
   return (
-    <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-950 ring-1 ring-amber-200">
+    <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-950 ring-1 ring-amber-200">
       <Tag className="h-4 w-4 shrink-0 text-amber-700" aria-hidden="true" />
       <span className="font-bold">Акція −{discountPercent}%</span>
       <span>
@@ -137,7 +131,7 @@ function ProductDetails({ product }) {
       <div className="mt-4 grid gap-6 lg:mt-6 lg:grid-cols-2 lg:gap-10">
         <div className="lg:sticky lg:top-36 lg:self-start">
           {/* Shared view-transition name: the product card's image morphs into this one. */}
-          <div className="relative overflow-clip rounded-3xl bg-emerald-50 shadow-soft ring-1 ring-slate-100 [view-transition-name:product-image]">
+          <div className="relative overflow-clip rounded-xl bg-emerald-50 shadow-soft ring-1 ring-slate-100 [view-transition-name:product-image]">
             <ProductBadges product={product} className="absolute left-4 top-4 z-[1]" />
             <SafeImage
               src={withImageWidth(product.image, 900)}
@@ -203,7 +197,7 @@ function ProductDetails({ product }) {
             <ProductPurchasePanel product={product} />
           </div>
 
-          <dl className="mt-5 grid gap-3 rounded-2xl bg-white p-4 text-sm ring-1 ring-slate-100 sm:grid-cols-2">
+          <dl className="mt-5 grid gap-3 border-t border-slate-200 pt-4 text-sm sm:grid-cols-2">
             <div>
               <dt className="flex items-center gap-2 text-slate-600">
                 <Globe className="h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
@@ -219,19 +213,10 @@ function ProductDetails({ product }) {
               <dd className="pl-6 font-semibold text-slate-900">{product.producer}</dd>
             </div>
           </dl>
-
-          <ul className="mt-4 grid gap-2 text-sm text-slate-700 sm:grid-cols-3">
-            {SERVICE_PROMISES.map(({ icon: Icon, label }) => (
-              <li key={label} className="flex items-center gap-2">
-                <Icon className="h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
-                {label}
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
 
-      <div className="mt-10 grid gap-4 lg:grid-cols-2">
+      <div className="mt-12 grid gap-x-10 gap-y-8 lg:grid-cols-2">
         <DetailsSection title="Опис">
           <p>{product.description}</p>
         </DetailsSection>
@@ -282,14 +267,14 @@ function ProductPageSkeleton() {
     <div aria-busy="true" aria-label="Завантаження товару">
       <div className="skeleton h-5 w-72 max-w-full rounded" />
       <div className="mt-6 grid gap-6 lg:grid-cols-2 lg:gap-10">
-        <div className="skeleton aspect-square w-full rounded-3xl" />
+        <div className="skeleton aspect-square w-full rounded-xl" />
         <div>
           <div className="skeleton h-4 w-32 rounded" />
           <div className="skeleton mt-3 h-9 w-full rounded" />
           <div className="skeleton mt-2 h-9 w-2/3 rounded" />
           <div className="skeleton mt-5 h-5 w-48 rounded" />
           <div className="skeleton mt-6 h-10 w-40 rounded" />
-          <div className="skeleton mt-6 h-36 w-full rounded-2xl" />
+          <div className="skeleton mt-6 h-36 w-full rounded-lg" />
         </div>
       </div>
     </div>

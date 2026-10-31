@@ -12,7 +12,7 @@ export default function StoreCard({ store }) {
   const fullAddress = `${CITY}, ${store.address}`;
 
   return (
-    <article className="flex h-full flex-col rounded-2xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+    <article className="flex h-full flex-col rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-100">
       <div className="flex items-start justify-between gap-3">
         <h3 className="font-bold text-slate-900">{store.name}</h3>
         <span

@@ -20,7 +20,7 @@ const TONE_CLASSES = {
  */
 export default function BrandLogo({ tone = 'light', showTagline = false, showSubtitle = false, isIntroAnimated = false, isDecorative = false, className }) {
   const toneClasses = TONE_CLASSES[tone];
-  const wrapperClassName = cn('flex min-h-11 shrink-0 items-center gap-2 rounded-xl', !isDecorative && 'brand-logo', isIntroAnimated && 'logo-intro', className);
+  const wrapperClassName = cn('flex min-h-11 shrink-0 items-center gap-2 rounded-lg', !isDecorative && 'brand-logo', isIntroAnimated && 'logo-intro', className);
 
   const lockup = (
     <>

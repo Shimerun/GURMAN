@@ -131,13 +131,13 @@ export default function Footer() {
             <div className="mt-4 flex flex-wrap gap-2">
               <Link
                 to={ROUTES.contacts}
-                className="inline-flex min-h-11 items-center rounded-full bg-amber-400 px-4 text-sm font-semibold text-slate-900 transition-colors hover:bg-amber-300"
+                className="inline-flex min-h-11 items-center rounded-lg bg-amber-400 px-4 text-sm font-semibold text-slate-900 transition-colors hover:bg-amber-300"
               >
                 Адреси магазинів
               </Link>
               <Link
                 to={ROUTES.delivery}
-                className="inline-flex min-h-11 items-center rounded-full px-4 text-sm font-semibold text-white ring-1 ring-white/30 transition-colors hover:bg-white/10"
+                className="inline-flex min-h-11 items-center rounded-lg px-4 text-sm font-semibold text-white ring-1 ring-white/30 transition-colors hover:bg-white/10"
               >
                 Як купити
               </Link>

@@ -149,7 +149,7 @@ export default function SearchBox({ className }) {
           placeholder={placeholder}
           autoComplete="off"
           enterKeyHint="search"
-          className="h-11 w-full rounded-full border border-slate-300 bg-slate-50 pl-12 pr-12 text-base text-slate-800 transition-colors placeholder:text-slate-500 hover:border-slate-400 focus:border-emerald-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600/20 md:text-sm [&::-webkit-search-cancel-button]:hidden"
+          className="h-11 w-full rounded-lg border border-slate-300 bg-slate-50 pl-12 pr-12 text-base text-slate-800 transition-colors placeholder:text-slate-500 hover:border-slate-400 focus:border-emerald-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600/20 md:text-sm [&::-webkit-search-cancel-button]:hidden"
         />
         {query && (
           <button
@@ -175,7 +175,7 @@ export default function SearchBox({ className }) {
         hidden={!isOpen}
         onMouseDown={(event) => event.preventDefault()}
         className={cn(
-          'absolute inset-x-0 top-full z-50 mt-2 max-h-[min(28rem,70dvh)] overflow-y-auto overscroll-contain rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-slate-200',
+          'absolute inset-x-0 top-full z-50 mt-2 max-h-[min(28rem,70dvh)] overflow-y-auto overscroll-contain rounded-lg bg-white p-1.5 shadow-xl ring-1 ring-slate-200',
           // Only the rows dim: a translucent panel would let the page show through.
           isStale && '[&>li]:opacity-60',
         )}
@@ -191,7 +191,7 @@ export default function SearchBox({ className }) {
             aria-selected={activeIndex === index}
             onClick={(event) => chooseOption(index, event.currentTarget.closest('form')?.querySelector('input') ?? null)}
             onMouseEnter={() => setActiveIndex(index)}
-            className={cn('flex cursor-pointer items-center gap-3 rounded-xl px-2 py-1.5', activeIndex === index && 'bg-emerald-50')}
+            className={cn('flex cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5', activeIndex === index && 'bg-emerald-50')}
           >
             <SafeImage
               src={withImageWidth(product.image, THUMBNAIL_WIDTH.suggestion)}
@@ -219,7 +219,7 @@ export default function SearchBox({ className }) {
           onClick={(event) => openCatalogSearch(event.currentTarget.closest('form')?.querySelector('input') ?? null)}
           onMouseEnter={() => setActiveIndex(suggestions.length)}
           className={cn(
-            'mt-1 flex cursor-pointer items-center justify-between gap-2 rounded-xl border-t border-slate-100 px-3 py-2.5 text-sm font-semibold text-emerald-800',
+            'mt-1 flex cursor-pointer items-center justify-between gap-2 rounded-lg border-t border-slate-100 px-3 py-2.5 text-sm font-semibold text-emerald-800',
             activeIndex === suggestions.length && 'bg-emerald-50',
           )}
         >

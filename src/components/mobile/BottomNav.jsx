@@ -1,4 +1,3 @@
-import { House, LayoutGrid, MapPin, ShoppingBasket, Tag } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useHasMounted } from '../../hooks/useHasMounted';
@@ -6,27 +5,28 @@ import { PROMO_LISTING_QUERY } from '../../lib/constants';
 import { PRODUCT_FORMS, pluralize } from '../../lib/format';
 import { ROUTES, getCatalogPath, isNavLinkActive, isPromoListing } from '../../lib/routes';
 import { cn } from '../../lib/utils';
+import BrandIcon from '../ui/BrandIcon';
 import { selectTotalItems, useCartStore } from '../../store/useCartStore';
 
 /** `isActive` decides from the full location, because "Акції" and "Каталог" share the /catalog path. */
 const TABS = [
-  { id: 'home', to: ROUTES.home, label: 'Головна', icon: House, isActive: (pathname) => pathname === ROUTES.home },
+  { id: 'home', to: ROUTES.home, label: 'Головна', icon: 'home', isActive: (pathname) => pathname === ROUTES.home },
   {
     id: 'catalog',
     to: ROUTES.catalog,
     label: 'Каталог',
-    icon: LayoutGrid,
+    icon: 'catalog',
     isActive: (pathname, search) => isNavLinkActive(ROUTES.catalog, pathname, false) && !isPromoListing(pathname, search),
   },
   {
     id: 'promo',
     to: getCatalogPath(PROMO_LISTING_QUERY),
     label: 'Акції',
-    icon: Tag,
+    icon: 'tag',
     isActive: (pathname, search) => isPromoListing(pathname, search),
   },
-  { id: 'cart', to: ROUTES.cart, label: 'Кошик', icon: ShoppingBasket, isActive: (pathname) => pathname === ROUTES.cart },
-  { id: 'stores', to: ROUTES.contacts, label: 'Магазини', icon: MapPin, isActive: (pathname) => pathname === ROUTES.contacts },
+  { id: 'cart', to: ROUTES.cart, label: 'Кошик', icon: 'basket', isActive: (pathname) => pathname === ROUTES.cart },
+  { id: 'stores', to: ROUTES.contacts, label: 'Магазини', icon: 'pin', isActive: (pathname) => pathname === ROUTES.contacts },
 ];
 
 /** Positions of the sliding highlight, one per tab (it is one tab wide). */
@@ -56,7 +56,7 @@ export default function BottomNav() {
         <span className="h-8 w-14 rounded-full bg-emerald-50" />
       </span>
       <ul className="relative grid h-14 grid-cols-5">
-        {TABS.map(({ id, to, label, icon: Icon }, index) => {
+        {TABS.map(({ id, to, label, icon }, index) => {
           const isActive = index === activeIndex;
           return (
             <li key={id}>
@@ -69,12 +69,7 @@ export default function BottomNav() {
                 )}
               >
                 <span className="relative" data-cart-target={id === 'cart' ? true : undefined}>
-                  <Icon
-                    key={isActive ? 'active' : 'idle'}
-                    className={cn('h-6 w-6', isActive && hasNavigated && 'animate-tab-pop')}
-                    strokeWidth={isActive ? 2.25 : 1.75}
-                    aria-hidden="true"
-                  />
+                  <BrandIcon key={isActive ? 'active' : 'idle'} name={icon} className={cn('h-6 w-6', isActive && hasNavigated && 'animate-tab-pop')} />
                   {id === 'cart' && cartCount > 0 && (
                     <span
                       key={cartCount}

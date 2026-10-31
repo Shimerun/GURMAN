@@ -48,13 +48,12 @@ export default function PrivacyPage() {
     <div className="max-w-3xl">
       <PageHeader
         title="Політика конфіденційності"
-        eyebrow="Персональні дані"
         breadcrumbs={[{ label: 'Політика конфіденційності' }]}
         description={`Редакція від ${UPDATED_LABEL}`}
       />
 
       {IS_DEMO_CONTENT && (
-        <p className="mb-8 flex items-start gap-3 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900 ring-1 ring-amber-200">
+        <p className="mb-8 flex items-start gap-3 rounded-lg bg-amber-50 p-4 text-sm text-amber-900 ring-1 ring-amber-200">
           <FileWarning className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
           Це шаблон для демо-версії сайту. Перед запуском його має перевірити юрист, а дані володільця в квадратних дужках — замінити на
           реальні.

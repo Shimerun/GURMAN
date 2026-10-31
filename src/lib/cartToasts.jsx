@@ -19,7 +19,7 @@ export function showRemovedFromCartToast(productTitle, onUndo) {
             onUndo();
             toast.dismiss(currentToast.id);
           }}
-          className="-my-2 inline-flex min-h-11 shrink-0 items-center rounded-full px-3 font-semibold text-emerald-800 underline underline-offset-2 hover:bg-emerald-50"
+          className="-my-2 inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 font-semibold text-emerald-800 underline underline-offset-2 hover:bg-emerald-50"
         >
           Повернути
         </button>

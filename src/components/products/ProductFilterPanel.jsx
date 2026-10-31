@@ -15,7 +15,7 @@ function FilterSection({ title, children }) {
 /** @param {{ label: string, description: string, isChecked: boolean, onChange: (isChecked: boolean) => void }} props */
 function ToggleRow({ label, description, isChecked, onChange }) {
   return (
-    <label className="flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-xl py-1">
+    <label className="flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-lg py-1">
       <span>
         <span className="block text-sm font-medium text-slate-800">{label}</span>
         <span className="block text-xs text-slate-600">{description}</span>

@@ -10,7 +10,7 @@ const PRICE_PRESETS = [
 ];
 
 const INPUT_CLASS_NAME =
-  'mt-1 block h-11 w-full min-w-0 rounded-xl border border-slate-300 bg-white px-3 text-base tabular-nums sm:text-sm text-slate-800 transition-colors placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20';
+  'mt-1 block h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 text-base tabular-nums sm:text-sm text-slate-800 transition-colors placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20';
 
 /** @param {string} value @returns {number | undefined} */
 function parsePriceInput(value) {

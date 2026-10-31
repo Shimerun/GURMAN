@@ -23,7 +23,6 @@ export default function CatalogPage() {
     <>
       <PageHeader
         title="Каталог товарів"
-        eyebrow="Ціни магазинів GURMAN у Житомирі"
         breadcrumbs={[{ label: 'Каталог' }]}
         description="Понад 70 позицій від перевірених постачальників: свіжі овочі та фрукти, м'ясо, молочні продукти, випічка з власної пекарні та напої."
       />

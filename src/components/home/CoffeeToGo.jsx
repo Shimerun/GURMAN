@@ -125,12 +125,11 @@ export default function CoffeeToGo() {
   return (
     // overflow-clip, not -hidden: a hidden-overflow box is a scroll container, which would freeze
     // the cup's scroll-driven fill (its view timeline would track this box instead of the page).
-    <section aria-labelledby="coffee-heading" className="overflow-clip rounded-3xl bg-amber-50 p-6 ring-1 ring-amber-200 sm:p-10">
+    <section aria-labelledby="coffee-heading" className="overflow-clip rounded-xl bg-amber-50 p-6 ring-1 ring-amber-200 sm:p-10">
       <div className="grid items-center gap-8 lg:grid-cols-[1.4fr_1fr]">
         <div>
           <SectionHeader
             id="coffee-heading"
-            eyebrow="Кава з собою"
             title="Смачна кава — в обох магазинах"
             description={`Варимо на каві ${COFFEE_TO_GO.brand}. Готуємо при вас, поки ви обираєте продукти.`}
           />

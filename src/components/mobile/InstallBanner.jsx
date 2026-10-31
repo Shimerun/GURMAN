@@ -39,8 +39,8 @@ export default function InstallBanner() {
   };
 
   return (
-    <aside aria-label="Встановлення застосунку" className="flex items-center gap-3 rounded-2xl bg-white p-3 shadow-soft ring-1 ring-emerald-100">
-      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-emerald-700 text-white">
+    <aside aria-label="Встановлення застосунку" className="flex items-center gap-3 rounded-lg bg-white p-3 shadow-soft ring-1 ring-emerald-100">
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-emerald-700 text-white">
         <Download className="h-5 w-5" aria-hidden="true" />
       </span>
       <div className="min-w-0 flex-1">

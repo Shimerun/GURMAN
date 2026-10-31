@@ -68,7 +68,7 @@ export default function CartPage() {
         <button
           type="button"
           onClick={clearCart}
-          className="inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-700"
+          className="inline-flex h-11 items-center gap-2 rounded-lg px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-700"
         >
           <Trash2 className="h-4 w-4" aria-hidden="true" />
           Очистити кошик
@@ -76,7 +76,7 @@ export default function CartPage() {
       </PageHeader>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start lg:gap-8">
-        <section aria-labelledby="cart-items-heading" className="rounded-2xl bg-white px-4 shadow-soft ring-1 ring-slate-100 sm:px-6">
+        <section aria-labelledby="cart-items-heading" className="rounded-lg bg-white px-4 shadow-soft ring-1 ring-slate-100 sm:px-6">
           <h2 id="cart-items-heading" className="sr-only">
             Товари в кошику
           </h2>
@@ -88,7 +88,7 @@ export default function CartPage() {
         </section>
 
         <aside aria-labelledby="order-summary-heading" className="space-y-3 lg:sticky lg:top-36">
-          <div className="rounded-2xl bg-white p-5 shadow-soft ring-2 ring-emerald-100 sm:p-6">
+          <div className="rounded-lg bg-white p-5 shadow-soft ring-2 ring-emerald-100 sm:p-6">
             <h2 id="order-summary-heading" className="text-lg font-bold text-slate-900">
               Підсумок
             </h2>
@@ -99,7 +99,7 @@ export default function CartPage() {
             <p className="mt-2 text-center text-xs text-slate-600">Список зберігається на цьому пристрої — відкрийте його в магазині.</p>
           </div>
 
-          <div className="rounded-2xl bg-emerald-50 p-5 text-sm text-emerald-950 ring-1 ring-emerald-100">
+          <div className="rounded-lg bg-emerald-50 p-5 text-sm text-emerald-950 ring-1 ring-emerald-100">
             <p className="flex items-center gap-2 font-bold">
               <Store className="h-5 w-5 text-emerald-700" aria-hidden="true" />
               Як отримати товари

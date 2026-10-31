@@ -65,7 +65,7 @@ export default function ShareListButton({ className }) {
       </button>
 
       {isOptionsOpen && (
-        <div id={optionsId} className="mt-2 rounded-2xl bg-slate-50 p-2 ring-1 ring-slate-100">
+        <div id={optionsId} className="mt-2 rounded-lg bg-slate-50 p-2 ring-1 ring-slate-100">
           <p className="px-1 pb-2 text-xs text-slate-600">Надіслати через:</p>
           <div className="flex flex-wrap gap-2">
             <a href={links.viber} onClick={() => trackShare('viber')} className={optionClassName}>

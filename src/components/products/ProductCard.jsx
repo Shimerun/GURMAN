@@ -1,4 +1,3 @@
-import { ShoppingCart } from 'lucide-react';
 import { useLayoutEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useViewTransitionState } from 'react-router-dom';
@@ -13,6 +12,7 @@ import { isMorphSourceImage, rememberTappedCardImage } from '../../lib/productIm
 import { getProductPath } from '../../lib/routes';
 import { cn } from '../../lib/utils';
 import { selectItemQuantity, useCartStore } from '../../store/useCartStore';
+import BrandIcon from '../ui/BrandIcon';
 import PriceTag from '../ui/PriceTag';
 import ProductBadges from '../ui/ProductBadges';
 import QuantityStepper from '../ui/QuantityStepper';
@@ -67,9 +67,9 @@ export default function ProductCard({ product, isImageEager = false, hasImageTra
       onPointerLeave={resetCardTilt}
       onTouchStart={loadProductPage}
       onFocus={loadProductPage}
-      className="group relative flex h-full flex-col rounded-2xl bg-white p-3 shadow-soft ring-1 ring-slate-100 card-tilt transition-[transform,box-shadow] duration-200 hover:shadow-md focus-within:ring-2 focus-within:ring-emerald-600 motion-reduce:transition-none sm:p-4">
+      className="group relative flex h-full flex-col rounded-lg bg-white p-3 shadow-soft ring-1 ring-slate-100 card-tilt transition-[transform,box-shadow] duration-200 hover:shadow-md focus-within:ring-2 focus-within:ring-emerald-600 motion-reduce:transition-none sm:p-4">
       {/* overflow-clip keeps the badge glint's scroll timeline on the page (hidden would make this box its scroller). */}
-      <div ref={imageRef} data-morph-product={hasImageTransition ? product.id : undefined} className="relative overflow-clip rounded-xl bg-emerald-50">
+      <div ref={imageRef} data-morph-product={hasImageTransition ? product.id : undefined} className="relative overflow-clip rounded-md bg-emerald-50">
         {/* pointer-events-none keeps the stretched product link clickable through the badges. */}
         {/* right-12 keeps the badges clear of the heart: a second badge wraps below instead of hiding under it. */}
         <ProductBadges product={product} className="pointer-events-none absolute left-2 right-12 top-2 z-[1]" />
@@ -104,7 +104,7 @@ export default function ProductCard({ product, isImageEager = false, hasImageTra
             to={productPath}
             viewTransition={hasImageTransition}
             onClick={() => rememberTappedCardImage(imageRef.current)}
-            className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-5 text-slate-800 transition-colors after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus:outline-none group-hover:text-emerald-800"
+            className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-5 text-slate-800 transition-colors after:absolute after:inset-0 after:rounded-lg after:content-[''] focus:outline-none group-hover:text-emerald-800"
           >
             {product.title}
           </Link>
@@ -133,7 +133,7 @@ export default function ProductCard({ product, isImageEager = false, hasImageTra
                 disabled={isOutOfStock}
                 className={buttonClassName({ size: 'sm', className: cn('w-full', cartControlMotion === 'collapse' && 'cart-control-collapse') })}
               >
-                <ShoppingCart className="h-4 w-4" aria-hidden="true" />
+                <BrandIcon name="basket" className="h-4 w-4" />
                 {isOutOfStock ? 'Немає' : 'У кошик'}
                 <span className="sr-only">: {product.title}</span>
               </button>

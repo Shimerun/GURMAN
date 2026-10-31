@@ -16,7 +16,7 @@ function StoresContent() {
     return (
       <ul className={STORE_GRID_CLASS_NAME} aria-busy="true" aria-label="Завантаження магазинів">
         {Array.from({ length: 2 }, (_, index) => (
-          <li key={index} className="skeleton h-56 rounded-2xl" />
+          <li key={index} className="skeleton h-56 rounded-lg" />
         ))}
       </ul>
     );
@@ -45,11 +45,10 @@ function StoresContent() {
   );
 }
 
-/** @param {{ eyebrow?: string }} props */
-export default function StoresBlock({ eyebrow = 'Поруч із вами' }) {
+export default function StoresBlock() {
   return (
     <section id={SECTION_IDS.stores} aria-labelledby="stores-heading">
-      <SectionHeader id="stores-heading" eyebrow={eyebrow} title={`Магазини GURMAN ${IN_CITY}`} />
+      <SectionHeader id="stores-heading" title={`Магазини GURMAN ${IN_CITY}`} />
       <StoresContent />
     </section>
   );

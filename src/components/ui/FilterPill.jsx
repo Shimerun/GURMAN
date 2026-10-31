@@ -13,7 +13,7 @@ export default function FilterPill({ isActive, onClick, children, className, siz
       aria-pressed={isActive}
       onClick={onClick}
       className={cn(
-        'flex shrink-0 snap-start items-center gap-2 whitespace-nowrap rounded-full border font-medium transition-colors',
+        'flex shrink-0 snap-start items-center gap-2 whitespace-nowrap rounded-lg border font-medium transition-colors',
         SIZE_CLASSES[size],
         isActive
           ? 'border-emerald-700 bg-emerald-700 text-white shadow-sm'

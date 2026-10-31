@@ -12,7 +12,7 @@ export default function ErrorState({
   headingAs: Heading = 'h3',
 }) {
   return (
-    <div role="alert" className="flex flex-col items-center rounded-2xl bg-red-50 px-6 py-12 text-center ring-1 ring-red-100">
+    <div role="alert" className="flex flex-col items-center rounded-lg bg-red-50 px-6 py-12 text-center ring-1 ring-red-100">
       <span className="grid h-14 w-14 place-items-center rounded-full bg-red-100 text-red-700">
         <TriangleAlert className="h-7 w-7" aria-hidden="true" />
       </span>
