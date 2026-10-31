@@ -85,6 +85,6 @@ SEO: the build (`scripts/seoPages.js`, a Vite plugin) writes one HTML file per r
 - Test: npm test — Playwright e2e suite in `tests/e2e/` against the production build (`vite preview`, port 4173) using the installed Google Chrome (`channel: 'chrome'`). `npm run test:ui` for the interactive runner.
 - Visual regression: `npm run test:visual` compares key pages (desktop + phone) with baselines in `tests/visual/*-snapshots/` (frozen clock, reduced motion). Baselines are per OS (Windows now), so this project is not run in CI; after an intended design change run `npm run test:visual:update` and review the new images before committing.
 - Tests stub Unsplash images and fail on any console error. Use `tests/e2e/fixtures.js` (`test`, `open`, `waitForData`, `cartBadge`, `currentPath`). New behaviour gets a test; time-dependent checks use `page.clock`.
-- CI: `.github/workflows/ci.yml` runs `npm ci`, build and `npm test` on every push and on PRs to `main`.
-- Lint: `npm run lint` (ESLint flat config in `eslint.config.js`, with the React Hooks rules). CI does not run it yet; run it before committing.
+- CI: `.github/workflows/ci.yml` runs `npm ci`, lint, build and `npm test` on Node 24 (the lockfile's npm; keep `.nvmrc` in step) on every push and on PRs to `main`.
+- Lint: `npm run lint` (ESLint flat config in `eslint.config.js`, with the React Hooks rules); CI runs it before the build.
 </commands>
