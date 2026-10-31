@@ -15,6 +15,7 @@ import SafeImage from '../components/ui/SafeImage';
 import SectionHeader from '../components/ui/SectionHeader';
 import StockBadge from '../components/ui/StockBadge';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { getProductPageMeta } from '../lib/pageMeta';
 import { useProduct, useProducts } from '../hooks/useProducts';
 import { FEATURES } from '../config/business';
 import { IN_CITY, PROMO_VALID_UNTIL } from '../lib/constants';
@@ -296,10 +297,8 @@ function ProductContent({ productId }) {
   const { data: product, isLoading, error, refetch } = useProduct(productId);
   const isMissing = isNotFoundError(error);
 
-  useDocumentTitle(
-    product?.title ?? (isMissing ? 'Товар не знайдено' : undefined),
-    product ? `${product.title}: ${formatPrice(product.price)} / ${product.unit} у магазинах GURMAN ${IN_CITY}. ${product.shortDescription}` : undefined,
-  );
+  const productMeta = product ? getProductPageMeta(product) : undefined;
+  useDocumentTitle(productMeta?.title ?? (isMissing ? 'Товар не знайдено' : undefined), productMeta?.description);
 
   if (isLoading) return <ProductPageSkeleton />;
 

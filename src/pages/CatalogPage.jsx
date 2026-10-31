@@ -5,6 +5,7 @@ import ProductListing from '../components/products/ProductListing';
 import EmptyState from '../components/ui/EmptyState';
 import PageHeader from '../components/ui/PageHeader';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { STATIC_PAGE_META } from '../lib/pageMeta';
 import { useProductFilters } from '../hooks/useProductFilters';
 import { useProducts } from '../hooks/useProducts';
 import { buttonClassName } from '../lib/buttonStyles';
@@ -16,10 +17,7 @@ export default function CatalogPage() {
   const productsQuery = useProducts(filterState.productParams);
   const { appliedSearch, resetFilters } = filterState;
 
-  useDocumentTitle(
-    appliedSearch ? `Пошук «${appliedSearch}»` : 'Каталог товарів',
-    'Каталог GURMAN у Житомирі: понад 70 товарів із цінами, акціями й наявністю — фрукти, овочі, м’ясо, молочні продукти, випічка та напої.',
-  );
+  useDocumentTitle(appliedSearch ? `Пошук «${appliedSearch}»` : STATIC_PAGE_META.catalog.title, STATIC_PAGE_META.catalog.description);
 
   return (
     <>

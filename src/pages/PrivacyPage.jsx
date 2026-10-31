@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import PageHeader from '../components/ui/PageHeader';
 import { ANALYTICS, BRAND_NAME, IS_DEMO_CONTENT, LEGAL_ENTITY, PRIVACY_POLICY_UPDATED } from '../config/business';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { STATIC_PAGE_META } from '../lib/pageMeta';
 import { STORE_CONTACTS } from '../lib/constants';
 import { formatDayMonth } from '../lib/format';
 import { ROUTES } from '../lib/routes';
@@ -41,7 +42,7 @@ function PolicySection({ id, title, children }) {
  * Ukrainian law ("Про захист персональних даних"); must be reviewed by a lawyer before launch.
  */
 export default function PrivacyPage() {
-  useDocumentTitle('Політика конфіденційності', `Як ${BRAND_NAME} обробляє персональні дані відвідувачів сайту: що збираємо, навіщо, як довго зберігаємо та які у вас права.`);
+  useDocumentTitle(STATIC_PAGE_META.privacy.title, STATIC_PAGE_META.privacy.description);
 
   return (
     <div className="max-w-3xl">

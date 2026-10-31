@@ -2,6 +2,7 @@ import { ChevronDown, CreditCard, ListChecks, MapPin, RotateCcw, Store } from 'l
 import PageHeader from '../components/ui/PageHeader';
 import SectionHeader from '../components/ui/SectionHeader';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { STATIC_PAGE_META } from '../lib/pageMeta';
 import { IN_CITY, PAYMENT_METHODS, STORE_CONTACTS } from '../lib/constants';
 
 const STEPS = [
@@ -38,10 +39,7 @@ const FAQ = [
 ];
 
 export default function DeliveryPage() {
-  useDocumentTitle(
-    'Як купити: оплата й повернення',
-    `Обирайте товари на сайті й купуйте в магазинах GURMAN ${IN_CITY}. Способи оплати, повернення та відповіді на питання.`,
-  );
+  useDocumentTitle(STATIC_PAGE_META.delivery.title, STATIC_PAGE_META.delivery.description);
 
   return (
     <div className="space-y-12 sm:space-y-16">

@@ -1,4 +1,5 @@
 import { getDiscountPercent } from '../lib/format';
+import { buildCatalog, isAvailable } from './catalog';
 import { ServiceError, simulateNetworkLatency } from './simulateNetworkLatency';
 
 /** @typedef {'in_stock' | 'low_stock' | 'out_of_stock'} StockStatus */
@@ -66,12 +67,7 @@ import { ServiceError, simulateNetworkLatency } from './simulateNetworkLatency';
 const SERVICE = 'productService';
 const LOCALE = 'uk-UA';
 
-const POPULAR_BADGE_COUNT = 12;
-const STORAGE_CONDITIONS_KEY = 'Умови зберігання';
-const SHELF_LIFE_KEY = 'Термін зберігання';
-
 const getProductDiscount = (product) => getDiscountPercent(product.price, product.oldPrice);
-const isAvailable = (product) => product.stockStatus !== 'out_of_stock';
 
 /** @type {Record<ProductSort, (a: Product, b: Product) => number>} */
 const SORT_COMPARATORS = {
@@ -87,72 +83,14 @@ const SORT_COMPARATORS = {
 
 export const PRODUCT_SORTS = /** @type {ProductSort[]} */ (Object.keys(SORT_COMPARATORS));
 
-/**
- * @typedef {Object} Catalog
- * @property {Product[]} products
- * @property {Map<string, Product>} productById
- * @property {Category[]} categories
- */
-
-/** @param {string} description */
-const getFirstSentence = (description) => description.match(/^.+?[.!?](?=\s|$)/)?.[0] ?? description;
-
-/**
- * Derives the UI-ready catalog (denormalized titles, badges, storage, counts) from the raw records.
- * @param {any[]} rawProducts
- * @param {any[]} rawCategories
- * @returns {Catalog}
- */
-function buildCatalog(rawProducts, rawCategories) {
-  const categoryById = new Map(rawCategories.map((category) => [category.id, category]));
-  const popularProductIds = new Set(
-    [...rawProducts]
-      .sort((a, b) => b.popularity - a.popularity)
-      .slice(0, POPULAR_BADGE_COUNT)
-      .map((product) => product.id),
-  );
-
-  /** @type {Product[]} */
-  const products = rawProducts.map((product) => {
-    const category = categoryById.get(product.category);
-    const { [STORAGE_CONDITIONS_KEY]: storageConditions, [SHELF_LIFE_KEY]: shelfLife, ...characteristics } = product.characteristics;
-
-    /** @type {ProductBadge[]} */
-    const badges = [];
-    if (product.isPromo) badges.push('sale');
-    if (popularProductIds.has(product.id)) badges.push('popular');
-
-    return {
-      ...product,
-      categoryTitle: category?.title ?? '',
-      shortDescription: getFirstSentence(product.description),
-      characteristics,
-      storage: { conditions: storageConditions ?? category?.storage ?? '', shelfLife: shelfLife ?? null },
-      badges,
-    };
-  });
-
-  /** @type {Category[]} */
-  const categories = rawCategories.map((category) => {
-    const categoryProducts = products.filter((product) => product.category === category.id);
-    return {
-      ...category,
-      productCount: categoryProducts.length,
-      availableCount: categoryProducts.filter(isAvailable).length,
-    };
-  });
-
-  return { products, productById: new Map(products.map((product) => [product.id, product])), categories };
-}
-
-/** @type {Promise<Catalog> | undefined} */
+/** @type {Promise<import('./catalog').Catalog> | undefined} */
 let catalogPromise;
 
 /**
  * The mock catalog is a separate chunk, fetched on first use like a real API response, so its
  * ~65 kB stay out of the entry bundle. A failed load is not cached: the next call (a retry) tries again.
  * @param {string} operation
- * @returns {Promise<Catalog>}
+ * @returns {Promise<import('./catalog').Catalog>}
  */
 function loadCatalog(operation) {
   catalogPromise ??= Promise.all([import('../data/mockProducts.json'), import('../data/mockCategories.json')])

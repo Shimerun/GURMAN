@@ -8,6 +8,7 @@ import ErrorState from '../components/ui/ErrorState';
 import NotFoundState from '../components/ui/NotFoundState';
 import SafeImage from '../components/ui/SafeImage';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { getCategoryPageMeta } from '../lib/pageMeta';
 import { useProductFilters } from '../hooks/useProductFilters';
 import { useCategory, useProducts } from '../hooks/useProducts';
 import { buttonClassName } from '../lib/buttonStyles';
@@ -125,10 +126,8 @@ function CategoryContent({ categoryId }) {
   const { data: category, isLoading, error, refetch } = useCategory(categoryId);
   const isMissing = isNotFoundError(error);
 
-  useDocumentTitle(
-    category?.title ?? (isMissing ? 'Категорію не знайдено' : undefined),
-    category ? `${category.title} у GURMAN, Житомир: ${category.description}` : undefined,
-  );
+  const categoryMeta = category ? getCategoryPageMeta(category) : undefined;
+  useDocumentTitle(categoryMeta?.title ?? (isMissing ? 'Категорію не знайдено' : undefined), categoryMeta?.description);
 
   if (isLoading) return <CategoryBannerSkeleton />;
 

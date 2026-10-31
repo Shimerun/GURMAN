@@ -5,6 +5,7 @@ import ProductGrid from '../components/products/ProductGrid';
 import EmptyState from '../components/ui/EmptyState';
 import PageHeader from '../components/ui/PageHeader';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { STATIC_PAGE_META } from '../lib/pageMeta';
 import { useHasMounted } from '../hooks/useHasMounted';
 import { useProductsByIds } from '../hooks/useProducts';
 import { buttonClassName } from '../lib/buttonStyles';
@@ -57,7 +58,7 @@ export default function FavoritesPage() {
   // Snapshot of the ids on arrival, so removing a favourite here does not trigger a new request.
   const [initialProductIds] = useState(productIds);
 
-  useDocumentTitle('Обране', 'Улюблені товари GURMAN, збережені на цьому пристрої.');
+  useDocumentTitle(STATIC_PAGE_META.favorites.title, STATIC_PAGE_META.favorites.description);
 
   if (!hasMounted) return <PageHeader title="Обране" breadcrumbs={FAVORITES_CRUMBS} />;
 

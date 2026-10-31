@@ -4,6 +4,7 @@ import StoresBlock from '../components/home/StoresBlock';
 import PageHeader from '../components/ui/PageHeader';
 import SocialLinks from '../components/ui/SocialLinks';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { STATIC_PAGE_META } from '../lib/pageMeta';
 import { IN_CITY, STORE_CONTACTS } from '../lib/constants';
 
 const CONTACT_CARDS = [
@@ -14,10 +15,7 @@ const CONTACT_CARDS = [
 ];
 
 export default function ContactsPage() {
-  useDocumentTitle(
-    'Магазини та контакти',
-    `Адреси, графік роботи й телефони двох магазинів GURMAN ${IN_CITY}, маршрут до магазину та форма зворотного зв’язку.`,
-  );
+  useDocumentTitle(STATIC_PAGE_META.contacts.title, STATIC_PAGE_META.contacts.description);
 
   return (
     <div className="space-y-12 sm:space-y-16">

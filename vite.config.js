@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
-import { ANALYTICS, SITE_URL } from './src/config/business.js';
+import { seoPages } from './scripts/seoPages.js';
+import { ANALYTICS } from './src/config/business.js';
 
 const THIRTY_DAYS_IN_SECONDS = 60 * 60 * 24 * 30;
 const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365;
@@ -54,24 +55,13 @@ const securityHeadersFile = () => ({
   },
 });
 
-/** Link previews need absolute URLs: prefixes the Open Graph image (and adds og:url) once SITE_URL is known. */
-const absoluteSocialMeta = () => ({
-  name: 'gurman-absolute-social-meta',
-  transformIndexHtml(html) {
-    if (!SITE_URL) return html;
-    return html
-      .replace('content="/og-image.png"', `content="${SITE_URL}/og-image.png"`)
-      .replace('<meta property="og:type"', `<meta property="og:url" content="${SITE_URL}/" />\n    <meta property="og:type"`);
-  },
-});
-
 export default defineConfig({
   // The local preview serves the same headers, so e2e tests run under the production CSP.
   preview: { headers: SECURITY_HEADERS },
   plugins: [
     react(),
     securityHeadersFile(),
-    absoluteSocialMeta(),
+    seoPages(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icon.svg', 'apple-touch-icon.png'],
@@ -95,7 +85,9 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // Only the app shell's index.html: the per-page HTML from seoPages() is for crawlers (the
+        // service worker answers every navigation with index.html anyway).
+        globPatterns: ['**/*.{js,css,svg,png,woff2}', 'index.html'],
         // Only fetched by link-preview crawlers, never by the app.
         globIgnores: ['og-image.png'],
         navigateFallback: '/index.html',

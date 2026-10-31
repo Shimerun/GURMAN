@@ -8,6 +8,7 @@ import BasketIllustration from '../components/ui/BasketIllustration';
 import EmptyState from '../components/ui/EmptyState';
 import PageHeader from '../components/ui/PageHeader';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { STATIC_PAGE_META } from '../lib/pageMeta';
 import { useHasMounted } from '../hooks/useHasMounted';
 import { buttonClassName } from '../lib/buttonStyles';
 import { IN_CITY, PROMO_LISTING_QUERY } from '../lib/constants';
@@ -26,7 +27,7 @@ export default function CartPage() {
   const totalSavings = useCartStore(selectTotalSavings);
   const hasMounted = useHasMounted();
 
-  useDocumentTitle('Кошик', `Кошик GURMAN: перевірте товари й суму перед покупкою в магазинах ${IN_CITY}.`);
+  useDocumentTitle(STATIC_PAGE_META.cart.title, STATIC_PAGE_META.cart.description);
 
   // Persisted cart is read synchronously, but waiting one frame matches the header badge and avoids a flash.
   if (!hasMounted) return <PageHeader title="Кошик" breadcrumbs={CART_CRUMBS} />;

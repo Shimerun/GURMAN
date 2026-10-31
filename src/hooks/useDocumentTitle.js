@@ -1,9 +1,5 @@
 import { useEffect } from 'react';
-
-const SITE_NAME = 'GURMAN';
-const DEFAULT_TITLE = `${SITE_NAME} — супермаркет свіжих продуктів у Житомирі`;
-const DEFAULT_DESCRIPTION =
-  'GURMAN — супермаркет свіжих продуктів у Житомирі: акції тижня, каталог із цінами та два магазини поруч.';
+import { DEFAULT_PAGE_DESCRIPTION, formatPageTitle } from '../lib/pageMeta';
 
 /** @param {string} selector @param {string} attribute @param {string} key */
 function setMetaContent(selector, attribute, key, content) {
@@ -17,14 +13,16 @@ function setMetaContent(selector, attribute, key, content) {
 }
 
 /**
- * Sets the tab title plus the description / Open Graph tags that crawlers which run JS pick up.
+ * Sets the tab title plus the description / Open Graph tags when the visitor moves between pages.
+ * Crawlers that don't run JS get the same values from the HTML generated at build time
+ * (scripts/seoPages.js); texts live in lib/pageMeta.js for both.
  * @param {string | undefined} pageTitle Undefined while the page's data is still loading.
  * @param {string} [description] Falls back to the site-wide description.
  */
 export function useDocumentTitle(pageTitle, description) {
   useEffect(() => {
-    const title = pageTitle ? `${pageTitle} — ${SITE_NAME}` : DEFAULT_TITLE;
-    const metaDescription = description ?? DEFAULT_DESCRIPTION;
+    const title = formatPageTitle(pageTitle);
+    const metaDescription = description ?? DEFAULT_PAGE_DESCRIPTION;
 
     document.title = title;
     setMetaContent('meta[name="description"]', 'name', 'description', metaDescription);

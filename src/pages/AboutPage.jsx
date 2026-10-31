@@ -17,6 +17,7 @@ import PageHeader from '../components/ui/PageHeader';
 import SafeImage from '../components/ui/SafeImage';
 import SectionHeader from '../components/ui/SectionHeader';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { STATIC_PAGE_META } from '../lib/pageMeta';
 import { buttonClassName } from '../lib/buttonStyles';
 import { COMPANY_FACTS, COMPANY_MILESTONES } from '../config/business';
 import { IN_CITY, STORE_CONTACTS } from '../lib/constants';
@@ -111,7 +112,7 @@ function FeatureCards({ items, columnsClassName }) {
 }
 
 export default function AboutPage() {
-  useDocumentTitle('Про нас', `Історія GURMAN — мережі з двох супермаркетів свіжих продуктів ${IN_CITY}: місцеві постачальники, власна пекарня й гарантія якості.`);
+  useDocumentTitle(STATIC_PAGE_META.about.title, STATIC_PAGE_META.about.description);
 
   return (
     <div className="space-y-12 sm:space-y-16">
