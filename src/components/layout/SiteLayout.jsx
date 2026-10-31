@@ -90,7 +90,9 @@ export default function SiteLayout() {
       />
 
       {isLongReadPath(pathname) && <ScrollProgress />}
-      <main ref={mainRef} id="main" tabIndex={-1} className="relative mx-auto w-full max-w-7xl flex-1 px-4 py-6 focus:outline-none sm:px-6 sm:py-8 lg:px-8">
+      {/* min-h-screen keeps the footer below the fold while a page's data loads, so it is not
+          pushed down on screen as content arrives (layout shift). */}
+      <main ref={mainRef} id="main" tabIndex={-1} className="relative mx-auto min-h-screen w-full max-w-7xl flex-1 px-4 py-6 focus:outline-none sm:px-6 sm:py-8 lg:px-8">
         <Suspense fallback={<PageFallback />}>
           <Outlet />
         </Suspense>

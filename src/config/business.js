@@ -111,6 +111,12 @@ export const SOCIAL_LINKS = [
  */
 export const LEGAL_ENTITY = null;
 
+/**
+ * Photo of the store's produce aisle: home banner and About page. DEMO: a stock photo until the
+ * client's own is taken; any URL works, a `w=` width parameter also enables responsive sizes.
+ */
+export const STORE_PHOTO_URL = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1400&q=70&auto=format';
+
 /** ISO date of the current privacy-policy text. */
 export const PRIVACY_POLICY_UPDATED = '2026-10-31';
 

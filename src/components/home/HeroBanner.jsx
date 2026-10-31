@@ -1,6 +1,8 @@
 import { ArrowRight, Clock, LayoutGrid, MapPin, Sprout, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { STORE_PHOTO_URL } from '../../config/business';
 import { CITY, PROMO_LISTING_QUERY, STORE_CONTACTS } from '../../lib/constants';
+import { IMAGE_SIZES } from '../../lib/imageSizes';
 import { buttonClassName } from '../../lib/buttonStyles';
 import { ROUTES, getCatalogPath } from '../../lib/routes';
 import SafeImage from '../ui/SafeImage';
@@ -20,7 +22,8 @@ export default function HeroBanner() {
     <section aria-labelledby="hero-heading" className="grid gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:gap-5">
       <div className="relative isolate flex overflow-hidden rounded-3xl bg-emerald-950 text-white shadow-soft">
         <SafeImage
-          src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1400&q=70&auto=format"
+          src={STORE_PHOTO_URL}
+          sizes={IMAGE_SIZES.hero}
           alt=""
           isEager
           fetchpriority="high"

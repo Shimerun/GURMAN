@@ -48,7 +48,8 @@ export default function BrandLogo({ tone = 'light', showTagline = false, showSub
   }
 
   return (
-    <Link to={ROUTES.home} aria-label={`GURMAN — продуктовий магазин у місті ${CITY}, на головну`} className={wrapperClassName}>
+    // The name starts with the visible text (WCAG 2.5.3), so "click GURMAN" works for voice control.
+    <Link to={ROUTES.home} aria-label={`${showTagline ? 'смачно щодня, ' : ''}GURMAN — продуктовий магазин у місті ${CITY}, на головну`} className={wrapperClassName}>
       {lockup}
     </Link>
   );

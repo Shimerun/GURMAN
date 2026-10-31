@@ -7,6 +7,7 @@ import { useTypingPlaceholder } from '../../hooks/useTypingPlaceholder';
 import { SEARCH_SUGGESTIONS } from '../../lib/constants';
 import { PRODUCT_FORMS, formatPrice, pluralize } from '../../lib/format';
 import { getCatalogPath, getProductPath } from '../../lib/routes';
+import { THUMBNAIL_WIDTH } from '../../lib/imageSizes';
 import { cn, withImageWidth } from '../../lib/utils';
 import SafeImage from '../ui/SafeImage';
 
@@ -193,7 +194,7 @@ export default function SearchBox({ className }) {
             className={cn('flex cursor-pointer items-center gap-3 rounded-xl px-2 py-1.5', activeIndex === index && 'bg-emerald-50')}
           >
             <SafeImage
-              src={withImageWidth(product.image, 96)}
+              src={withImageWidth(product.image, THUMBNAIL_WIDTH.suggestion)}
               alt=""
               width={48}
               height={48}

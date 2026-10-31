@@ -6,6 +6,7 @@ import { FEATURES } from '../../config/business';
 import { buttonClassName } from '../../lib/buttonStyles';
 import { resetCardTilt, tiltCardTowardsPointer } from '../../lib/cardTilt';
 import { flyToCart } from '../../lib/flyToCart';
+import { IMAGE_SIZES } from '../../lib/imageSizes';
 import { vibrateOnTap } from '../../lib/haptics';
 import { loadProductPage } from '../../lib/pageLoaders';
 import { isMorphSourceImage, rememberTappedCardImage } from '../../lib/productImageMorph';
@@ -79,6 +80,7 @@ export default function ProductCard({ product, isImageEager = false, hasImageTra
         )}
         <SafeImage
           src={product.image}
+          sizes={IMAGE_SIZES.productCard}
           alt=""
           isEager={isImageEager}
           width={400}

@@ -19,10 +19,11 @@ import SectionHeader from '../components/ui/SectionHeader';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { STATIC_PAGE_META } from '../lib/pageMeta';
 import { buttonClassName } from '../lib/buttonStyles';
-import { COMPANY_FACTS, COMPANY_MILESTONES } from '../config/business';
+import { COMPANY_FACTS, COMPANY_MILESTONES, STORE_PHOTO_URL } from '../config/business';
 import { IN_CITY, STORE_CONTACTS } from '../lib/constants';
 import { ROUTES } from '../lib/routes';
-import { cn } from '../lib/utils';
+import { IMAGE_SIZES } from '../lib/imageSizes';
+import { cn, withImageWidth } from '../lib/utils';
 
 const STATS = [
   { value: String(COMPANY_FACTS.foundedYear), label: 'рік відкриття першого магазину' },
@@ -145,7 +146,8 @@ export default function AboutPage() {
           </div>
           <div className="overflow-hidden rounded-3xl bg-emerald-50 shadow-soft ring-1 ring-slate-100">
             <SafeImage
-              src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1000&q=70&auto=format"
+              src={withImageWidth(STORE_PHOTO_URL, 1000)}
+              sizes={IMAGE_SIZES.aboutPhoto}
               alt="Полиці зі свіжими овочами та фруктами в магазині GURMAN"
               isEager
               width={1000}

@@ -6,6 +6,8 @@ import { formatPrice } from '../../lib/format';
 import { getProductPath } from '../../lib/routes';
 import { useCartStore } from '../../store/useCartStore';
 import QuantityStepper from '../ui/QuantityStepper';
+import { THUMBNAIL_WIDTH } from '../../lib/imageSizes';
+import { withImageWidth } from '../../lib/utils';
 import SafeImage from '../ui/SafeImage';
 
 /** @param {{ item: import('../../store/useCartStore').CartItem }} props */
@@ -51,7 +53,7 @@ export default function CartItem({ item }) {
   return (
     <li ref={itemRef} className="flex gap-3 py-4">
       <Link to={productPath} tabIndex={-1} aria-hidden="true" className="shrink-0">
-        <SafeImage src={product.image} alt="" width={80} height={80} className="h-20 w-20 rounded-xl bg-emerald-50 object-cover transition-opacity hover:opacity-90" />
+        <SafeImage src={withImageWidth(product.image, THUMBNAIL_WIDTH.cartLine)} alt="" width={80} height={80} className="h-20 w-20 rounded-xl bg-emerald-50 object-cover transition-opacity hover:opacity-90" />
       </Link>
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-start justify-between gap-1">

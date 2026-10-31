@@ -8,6 +8,7 @@ import ErrorState from '../components/ui/ErrorState';
 import NotFoundState from '../components/ui/NotFoundState';
 import SafeImage from '../components/ui/SafeImage';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { IMAGE_SIZES } from '../lib/imageSizes';
 import { getCategoryPageMeta } from '../lib/pageMeta';
 import { useProductFilters } from '../hooks/useProductFilters';
 import { useCategory, useProducts } from '../hooks/useProducts';
@@ -27,6 +28,7 @@ function CategoryBanner({ category }) {
     <section aria-labelledby="category-title" className="relative mt-3 overflow-hidden rounded-3xl bg-emerald-900 shadow-soft">
       <SafeImage
         src={withImageWidth(category.image, 1400)}
+        sizes={IMAGE_SIZES.categoryHeader}
         alt=""
         isEager
         fetchpriority="high"

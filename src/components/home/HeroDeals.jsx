@@ -7,6 +7,8 @@ import { buttonClassName } from '../../lib/buttonStyles';
 import { PROMO_LISTING_QUERY, PROMO_VALID_UNTIL } from '../../lib/constants';
 import { PRODUCT_FORMS, formatDayMonth, formatPrice, getDiscountPercent, pluralize } from '../../lib/format';
 import { getCatalogPath, getProductPath } from '../../lib/routes';
+import { THUMBNAIL_WIDTH } from '../../lib/imageSizes';
+import { withImageWidth } from '../../lib/utils';
 import SafeImage from '../ui/SafeImage';
 
 const MAX_DEALS = 3;
@@ -79,7 +81,7 @@ export default function HeroDeals() {
               <li key={product.id}>
                 <Link to={getProductPath(product.id)} className="group flex items-center gap-3 rounded-xl py-2.5 transition-colors hover:bg-slate-50 sm:py-3">
                   <span className="relative shrink-0">
-                    <SafeImage src={product.image} alt="" width={64} height={64} className="h-14 w-14 rounded-xl bg-emerald-50 object-cover sm:h-16 sm:w-16" />
+                    <SafeImage src={withImageWidth(product.image, THUMBNAIL_WIDTH.deal)} alt="" width={64} height={64} className="h-14 w-14 rounded-xl bg-emerald-50 object-cover sm:h-16 sm:w-16" />
                     <span className="absolute -left-1.5 -top-1.5 rounded-full bg-amber-400 px-1.5 py-0.5 text-xs font-bold leading-none text-slate-900">
                       <CountingDiscount percent={getDiscountPercent(product.price, product.oldPrice)} />
                     </span>

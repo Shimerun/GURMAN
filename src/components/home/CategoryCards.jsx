@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCategories } from '../../hooks/useProducts';
 import { buttonClassName } from '../../lib/buttonStyles';
+import { IMAGE_SIZES } from '../../lib/imageSizes';
 import { SECTION_IDS } from '../../lib/constants';
 import { PRODUCT_FORMS, pluralize } from '../../lib/format';
 import { ROUTES, getCategoryPath } from '../../lib/routes';
@@ -45,6 +46,7 @@ export default function CategoryCards() {
               >
                 <SafeImage
                   src={category.image}
+                  sizes={IMAGE_SIZES.categoryCard}
                   alt=""
                   width={800}
                   height={500}

@@ -15,6 +15,7 @@ import SafeImage from '../components/ui/SafeImage';
 import SectionHeader from '../components/ui/SectionHeader';
 import StockBadge from '../components/ui/StockBadge';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { IMAGE_SIZES } from '../lib/imageSizes';
 import { getProductPageMeta } from '../lib/pageMeta';
 import { useProduct, useProducts } from '../hooks/useProducts';
 import { FEATURES } from '../config/business';
@@ -140,6 +141,7 @@ function ProductDetails({ product }) {
             <ProductBadges product={product} className="absolute left-4 top-4 z-[1]" />
             <SafeImage
               src={withImageWidth(product.image, 900)}
+              sizes={IMAGE_SIZES.productPage}
               alt={product.title}
               isEager
               fetchpriority="high"
@@ -181,16 +183,18 @@ function ProductDetails({ product }) {
                 {product.stockStatus === 'in_stock' && <span className="text-slate-600">У магазинах GURMAN {IN_CITY}</span>}
               </dd>
             </div>
-            <div className="flex items-start gap-2 text-slate-700">
+            <div>
               <dt className="sr-only">Одиниця продажу</dt>
-              <Scale className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
-              <dd>
-                {UNIT_EXPLANATIONS[product.unit]}
-                {packaging && (
-                  <span className="block font-semibold text-slate-900">
-                    {packaging[0]}: {packaging[1]}
-                  </span>
-                )}
+              <dd className="flex items-start gap-2 text-slate-700">
+                <Scale className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+                <span>
+                  {UNIT_EXPLANATIONS[product.unit]}
+                  {packaging && (
+                    <span className="block font-semibold text-slate-900">
+                      {packaging[0]}: {packaging[1]}
+                    </span>
+                  )}
+                </span>
               </dd>
             </div>
           </dl>
@@ -200,19 +204,19 @@ function ProductDetails({ product }) {
           </div>
 
           <dl className="mt-5 grid gap-3 rounded-2xl bg-white p-4 text-sm ring-1 ring-slate-100 sm:grid-cols-2">
-            <div className="flex items-start gap-2">
-              <Globe className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
-              <div>
-                <dt className="text-slate-600">Походження</dt>
-                <dd className="font-semibold text-slate-900">{product.origin}</dd>
-              </div>
+            <div>
+              <dt className="flex items-center gap-2 text-slate-600">
+                <Globe className="h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+                Походження
+              </dt>
+              <dd className="pl-6 font-semibold text-slate-900">{product.origin}</dd>
             </div>
-            <div className="flex items-start gap-2">
-              <Factory className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
-              <div>
-                <dt className="text-slate-600">Виробник</dt>
-                <dd className="font-semibold text-slate-900">{product.producer}</dd>
-              </div>
+            <div>
+              <dt className="flex items-center gap-2 text-slate-600">
+                <Factory className="h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+                Виробник
+              </dt>
+              <dd className="pl-6 font-semibold text-slate-900">{product.producer}</dd>
             </div>
           </dl>
 

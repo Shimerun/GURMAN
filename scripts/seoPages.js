@@ -1,10 +1,11 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { CITY, SITE_URL } from '../src/config/business.js';
+import { CITY, SITE_URL, STORE_PHOTO_URL } from '../src/config/business.js';
 import { PROMO_VALID_UNTIL } from '../src/lib/constants.js';
 import { DEFAULT_PAGE_DESCRIPTION, STATIC_PAGE_META, formatPageTitle, getCategoryPageMeta, getProductPageMeta } from '../src/lib/pageMeta.js';
 import { ROUTES, getCategoryPath, getProductPath } from '../src/lib/routes.js';
-import { withImageWidth } from '../src/lib/utils.js';
+import { IMAGE_SIZES } from '../src/lib/imageSizes.js';
+import { buildImageSrcSet, withImageWidth } from '../src/lib/utils.js';
 import { buildCatalog } from '../src/services/catalog.js';
 
 /**
@@ -29,6 +30,8 @@ const PRIVATE_PATHS = new Set([ROUTES.cart, ROUTES.favorites]);
  * @property {string} description
  * @property {{ url: string, alt: string } | null} image  null keeps the site preview image
  * @property {object[]} structuredData schema.org nodes for the page's JSON-LD @graph
+ * @property {{ src: string, sizes: string } | null} [heroImage] the page's largest image (LCP),
+ *   preloaded from the HTML so it starts downloading before the app has rendered
  */
 
 /** @param {string} pagePath */
@@ -132,6 +135,7 @@ export function listSeoPages(catalog, stores) {
       title: formatPageTitle(meta.title),
       description: meta.description,
       image: category.image ? { url: withImageWidth(category.image, PREVIEW_IMAGE_WIDTH), alt: category.title } : null,
+      heroImage: category.image ? { src: withImageWidth(category.image, 1400), sizes: IMAGE_SIZES.categoryHeader } : null,
       structuredData: toBreadcrumbs([home, catalogCrumb, { name: category.title, path: getCategoryPath(category.id) }]),
     };
   });
@@ -144,6 +148,7 @@ export function listSeoPages(catalog, stores) {
       title: formatPageTitle(meta.title),
       description: meta.description,
       image: product.image ? { url: withImageWidth(product.image, PREVIEW_IMAGE_WIDTH), alt: product.title } : null,
+      heroImage: product.image ? { src: withImageWidth(product.image, 900), sizes: IMAGE_SIZES.productPage } : null,
       structuredData: [
         toProduct(product),
         ...toBreadcrumbs([
@@ -157,7 +162,14 @@ export function listSeoPages(catalog, stores) {
   });
 
   return [
-    { path: ROUTES.home, title: formatPageTitle(undefined), description: DEFAULT_PAGE_DESCRIPTION, image: null, structuredData: storeNodes },
+    {
+      path: ROUTES.home,
+      title: formatPageTitle(undefined),
+      description: DEFAULT_PAGE_DESCRIPTION,
+      image: null,
+      heroImage: { src: STORE_PHOTO_URL, sizes: IMAGE_SIZES.hero },
+      structuredData: storeNodes,
+    },
     ...staticPages,
     ...categoryPages,
     ...productPages,
@@ -201,6 +213,15 @@ export function renderSeoPage(template, page) {
   const url = absoluteUrl(page.path);
   if (url) headTags.push(`<link rel="canonical" href="${escapeAttribute(url)}" />`, `<meta property="og:url" content="${escapeAttribute(url)}" />`);
   if (PRIVATE_PATHS.has(page.path)) headTags.push('<meta name="robots" content="noindex" />');
+  if (page.heroImage) {
+    // Same candidates, CORS mode and referrer policy as the page's <img> (SafeImage), or the
+    // browser would not reuse the preloaded file and download the picture twice.
+    const srcSet = buildImageSrcSet(page.heroImage.src);
+    const candidates = srcSet ? ` imagesrcset="${escapeAttribute(srcSet)}" imagesizes="${escapeAttribute(page.heroImage.sizes)}"` : '';
+    headTags.push(
+      `<link rel="preload" as="image" href="${escapeAttribute(page.heroImage.src)}"${candidates} fetchpriority="high" crossorigin="anonymous" referrerpolicy="no-referrer" />`,
+    );
+  }
   if (page.structuredData.length > 0) {
     // A JSON data block, not a script: the CSP (script-src 'self') does not apply to it. "<" is
     // escaped so text in the data can never close the element.

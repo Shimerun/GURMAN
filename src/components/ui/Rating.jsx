@@ -43,7 +43,7 @@ export default function Rating({ rating, reviewsCount, size = 'sm', isCompact = 
         {ratingFormatter.format(rating)}
       </span>
       {reviewsCount !== undefined && (
-        <span className="text-slate-500" aria-hidden="true">
+        <span className="text-slate-600" aria-hidden="true">
           ({isCompact ? reviewsCount : formatReviewsCount(reviewsCount)})
         </span>
       )}
