@@ -17,16 +17,19 @@ import PageHeader from '../components/ui/PageHeader';
 import SafeImage from '../components/ui/SafeImage';
 import SectionHeader from '../components/ui/SectionHeader';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { STATIC_PAGE_META } from '../lib/pageMeta';
 import { buttonClassName } from '../lib/buttonStyles';
-import { IN_CITY } from '../lib/constants';
+import { COMPANY_FACTS, COMPANY_MILESTONES, STORE_PHOTO_URL } from '../config/business';
+import { IN_CITY, STORE_CONTACTS } from '../lib/constants';
 import { ROUTES } from '../lib/routes';
-import { cn } from '../lib/utils';
+import { IMAGE_SIZES } from '../lib/imageSizes';
+import { cn, withImageWidth } from '../lib/utils';
 
 const STATS = [
-  { value: '2014', label: 'рік відкриття першого магазину' },
+  { value: String(COMPANY_FACTS.foundedYear), label: 'рік відкриття першого магазину' },
   { value: '2', label: `магазини ${IN_CITY}` },
-  { value: '120+', label: 'фермерів і виробників-партнерів' },
-  { value: '7:00–22:00', label: 'щодня, без вихідних' },
+  { value: `${COMPANY_FACTS.partnerSupplierCount}+`, label: 'фермерів і виробників-партнерів' },
+  { value: STORE_CONTACTS.storeHours.replace('Щодня ', ''), label: 'щодня, без вихідних' },
 ];
 
 const VALUES = [
@@ -90,25 +93,13 @@ const GUARANTEES = [
   },
 ];
 
-const MILESTONES = [
-  {
-    year: '2014',
-    title: 'Перший магазин на Грушевського',
-    description: 'Невелика крамниця з фермерськими продуктами та власною пекарнею.',
-  },
-  { year: '2017', title: 'Власна пекарня й кулінарія', description: 'Почали випікати хліб на заквасці та ліпити вареники щоранку.' },
-  { year: '2020', title: 'Картка GURMAN', description: 'Запустили програму лояльності з бонусами та персональними знижками.' },
-  { year: '2023', title: 'Другий магазин', description: 'Відкрили магазин на вулиці Гагаріна.' },
-  { year: '2026', title: 'Новий сайт', description: 'Каталог із цінами, акції тижня й адреси магазинів — в одному місці.' },
-];
-
 /** @param {{ items: { icon: import('lucide-react').LucideIcon, title: string, description: string }[], columnsClassName: string }} props */
 function FeatureCards({ items, columnsClassName }) {
   return (
     <ul className={cn('grid gap-4', columnsClassName)}>
       {items.map(({ icon: Icon, title, description }) => (
-        <li key={title} className="flex gap-4 rounded-2xl bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-6">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100">
+        <li key={title} className="flex gap-4 rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-6">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100">
             <Icon className="h-6 w-6" aria-hidden="true" />
           </span>
           <div>
@@ -122,23 +113,21 @@ function FeatureCards({ items, columnsClassName }) {
 }
 
 export default function AboutPage() {
-  useDocumentTitle('Про нас', `Історія GURMAN — мережі з двох супермаркетів свіжих продуктів ${IN_CITY}: місцеві постачальники, власна пекарня й гарантія якості.`);
+  useDocumentTitle(STATIC_PAGE_META.about.title, STATIC_PAGE_META.about.description);
 
   return (
     <div className="space-y-12 sm:space-y-16">
       <div>
         <PageHeader
           title="Про GURMAN"
-          eyebrow="Наша історія"
           breadcrumbs={[{ label: 'Про нас' }]}
           description={`GURMAN — супермаркет свіжих продуктів ${IN_CITY}. Ми віримо, що щоденні покупки можуть бути приємними: зрозумілий асортимент, чесні ціни та якість, за яку не соромно.`}
         />
 
-        <div className="grid items-center gap-8 lg:grid-cols-2">
+        <div className="grid items-start gap-8 lg:grid-cols-2">
           <div className="space-y-4 text-base leading-relaxed text-slate-600">
             <p>
               Усе почалося з невеликої крамниці на Грушевського, де ми продавали овочі від знайомих фермерів і хліб, який пекли самі.
-              Покупці поверталися не лише по продукти, а й по пораду: що приготувати на вечерю та який сир обрати до вина.
             </p>
             <p>
               Сьогодні в GURMAN два магазини {IN_CITY}, але принцип лишився той самий: ми особисто знаємо постачальників, перевіряємо
@@ -154,9 +143,10 @@ export default function AboutPage() {
               </Link>
             </div>
           </div>
-          <div className="overflow-hidden rounded-3xl bg-emerald-50 shadow-soft ring-1 ring-slate-100">
+          <div className="overflow-hidden rounded-xl bg-emerald-50 shadow-soft ring-1 ring-slate-100">
             <SafeImage
-              src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1000&q=70&auto=format"
+              src={withImageWidth(STORE_PHOTO_URL, 1000)}
+              sizes={IMAGE_SIZES.aboutPhoto}
               alt="Полиці зі свіжими овочами та фруктами в магазині GURMAN"
               isEager
               width={1000}
@@ -167,9 +157,9 @@ export default function AboutPage() {
         </div>
       </div>
 
-      <section aria-labelledby="mission-heading" className="rounded-3xl bg-white p-6 shadow-soft ring-1 ring-slate-100 sm:p-10">
+      <section aria-labelledby="mission-heading" className="rounded-xl bg-white p-6 shadow-soft ring-1 ring-slate-100 sm:p-10">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-amber-100 text-amber-800">
+          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-lg bg-amber-100 text-amber-800">
             <Target className="h-7 w-7" aria-hidden="true" />
           </span>
           <div>
@@ -185,7 +175,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section aria-labelledby="why-heading" className="rounded-3xl bg-emerald-800 px-6 py-8 text-white shadow-soft sm:px-10">
+      <section aria-labelledby="why-heading" className="rounded-xl bg-emerald-800 px-6 py-8 text-white shadow-soft sm:px-10">
         <h2 id="why-heading" className="font-display text-lg font-bold sm:text-xl">
           Чому покупці обирають GURMAN
         </h2>
@@ -200,29 +190,28 @@ export default function AboutPage() {
       </section>
 
       <section aria-labelledby="values-heading">
-        <SectionHeader id="values-heading" eyebrow="У що ми віримо" title="Принципи якості" />
+        <SectionHeader id="values-heading" title="Принципи якості" />
         <FeatureCards items={VALUES} columnsClassName="sm:grid-cols-2" />
       </section>
 
       <section aria-labelledby="suppliers-heading">
         <SectionHeader
           id="suppliers-heading"
-          eyebrow="Постачальники"
           title="Звідки наші продукти"
-          description="Працюємо напряму з понад 120 господарствами та виробниками — без зайвих посередників."
+          description={`Працюємо напряму з понад ${COMPANY_FACTS.partnerSupplierCount} господарствами та виробниками — без зайвих посередників.`}
         />
         <FeatureCards items={SUPPLIERS} columnsClassName="md:grid-cols-3" />
       </section>
 
       <section aria-labelledby="guarantees-heading">
-        <SectionHeader id="guarantees-heading" eyebrow="Наші зобов’язання" title="Гарантії якості" />
+        <SectionHeader id="guarantees-heading" title="Гарантії якості" />
         <FeatureCards items={GUARANTEES} columnsClassName="md:grid-cols-3" />
       </section>
 
       <section aria-labelledby="history-heading">
-        <SectionHeader id="history-heading" eyebrow="Шлях GURMAN" title="Як ми зростали" />
+        <SectionHeader id="history-heading" title="Як ми зростали" />
         <ol className="relative space-y-6 border-l-2 border-emerald-100 pl-6 sm:pl-8">
-          {MILESTONES.map((milestone) => (
+          {COMPANY_MILESTONES.map((milestone) => (
             <li key={milestone.year} className="relative">
               <span
                 className="absolute -left-[2.05rem] top-1 grid h-4 w-4 place-items-center rounded-full bg-emerald-600 ring-4 ring-emerald-100 sm:-left-[2.55rem]"
@@ -236,7 +225,7 @@ export default function AboutPage() {
         </ol>
       </section>
 
-      <section aria-labelledby="about-cta-heading" className="rounded-3xl bg-amber-50 p-6 text-center ring-1 ring-amber-100 sm:p-10">
+      <section aria-labelledby="about-cta-heading" className="rounded-xl bg-amber-50 p-6 text-center ring-1 ring-amber-100 sm:p-10">
         <h2 id="about-cta-heading" className="font-display text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
           Спробуйте самі
         </h2>

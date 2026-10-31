@@ -33,7 +33,7 @@ export default function QuantityStepper({
   const isAtMax = quantity >= maxQuantity;
   const isRemoval = minQuantity === 0 && quantity === 1;
   const buttonClassName = cn(
-    'grid place-items-center rounded-full bg-white text-emerald-800 shadow-sm transition-colors hover:bg-emerald-700 hover:text-white active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none motion-reduce:active:scale-100',
+    'grid place-items-center rounded-md bg-white text-emerald-800 shadow-sm transition-colors hover:bg-emerald-700 hover:text-white active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none motion-reduce:active:scale-100',
     sizeClasses.button,
   );
 
@@ -41,7 +41,7 @@ export default function QuantityStepper({
     <div
       role="group"
       aria-label={`Кількість: ${productTitle}`}
-      className={cn('flex items-center justify-between gap-2 rounded-full bg-emerald-50 p-1 ring-1 ring-emerald-100', className)}
+      className={cn('flex items-center justify-between gap-2 rounded-lg bg-emerald-50 p-1 ring-1 ring-emerald-100', className)}
     >
       <button
         type="button"

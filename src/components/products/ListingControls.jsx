@@ -1,23 +1,30 @@
-import { LayoutGrid, Search, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
+import { useLayoutEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useCategories } from '../../hooks/useProducts';
 import { ROUTES, getCategoryPath } from '../../lib/routes';
 import { cn } from '../../lib/utils';
+import BrandIcon from '../ui/BrandIcon';
 import CategoryIcon from '../ui/CategoryIcon';
 
 const PILL_CLASS_NAME =
-  'flex min-h-11 shrink-0 snap-start items-center gap-2 whitespace-nowrap rounded-full border px-4 text-sm font-medium transition-colors';
+  'flex min-h-11 shrink-0 snap-start items-center gap-2 whitespace-nowrap rounded-lg border px-4 text-sm font-medium transition-colors';
 
-/** @param {{ to: { pathname: string, search: string }, isActive: boolean, children: import('react').ReactNode }} props */
+/**
+ * Switching category is a view transition: the green active pill carries one shared name, so the
+ * browser glides it from the old category to the new one (browsers without the API just switch).
+ * @param {{ to: { pathname: string, search: string }, isActive: boolean, children: import('react').ReactNode }} props
+ */
 function CategoryPill({ to, isActive, children }) {
   return (
     <Link
       to={to}
+      viewTransition
       aria-current={isActive ? 'page' : undefined}
       className={cn(
         PILL_CLASS_NAME,
         isActive
-          ? 'border-emerald-700 bg-emerald-700 text-white shadow-sm'
+          ? 'border-emerald-700 bg-emerald-700 text-white shadow-sm [view-transition-name:active-category]'
           : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-500 hover:text-emerald-800',
       )}
     >
@@ -38,6 +45,16 @@ export default function ListingControls({ filterState, activeCategory }) {
   const { searchInput, setSearchInput } = filterState;
   const { data: categories, isLoading: isCategoriesLoading } = useCategories();
   const { search } = useLocation();
+  const pillRowRef = useRef(/** @type {HTMLUListElement | null} */ (null));
+
+  // Phones scroll the pills sideways: bring the active one into view (before the view transition's
+  // snapshot, so the highlight glides to where it is visible). Wrapped rows on desktop don't scroll.
+  useLayoutEffect(() => {
+    const row = pillRowRef.current;
+    const activePill = row?.querySelector('[aria-current="page"]');
+    if (!row || !(activePill instanceof HTMLElement)) return;
+    row.scrollLeft = activePill.offsetLeft - (row.clientWidth - activePill.offsetWidth) / 2;
+  }, [activeCategory?.id, isCategoriesLoading]);
 
   return (
     <div className="mb-6 space-y-4">
@@ -54,7 +71,7 @@ export default function ListingControls({ filterState, activeCategory }) {
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
             placeholder={activeCategory ? `Шукати в «${activeCategory.title}»` : 'Назва товару або виробника: молоко, «Полісся», банани…'}
-            className="h-12 w-full rounded-2xl border border-slate-300 bg-white pl-12 pr-12 text-base text-slate-800 shadow-soft transition-colors placeholder:text-slate-500 hover:border-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20 [&::-webkit-search-cancel-button]:hidden"
+            className="h-12 w-full rounded-lg border border-slate-300 bg-white pl-12 pr-12 text-base text-slate-800 shadow-soft transition-colors placeholder:text-slate-500 hover:border-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20 [&::-webkit-search-cancel-button]:hidden"
           />
           {searchInput && (
             <button
@@ -77,10 +94,10 @@ export default function ListingControls({ filterState, activeCategory }) {
             ))}
           </div>
         ) : (
-          <ul className="scrollbar-hide -mx-4 flex snap-x gap-2 overflow-x-auto px-4 py-1 sm:mx-0 sm:px-0 lg:flex-wrap lg:overflow-visible">
+          <ul ref={pillRowRef} className="scrollbar-hide relative -mx-4 flex snap-x gap-2 overflow-x-auto px-4 py-1 sm:mx-0 sm:px-0 lg:flex-wrap lg:overflow-visible">
             <li className="shrink-0">
               <CategoryPill to={{ pathname: ROUTES.catalog, search }} isActive={!activeCategory}>
-                <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+                <BrandIcon name="catalog" className="h-4 w-4" />
                 Усі товари
               </CategoryPill>
             </li>

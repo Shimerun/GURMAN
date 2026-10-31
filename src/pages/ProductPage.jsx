@@ -1,8 +1,10 @@
-import { BadgeCheck, Factory, Globe, RotateCcw, Scale, Store, Tag } from 'lucide-react';
-import { useMemo } from 'react';
+import { Factory, Globe, Scale, Tag } from 'lucide-react';
+import { useEffect, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import FavoriteButton from '../components/products/FavoriteButton';
 import ProductGrid from '../components/products/ProductGrid';
 import ProductPurchasePanel from '../components/products/ProductPurchasePanel';
+import RecentlyViewed from '../components/products/RecentlyViewed';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import ErrorState from '../components/ui/ErrorState';
 import NotFoundState from '../components/ui/NotFoundState';
@@ -13,12 +15,16 @@ import SafeImage from '../components/ui/SafeImage';
 import SectionHeader from '../components/ui/SectionHeader';
 import StockBadge from '../components/ui/StockBadge';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { IMAGE_SIZES } from '../lib/imageSizes';
+import { getProductPageMeta } from '../lib/pageMeta';
 import { useProduct, useProducts } from '../hooks/useProducts';
+import { FEATURES } from '../config/business';
 import { IN_CITY, PROMO_VALID_UNTIL } from '../lib/constants';
 import { formatDayMonth, formatPrice, getDiscountPercent } from '../lib/format';
 import { ROUTES, getCategoryPath } from '../lib/routes';
 import { cn, withImageWidth } from '../lib/utils';
 import { isNotFoundError } from '../services/simulateNetworkLatency';
+import { useRecentlyViewedStore } from '../store/useRecentlyViewedStore';
 import { buttonClassName } from '../lib/buttonStyles';
 
 /** @typedef {import('../services/productService').Product} Product */
@@ -26,16 +32,10 @@ import { buttonClassName } from '../lib/buttonStyles';
 const MAX_RECOMMENDATIONS = 4;
 const RECOMMENDATIONS_GRID_CLASS_NAME = 'grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4';
 
-const SERVICE_PROMISES = [
-  { icon: Store, label: 'Купуйте в магазинах GURMAN' },
-  { icon: BadgeCheck, label: 'Перевіряємо кожну партію' },
-  { icon: RotateCcw, label: 'Заміна або повернення грошей' },
-];
-
 /** @param {{ title: string, children: import('react').ReactNode }} props */
 function DetailsSection({ title, children }) {
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-6">
+    <section className="border-t border-slate-200 pt-5">
       <h2 className="text-lg font-bold text-slate-900">{title}</h2>
       <div className="mt-3 text-sm leading-relaxed text-slate-700">{children}</div>
     </section>
@@ -54,7 +54,7 @@ function RecommendedProducts({ product }) {
 
   return (
     <section aria-labelledby="recommended-heading" className="mt-12 sm:mt-16">
-      <SectionHeader id="recommended-heading" eyebrow="Вам також сподобається" title="Рекомендовані товари">
+      <SectionHeader id="recommended-heading" title="Рекомендовані товари">
         <Link
           to={getCategoryPath(product.category)}
           className={buttonClassName({ variant: 'ghost', size: 'sm' })}
@@ -70,6 +70,7 @@ function RecommendedProducts({ product }) {
         onRetry={refetch}
         skeletonCount={MAX_RECOMMENDATIONS}
         gridClassName={RECOMMENDATIONS_GRID_CLASS_NAME}
+        hasImageTransition={false}
         emptyState={null}
       />
     </section>
@@ -95,7 +96,7 @@ function PromoNotice({ product }) {
   if (!product.isPromo || discountPercent === 0) return null;
 
   return (
-    <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-950 ring-1 ring-amber-200">
+    <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-950 ring-1 ring-amber-200">
       <Tag className="h-4 w-4 shrink-0 text-amber-700" aria-hidden="true" />
       <span className="font-bold">Акція −{discountPercent}%</span>
       <span>
@@ -110,6 +111,11 @@ function ProductDetails({ product }) {
   const isOutOfStock = product.stockStatus === 'out_of_stock' || product.stockQty <= 0;
   const characteristics = Object.entries(product.characteristics);
   const packaging = getPackaging(product);
+  const addViewedProduct = useRecentlyViewedStore((state) => state.addViewedProduct);
+
+  useEffect(() => {
+    addViewedProduct(product.id);
+  }, [addViewedProduct, product.id]);
 
   return (
     // Bottom padding on phones keeps the sticky purchase bar from covering the last section.
@@ -124,10 +130,12 @@ function ProductDetails({ product }) {
 
       <div className="mt-4 grid gap-6 lg:mt-6 lg:grid-cols-2 lg:gap-10">
         <div className="lg:sticky lg:top-36 lg:self-start">
-          <div className="relative overflow-hidden rounded-3xl bg-emerald-50 shadow-soft ring-1 ring-slate-100">
+          {/* Shared view-transition name: the product card's image morphs into this one. */}
+          <div className="relative overflow-clip rounded-xl bg-emerald-50 shadow-soft ring-1 ring-slate-100 [view-transition-name:product-image]">
             <ProductBadges product={product} className="absolute left-4 top-4 z-[1]" />
             <SafeImage
               src={withImageWidth(product.image, 900)}
+              sizes={IMAGE_SIZES.productPage}
               alt={product.title}
               isEager
               fetchpriority="high"
@@ -139,14 +147,17 @@ function ProductDetails({ product }) {
         </div>
 
         <div className="min-w-0">
-          <Link
-            to={getCategoryPath(product.category)}
-            className="inline-flex min-h-8 items-center text-sm font-semibold text-emerald-800 underline-offset-4 transition-colors hover:underline"
-          >
-            {product.categoryTitle}
-          </Link>
+          <div className="flex items-center justify-between gap-3">
+            <Link
+              to={getCategoryPath(product.category)}
+              className="inline-flex min-h-8 items-center text-sm font-semibold text-emerald-800 underline-offset-4 transition-colors hover:underline"
+            >
+              {product.categoryTitle}
+            </Link>
+            <FavoriteButton product={product} isLabeled className="shrink-0" />
+          </div>
           <h1 className="mt-1 text-2xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">{product.title}</h1>
-          <Rating rating={product.rating} reviewsCount={product.reviewsCount} size="lg" className="mt-3" />
+          {FEATURES.productRatings && <Rating rating={product.rating} reviewsCount={product.reviewsCount} size="lg" className="mt-3" />}
 
           <div className="mt-5">
             <PriceTag product={product} size="lg" />
@@ -166,16 +177,18 @@ function ProductDetails({ product }) {
                 {product.stockStatus === 'in_stock' && <span className="text-slate-600">У магазинах GURMAN {IN_CITY}</span>}
               </dd>
             </div>
-            <div className="flex items-start gap-2 text-slate-700">
+            <div>
               <dt className="sr-only">Одиниця продажу</dt>
-              <Scale className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
-              <dd>
-                {UNIT_EXPLANATIONS[product.unit]}
-                {packaging && (
-                  <span className="block font-semibold text-slate-900">
-                    {packaging[0]}: {packaging[1]}
-                  </span>
-                )}
+              <dd className="flex items-start gap-2 text-slate-700">
+                <Scale className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+                <span>
+                  {UNIT_EXPLANATIONS[product.unit]}
+                  {packaging && (
+                    <span className="block font-semibold text-slate-900">
+                      {packaging[0]}: {packaging[1]}
+                    </span>
+                  )}
+                </span>
               </dd>
             </div>
           </dl>
@@ -184,35 +197,26 @@ function ProductDetails({ product }) {
             <ProductPurchasePanel product={product} />
           </div>
 
-          <dl className="mt-5 grid gap-3 rounded-2xl bg-white p-4 text-sm ring-1 ring-slate-100 sm:grid-cols-2">
-            <div className="flex items-start gap-2">
-              <Globe className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
-              <div>
-                <dt className="text-slate-600">Походження</dt>
-                <dd className="font-semibold text-slate-900">{product.origin}</dd>
-              </div>
+          <dl className="mt-5 grid gap-3 border-t border-slate-200 pt-4 text-sm sm:grid-cols-2">
+            <div>
+              <dt className="flex items-center gap-2 text-slate-600">
+                <Globe className="h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+                Походження
+              </dt>
+              <dd className="pl-6 font-semibold text-slate-900">{product.origin}</dd>
             </div>
-            <div className="flex items-start gap-2">
-              <Factory className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
-              <div>
-                <dt className="text-slate-600">Виробник</dt>
-                <dd className="font-semibold text-slate-900">{product.producer}</dd>
-              </div>
+            <div>
+              <dt className="flex items-center gap-2 text-slate-600">
+                <Factory className="h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+                Виробник
+              </dt>
+              <dd className="pl-6 font-semibold text-slate-900">{product.producer}</dd>
             </div>
           </dl>
-
-          <ul className="mt-4 grid gap-2 text-sm text-slate-700 sm:grid-cols-3">
-            {SERVICE_PROMISES.map(({ icon: Icon, label }) => (
-              <li key={label} className="flex items-center gap-2">
-                <Icon className="h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
-                {label}
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
 
-      <div className="mt-10 grid gap-4 lg:grid-cols-2">
+      <div className="mt-12 grid gap-x-10 gap-y-8 lg:grid-cols-2">
         <DetailsSection title="Опис">
           <p>{product.description}</p>
         </DetailsSection>
@@ -253,6 +257,7 @@ function ProductDetails({ product }) {
       </div>
 
       <RecommendedProducts product={product} />
+      <RecentlyViewed excludeProductId={product.id} hasImageTransition={false} className="mt-12 sm:mt-16" />
     </div>
   );
 }
@@ -262,14 +267,14 @@ function ProductPageSkeleton() {
     <div aria-busy="true" aria-label="Завантаження товару">
       <div className="skeleton h-5 w-72 max-w-full rounded" />
       <div className="mt-6 grid gap-6 lg:grid-cols-2 lg:gap-10">
-        <div className="skeleton aspect-square w-full rounded-3xl" />
+        <div className="skeleton aspect-square w-full rounded-xl" />
         <div>
           <div className="skeleton h-4 w-32 rounded" />
           <div className="skeleton mt-3 h-9 w-full rounded" />
           <div className="skeleton mt-2 h-9 w-2/3 rounded" />
           <div className="skeleton mt-5 h-5 w-48 rounded" />
           <div className="skeleton mt-6 h-10 w-40 rounded" />
-          <div className="skeleton mt-6 h-36 w-full rounded-2xl" />
+          <div className="skeleton mt-6 h-36 w-full rounded-lg" />
         </div>
       </div>
     </div>
@@ -281,10 +286,8 @@ function ProductContent({ productId }) {
   const { data: product, isLoading, error, refetch } = useProduct(productId);
   const isMissing = isNotFoundError(error);
 
-  useDocumentTitle(
-    product?.title ?? (isMissing ? 'Товар не знайдено' : undefined),
-    product ? `${product.title}: ${formatPrice(product.price)} / ${product.unit} у магазинах GURMAN ${IN_CITY}. ${product.shortDescription}` : undefined,
-  );
+  const productMeta = product ? getProductPageMeta(product) : undefined;
+  useDocumentTitle(productMeta?.title ?? (isMissing ? 'Товар не знайдено' : undefined), productMeta?.description);
 
   if (isLoading) return <ProductPageSkeleton />;
 

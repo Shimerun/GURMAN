@@ -5,28 +5,24 @@ import ProductListing from '../components/products/ProductListing';
 import EmptyState from '../components/ui/EmptyState';
 import PageHeader from '../components/ui/PageHeader';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { STATIC_PAGE_META } from '../lib/pageMeta';
 import { useProductFilters } from '../hooks/useProductFilters';
 import { useProducts } from '../hooks/useProducts';
 import { buttonClassName } from '../lib/buttonStyles';
+import { SEARCH_SUGGESTIONS } from '../lib/constants';
 import { getCatalogPath } from '../lib/routes';
-
-const SEARCH_SUGGESTIONS = ['молоко', 'хліб', 'сир', 'яйця', 'банани'];
 
 export default function CatalogPage() {
   const filterState = useProductFilters();
   const productsQuery = useProducts(filterState.productParams);
   const { appliedSearch, resetFilters } = filterState;
 
-  useDocumentTitle(
-    appliedSearch ? `Пошук «${appliedSearch}»` : 'Каталог товарів',
-    'Каталог GURMAN у Житомирі: понад 70 товарів із цінами, акціями й наявністю — фрукти, овочі, м’ясо, молочні продукти, випічка та напої.',
-  );
+  useDocumentTitle(appliedSearch ? `Пошук «${appliedSearch}»` : STATIC_PAGE_META.catalog.title, STATIC_PAGE_META.catalog.description);
 
   return (
     <>
       <PageHeader
         title="Каталог товарів"
-        eyebrow="Ціни магазинів GURMAN у Житомирі"
         breadcrumbs={[{ label: 'Каталог' }]}
         description="Понад 70 позицій від перевірених постачальників: свіжі овочі та фрукти, м'ясо, молочні продукти, випічка з власної пекарні та напої."
       />

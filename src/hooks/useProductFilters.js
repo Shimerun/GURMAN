@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { DEFAULT_SORT } from '../lib/constants';
-import { PRODUCT_SORTS } from '../services/productService';
+import { DEFAULT_SORT, SORT_OPTIONS } from '../lib/constants';
 import { useDebounce } from './useDebounce';
 
 /** @typedef {import('../services/productService').ProductSort} ProductSort */
@@ -17,8 +16,14 @@ const PARAM = {
 
 const FLAG_ON = '1';
 
-/** @param {string | null} value @returns {ProductSort} */
-const parseSort = (value) => (PRODUCT_SORTS.includes(/** @type {ProductSort} */ (value)) ? /** @type {ProductSort} */ (value) : DEFAULT_SORT);
+const OFFERED_SORTS = new Set(SORT_OPTIONS.map((option) => option.value));
+
+/**
+ * Only sorts the UI offers are accepted, so a shared `?sort=rating` link falls back to the
+ * default once ratings are switched off.
+ * @param {string | null} value @returns {ProductSort}
+ */
+const parseSort = (value) => (OFFERED_SORTS.has(/** @type {ProductSort} */ (value)) ? /** @type {ProductSort} */ (value) : DEFAULT_SORT);
 
 /** @param {string | null} value @returns {number | undefined} */
 function parsePrice(value) {

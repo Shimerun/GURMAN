@@ -1,13 +1,12 @@
 /**
- * Section title row: optional eyebrow, the section's <h2>, optional lead, and right-aligned actions.
- * @param {{ id: string, title: import('react').ReactNode, eyebrow?: string, description?: string, children?: import('react').ReactNode }} props
+ * Section title row: the section's <h2>, optional lead, and right-aligned actions.
+ * @param {{ id: string, title: import('react').ReactNode, description?: string, children?: import('react').ReactNode }} props
  */
-export default function SectionHeader({ id, eyebrow, title, description, children }) {
+export default function SectionHeader({ id, title, description, children }) {
   return (
     <div className="mb-5 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 sm:mb-6">
       <div className="min-w-0 max-w-3xl">
-        {eyebrow && <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">{eyebrow}</p>}
-        <h2 id={id} className="mt-1 font-display text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+        <h2 id={id} className="font-display text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
           {title}
         </h2>
         {/* The logo's orange swoosh, drawn in as the section scrolls into view. */}

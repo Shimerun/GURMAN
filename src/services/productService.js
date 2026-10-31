@@ -1,6 +1,5 @@
-import mockCategories from '../data/mockCategories.json';
-import mockProducts from '../data/mockProducts.json';
 import { getDiscountPercent } from '../lib/format';
+import { buildCatalog, isAvailable } from './catalog';
 import { ServiceError, simulateNetworkLatency } from './simulateNetworkLatency';
 
 /** @typedef {'in_stock' | 'low_stock' | 'out_of_stock'} StockStatus */
@@ -68,12 +67,7 @@ import { ServiceError, simulateNetworkLatency } from './simulateNetworkLatency';
 const SERVICE = 'productService';
 const LOCALE = 'uk-UA';
 
-const POPULAR_BADGE_COUNT = 12;
-const STORAGE_CONDITIONS_KEY = 'Умови зберігання';
-const SHELF_LIFE_KEY = 'Термін зберігання';
-
 const getProductDiscount = (product) => getDiscountPercent(product.price, product.oldPrice);
-const isAvailable = (product) => product.stockStatus !== 'out_of_stock';
 
 /** @type {Record<ProductSort, (a: Product, b: Product) => number>} */
 const SORT_COMPARATORS = {
@@ -89,47 +83,33 @@ const SORT_COMPARATORS = {
 
 export const PRODUCT_SORTS = /** @type {ProductSort[]} */ (Object.keys(SORT_COMPARATORS));
 
-const categoryById = new Map(mockCategories.map((category) => [category.id, category]));
+/** @type {Promise<import('./catalog').Catalog> | undefined} */
+let catalogPromise;
 
-const popularProductIds = new Set(
-  [...mockProducts]
-    .sort((a, b) => b.popularity - a.popularity)
-    .slice(0, POPULAR_BADGE_COUNT)
-    .map((product) => product.id),
-);
+/**
+ * The mock catalog is a separate chunk, fetched on first use like a real API response, so its
+ * ~65 kB stay out of the entry bundle. A failed load is not cached: the next call (a retry) tries again.
+ * @param {string} operation
+ * @returns {Promise<import('./catalog').Catalog>}
+ */
+function loadCatalog(operation) {
+  catalogPromise ??= Promise.all([import('../data/mockProducts.json'), import('../data/mockCategories.json')])
+    .then(([productsModule, categoriesModule]) => buildCatalog(productsModule.default, categoriesModule.default))
+    .catch((error) => {
+      catalogPromise = undefined;
+      throw new ServiceError(`${SERVICE}.${operation}: could not load the catalog`, { service: SERVICE, operation, code: 'NETWORK', cause: error });
+    });
+  return catalogPromise;
+}
 
-/** @param {string} description */
-const getFirstSentence = (description) => description.match(/^.+?[.!?](?=\s|$)/)?.[0] ?? description;
-
-/** @type {Product[]} */
-const products = mockProducts.map((product) => {
-  const category = categoryById.get(product.category);
-  const { [STORAGE_CONDITIONS_KEY]: storageConditions, [SHELF_LIFE_KEY]: shelfLife, ...characteristics } = product.characteristics;
-
-  /** @type {ProductBadge[]} */
-  const badges = [];
-  if (product.isPromo) badges.push('sale');
-  if (popularProductIds.has(product.id)) badges.push('popular');
-
-  return {
-    ...product,
-    categoryTitle: category?.title ?? '',
-    shortDescription: getFirstSentence(product.description),
-    characteristics,
-    storage: { conditions: storageConditions ?? category?.storage ?? '', shelfLife: shelfLife ?? null },
-    badges,
-  };
-});
-
-/** @type {Category[]} */
-const categories = mockCategories.map((category) => {
-  const categoryProducts = products.filter((product) => product.category === category.id);
-  return {
-    ...category,
-    productCount: categoryProducts.length,
-    availableCount: categoryProducts.filter(isAvailable).length,
-  };
-});
+/**
+ * Network latency and the catalog download run in parallel, as one simulated round-trip.
+ * @param {string} operation
+ */
+async function fetchCatalog(operation) {
+  const [catalog] = await Promise.all([loadCatalog(operation), simulateNetworkLatency({ service: SERVICE, operation })]);
+  return catalog;
+}
 
 /**
  * @param {ProductQueryParams} [params]
@@ -145,7 +125,7 @@ async function getProducts({ search = '', category, onlyPromo = false, inStockOn
     });
   }
 
-  await simulateNetworkLatency({ service: SERVICE, operation: 'getProducts' });
+  const { products } = await fetchCatalog('getProducts');
 
   const normalizedSearch = search.trim().toLocaleLowerCase(LOCALE);
 
@@ -167,7 +147,7 @@ async function getProducts({ search = '', category, onlyPromo = false, inStockOn
 
 /** @returns {Promise<Category[]>} */
 async function getCategories() {
-  await simulateNetworkLatency({ service: SERVICE, operation: 'getCategories' });
+  const { categories } = await fetchCatalog('getCategories');
   return [...categories];
 }
 
@@ -176,7 +156,7 @@ async function getCategories() {
  * @returns {Promise<Category>}
  */
 async function getCategoryById(categoryId) {
-  await simulateNetworkLatency({ service: SERVICE, operation: 'getCategoryById' });
+  const { categories } = await fetchCatalog('getCategoryById');
 
   const category = categories.find((candidate) => candidate.id === categoryId);
   if (!category) {
@@ -194,9 +174,9 @@ async function getCategoryById(categoryId) {
  * @returns {Promise<Product>}
  */
 async function getProductById(productId) {
-  await simulateNetworkLatency({ service: SERVICE, operation: 'getProductById' });
+  const { productById } = await fetchCatalog('getProductById');
 
-  const product = products.find((candidate) => candidate.id === productId);
+  const product = productById.get(productId);
   if (!product) {
     throw new ServiceError(`${SERVICE}.getProductById: product "${productId}" not found`, {
       service: SERVICE,
@@ -207,4 +187,23 @@ async function getProductById(productId) {
   return product;
 }
 
-export const productService = { getProducts, getCategories, getCategoryById, getProductById };
+/**
+ * Products in the order of `productIds`; ids that no longer exist (delisted products) are skipped.
+ * @param {string[]} productIds
+ * @returns {Promise<Product[]>}
+ */
+async function getProductsByIds(productIds) {
+  if (!Array.isArray(productIds) || productIds.some((productId) => typeof productId !== 'string')) {
+    throw new ServiceError(`${SERVICE}.getProductsByIds: expected an array of product id strings`, {
+      service: SERVICE,
+      operation: 'getProductsByIds',
+      code: 'INVALID_INPUT',
+    });
+  }
+
+  const { productById } = await fetchCatalog('getProductsByIds');
+
+  return productIds.map((productId) => productById.get(productId)).filter((product) => product !== undefined);
+}
+
+export const productService = { getProducts, getProductsByIds, getCategories, getCategoryById, getProductById };

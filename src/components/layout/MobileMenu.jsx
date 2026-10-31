@@ -1,4 +1,4 @@
-import { Clock, Phone, Store, Tag, X } from 'lucide-react';
+import { Clock, Phone, Store, X } from 'lucide-react';
 import { useRef } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
@@ -7,6 +7,7 @@ import { useCategories } from '../../hooks/useProducts';
 import { MOBILE_MENU_ID, NAV_LINKS, PROMO_LISTING_QUERY, STORE_CONTACTS } from '../../lib/constants';
 import { ROUTES, getCatalogPath, getCategoryPath, isNavLinkActive } from '../../lib/routes';
 import { cn } from '../../lib/utils';
+import BrandIcon from '../ui/BrandIcon';
 import BrandLogo from '../ui/BrandLogo';
 import CategoryIcon from '../ui/CategoryIcon';
 
@@ -55,9 +56,9 @@ export default function MobileMenu({ isOpen, onClose }) {
             <li>
               <Link
                 to={getCatalogPath(PROMO_LISTING_QUERY)}
-                className="mb-2 flex min-h-12 items-center gap-2 rounded-xl bg-amber-100 px-3 text-base font-semibold text-amber-900 transition-colors hover:bg-amber-200"
+                className="mb-2 flex min-h-12 items-center gap-2 rounded-lg bg-amber-100 px-3 text-base font-semibold text-amber-900 transition-colors hover:bg-amber-200"
               >
-                <Tag className="h-5 w-5" aria-hidden="true" />
+                <BrandIcon name="tag" className="h-5 w-5" />
                 Акції тижня
               </Link>
             </li>
@@ -68,7 +69,7 @@ export default function MobileMenu({ isOpen, onClose }) {
                   end={link.to === ROUTES.home}
                   className={({ isActive }) =>
                     cn(
-                      'flex min-h-11 items-center rounded-xl px-3 text-base font-medium transition-colors',
+                      'flex min-h-11 items-center rounded-lg px-3 text-base font-medium transition-colors',
                       isNavLinkActive(link.to, pathname, isActive) ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50',
                     )
                   }
@@ -87,7 +88,7 @@ export default function MobileMenu({ isOpen, onClose }) {
           {isCategoriesLoading ? (
             <div className="mt-2 space-y-2 px-3" aria-busy="true" aria-label="Завантаження категорій">
               {Array.from({ length: 6 }, (_, index) => (
-                <div key={index} className="skeleton h-9 rounded-xl" />
+                <div key={index} className="skeleton h-9 rounded-lg" />
               ))}
             </div>
           ) : (
@@ -98,7 +99,7 @@ export default function MobileMenu({ isOpen, onClose }) {
                     to={getCategoryPath(category.id)}
                     className={({ isActive }) =>
                       cn(
-                        'flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm transition-colors',
+                        'flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm transition-colors',
                         isActive ? 'bg-emerald-50 font-semibold text-emerald-800' : 'text-slate-700 hover:bg-slate-50',
                       )
                     }
@@ -115,7 +116,7 @@ export default function MobileMenu({ isOpen, onClose }) {
         </nav>
 
         <div className="mt-auto space-y-3 border-t border-slate-100 px-6 py-5 text-sm text-slate-700">
-          <p className="flex gap-2 rounded-xl bg-emerald-50 p-3 text-emerald-900">
+          <p className="flex gap-2 rounded-lg bg-emerald-50 p-3 text-emerald-900">
             <Store className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
             Магазини: {STORE_CONTACTS.storeHours.toLowerCase()}
           </p>

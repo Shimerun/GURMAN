@@ -15,13 +15,13 @@ const responseCache = new Map();
  *
  * @template T
  * @param {() => Promise<T>} fetcher
- * @param {string} queryKey Serialized inputs; a change triggers a refetch.
+ * @param {string | null} queryKey Serialized inputs; a change triggers a refetch. null skips fetching (no data, not loading).
  */
 export function useAsyncData(fetcher, queryKey) {
   const [state, setState] = useState(() => ({
-    data: /** @type {T | undefined} */ (responseCache.get(queryKey)),
+    data: /** @type {T | undefined} */ (queryKey === null ? undefined : responseCache.get(queryKey)),
     error: /** @type {unknown} */ (null),
-    isFetching: true,
+    isFetching: queryKey !== null,
   }));
   const [refetchCount, setRefetchCount] = useState(0);
   const fetcherRef = useRef(fetcher);
@@ -32,6 +32,11 @@ export function useAsyncData(fetcher, queryKey) {
   });
 
   useEffect(() => {
+    if (queryKey === null) {
+      setState({ data: undefined, error: null, isFetching: false });
+      return undefined;
+    }
+
     let isStale = false;
     setState((previous) => ({
       data: responseCache.has(queryKey) ? /** @type {T} */ (responseCache.get(queryKey)) : previous.data,

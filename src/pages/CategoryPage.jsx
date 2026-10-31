@@ -8,6 +8,8 @@ import ErrorState from '../components/ui/ErrorState';
 import NotFoundState from '../components/ui/NotFoundState';
 import SafeImage from '../components/ui/SafeImage';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { IMAGE_SIZES } from '../lib/imageSizes';
+import { getCategoryPageMeta } from '../lib/pageMeta';
 import { useProductFilters } from '../hooks/useProductFilters';
 import { useCategory, useProducts } from '../hooks/useProducts';
 import { buttonClassName } from '../lib/buttonStyles';
@@ -23,9 +25,10 @@ const CATALOG_CRUMB = { label: 'Каталог', to: ROUTES.catalog };
 /** @param {{ category: Category }} props */
 function CategoryBanner({ category }) {
   return (
-    <section aria-labelledby="category-title" className="relative mt-3 overflow-hidden rounded-3xl bg-emerald-900 shadow-soft">
+    <section aria-labelledby="category-title" className="relative mt-3 overflow-hidden rounded-xl bg-emerald-900 shadow-soft">
       <SafeImage
         src={withImageWidth(category.image, 1400)}
+        sizes={IMAGE_SIZES.categoryHeader}
         alt=""
         isEager
         fetchpriority="high"
@@ -42,11 +45,11 @@ function CategoryBanner({ category }) {
         </h1>
         <p className="mt-2 line-clamp-2 max-w-xl text-sm leading-relaxed text-white sm:mt-3 sm:line-clamp-none sm:text-base">{category.description}</p>
         <ul className="mt-4 flex flex-wrap gap-2 text-sm sm:mt-6">
-          <li className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 font-medium backdrop-blur-sm">
+          <li className="inline-flex items-center gap-1.5 rounded-lg bg-white/15 px-3 py-1.5 font-medium backdrop-blur-sm">
             <PackageOpen className="h-4 w-4 text-amber-300" aria-hidden="true" />
             {pluralize(category.productCount, PRODUCT_FORMS)}
           </li>
-          <li className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 font-medium backdrop-blur-sm">
+          <li className="inline-flex items-center gap-1.5 rounded-lg bg-white/15 px-3 py-1.5 font-medium backdrop-blur-sm">
             <PackageCheck className="h-4 w-4 text-amber-300" aria-hidden="true" />
             {category.availableCount} в наявності
           </li>
@@ -60,8 +63,8 @@ function CategoryBannerSkeleton() {
   return (
     <div aria-busy="true" aria-label="Завантаження категорії">
       <div className="skeleton h-5 w-56 rounded" />
-      <div className="skeleton mt-4 h-64 w-full rounded-3xl" />
-      <div className="skeleton mt-6 h-12 w-full rounded-2xl" />
+      <div className="skeleton mt-4 h-64 w-full rounded-xl" />
+      <div className="skeleton mt-6 h-12 w-full rounded-lg" />
     </div>
   );
 }
@@ -125,10 +128,8 @@ function CategoryContent({ categoryId }) {
   const { data: category, isLoading, error, refetch } = useCategory(categoryId);
   const isMissing = isNotFoundError(error);
 
-  useDocumentTitle(
-    category?.title ?? (isMissing ? 'Категорію не знайдено' : undefined),
-    category ? `${category.title} у GURMAN, Житомир: ${category.description}` : undefined,
-  );
+  const categoryMeta = category ? getCategoryPageMeta(category) : undefined;
+  useDocumentTitle(categoryMeta?.title ?? (isMissing ? 'Категорію не знайдено' : undefined), categoryMeta?.description);
 
   if (isLoading) return <CategoryBannerSkeleton />;
 

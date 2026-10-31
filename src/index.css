@@ -26,6 +26,22 @@
   }
 }
 
+/* Printing shows the page content only, not the app shell. "Роздрукувати список" swaps the page
+   for the paper shopping list (PrintableShoppingList) while html[data-print] is set. */
+@media print {
+  #root > div > :not(main) {
+    display: none !important;
+  }
+
+  html[data-print='shopping-list'] #root > div > main {
+    display: none !important;
+  }
+
+  html[data-print='shopping-list'] #root > div > .printable-shopping-list {
+    display: block !important;
+  }
+}
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -157,6 +173,714 @@
   }
 }
 
+/* Orange thrown into the cart by lib/flyToCart.js; positioned entirely by its transform. */
+.cart-flyer {
+  position: fixed;
+  left: -9px;
+  top: -9px;
+  z-index: 60;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 35%, theme('colors.amber.300'), theme('colors.amber.500'));
+  box-shadow: 0 2px 6px rgb(15 23 42 / 0.25);
+  pointer-events: none;
+}
+
+.cart-flyer::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: 1px;
+  width: 8px;
+  height: 5px;
+  border-radius: 8px 0;
+  background: theme('colors.emerald.500');
+}
+
+/* Final poses, so the scenes read correctly even with motion turned off. */
+.basket-tipped {
+  transform: rotate(-24deg);
+  transform-origin: 20% 90%;
+}
+
+.page-fallback {
+  animation: page-fallback-in 200ms ease-out 250ms both;
+}
+
+@keyframes page-fallback-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes basket-sway {
+  0%,
+  100% {
+    transform: none;
+  }
+  25% {
+    transform: rotate(-7deg);
+  }
+  55% {
+    transform: rotate(5deg);
+  }
+  80% {
+    transform: rotate(-2deg);
+  }
+}
+
+@keyframes basket-tip-over {
+  from {
+    transform: none;
+  }
+  70% {
+    transform: rotate(-28deg);
+  }
+  to {
+    transform: rotate(-24deg);
+  }
+}
+
+@keyframes basket-orange-roll {
+  from {
+    opacity: 0;
+    transform: translateX(-48px) rotate(-240deg);
+  }
+  20% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes logo-produce-loop {
+  0% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  30%,
+  75% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes logo-orange-hop {
+  0%,
+  55%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translateY(-4px);
+  }
+  75% {
+    transform: translateY(-1.5px);
+  }
+}
+
+@keyframes logo-leaf-sway {
+  0%,
+  100% {
+    transform: none;
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  60% {
+    transform: rotate(7deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .basket-sway {
+    transform-origin: 50% 90%;
+    animation: basket-sway 900ms ease-in-out 200ms both;
+  }
+
+  .basket-tipped {
+    animation: basket-tip-over 600ms ease-out both;
+  }
+
+  .basket-orange-roll {
+    animation: basket-orange-roll 800ms cubic-bezier(0.25, 1, 0.5, 1) 350ms both;
+  }
+
+  /* Page-chunk loader: produce keeps dropping into the basket until the page arrives. */
+  .logo-loading .logo-produce {
+    animation: logo-produce-loop 1.4s ease-in-out infinite;
+  }
+
+  .logo-loading .logo-produce-2 {
+    animation-delay: 150ms;
+  }
+
+  .logo-loading .logo-produce-3 {
+    animation-delay: 300ms;
+  }
+}
+
+/* SafeImage: hidden until the file arrives, then a one-off fade (see SafeImage.jsx). */
+img[data-image-state='loading'] {
+  opacity: 0;
+}
+
+@keyframes image-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes check-pop {
+  from {
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes badge-shine {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(120%);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* `to` is omitted, so the fade ends at the image's own opacity (e.g. dimmed out-of-stock photos). */
+  img[data-image-state='loaded'] {
+    animation: image-fade-in 300ms ease-out;
+  }
+
+  /* Contact form success: the circle and tick draw themselves. */
+  .check-draw {
+    animation: check-pop 400ms ease-out both;
+  }
+
+  .check-draw .check-circle,
+  .check-draw .check-tick {
+    stroke-dasharray: 1;
+    animation: swoosh-draw 450ms ease-out both;
+  }
+
+  .check-draw .check-tick {
+    animation-delay: 300ms;
+  }
+
+  ::view-transition-group(product-image) {
+    animation-duration: 350ms;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 200ms;
+  }
+}
+
+/* The one product card image picked for the card → product morph (lib/productImageMorph.js). */
+[data-morph-source] {
+  view-transition-name: product-image;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* Logo hover: the orange hops and the leaf sways (pointer devices only). */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .brand-logo:hover .logo-orange {
+    animation: logo-orange-hop 600ms ease-out;
+  }
+
+  .brand-logo:hover .logo-leaf {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: logo-leaf-sway 700ms ease-in-out;
+  }
+}
+
+/*
+ * Card cart control (ProductCard.jsx): "У кошик" opens into the −/+ stepper — the pill settles,
+ * the buttons slide out from the centre and the count pops — and closes back into the button.
+ */
+@keyframes cart-control-settle {
+  from {
+    opacity: 0.6;
+    transform: scaleX(0.9);
+  }
+}
+
+@keyframes cart-control-from-centre-left {
+  from {
+    opacity: 0;
+    transform: translateX(150%);
+  }
+}
+
+@keyframes cart-control-from-centre-right {
+  from {
+    opacity: 0;
+    transform: translateX(-150%);
+  }
+}
+
+/* "Надіслати список собі": the paper plane flies off to the top right and glides back in. */
+@keyframes paper-plane-flight {
+  0% {
+    transform: none;
+  }
+  45% {
+    opacity: 0;
+    transform: translate(1.25rem, -1.25rem) rotate(-12deg) scale(0.7);
+  }
+  46% {
+    opacity: 0;
+    transform: translate(-1rem, 0.75rem) scale(0.7);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Old prices: drawn as a line (not text-decoration) so it can strike itself through on scroll. */
+.price-strike {
+  position: relative;
+}
+
+.price-strike::after {
+  content: '';
+  position: absolute;
+  inset-inline: -0.125rem;
+  top: 55%;
+  height: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+  transform-origin: left;
+}
+
+@keyframes price-strike-draw {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* Store cards: the address pin drops in and bounces. */
+@keyframes pin-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-0.75rem);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0.125rem);
+  }
+  80% {
+    transform: translateY(-0.125rem);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* Coffee cup (CoffeeToGo.jsx): the liquid rises with a swaying surface, then the lid drops on and
+   the beans bounce. Lengths are SVG user units: 88 lowers the liquid just below the cup's base. */
+@keyframes coffee-fill {
+  from {
+    transform: translateY(88px);
+  }
+}
+
+@keyframes coffee-liquid-sway {
+  from {
+    transform: translateX(-7px);
+  }
+  to {
+    transform: translateX(7px);
+  }
+}
+
+@keyframes coffee-lid-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(2px);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes coffee-bean-bounce {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  55% {
+    opacity: 1;
+    transform: none;
+  }
+  75% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* Time-based, started by CoffeeToGo once the cup is in view (data-pour). Without motion: 'done', i.e. full. */
+@media (prefers-reduced-motion: no-preference) {
+  .coffee-lid,
+  .coffee-beans > g {
+    transform-box: fill-box;
+  }
+
+  .coffee-cup[data-pour='waiting'] .coffee-fill {
+    transform: translateY(88px);
+  }
+
+  .coffee-cup[data-pour='waiting'] :is(.coffee-lid, .coffee-beans > g, .coffee-steam) {
+    opacity: 0;
+  }
+
+  .coffee-cup[data-pour='pouring'] .coffee-fill {
+    animation: coffee-fill 1.4s cubic-bezier(0.4, 0, 0.3, 1) both;
+  }
+
+  .coffee-cup[data-pour='pouring'] .coffee-liquid {
+    animation: coffee-liquid-sway 0.7s ease-in-out 2 alternate;
+  }
+
+  .coffee-cup[data-pour='pouring'] .coffee-lid {
+    animation: coffee-lid-drop 0.45s ease-out 1.35s both;
+  }
+
+  .coffee-cup[data-pour='pouring'] .coffee-beans > g {
+    animation: coffee-bean-bounce 0.5s ease-out 1.6s both;
+  }
+
+  .coffee-cup[data-pour='pouring'] .coffee-beans > g:nth-child(2) {
+    animation-delay: 1.72s;
+  }
+
+  .coffee-cup[data-pour='pouring'] .coffee-beans > g:nth-child(3) {
+    animation-delay: 1.84s;
+  }
+
+  .coffee-cup[data-pour='pouring'] .coffee-steam {
+    animation: page-fallback-in 0.6s ease-out 1.8s both;
+  }
+}
+
+/* Category icons (CategoryIcon.jsx): the orange part hops when its link is hovered. */
+@keyframes category-icon-hop {
+  0%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translateY(-3px) rotate(-8deg);
+  }
+  60% {
+    transform: rotate(4deg);
+  }
+  80% {
+    transform: translateY(-1px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cart-control-expand,
+  .cart-control-collapse {
+    animation: cart-control-settle 260ms ease-out;
+  }
+
+  .cart-control-expand > :first-child {
+    animation: cart-control-from-centre-left 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .cart-control-expand > :last-child {
+    animation: cart-control-from-centre-right 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .cart-control-expand > :nth-child(2) {
+    animation: check-pop 300ms ease-out 120ms both;
+  }
+
+  .paper-plane-flight {
+    animation: paper-plane-flight 650ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Cart drawer: lines arrive one after another as it opens (later lines share the last delay). */
+  .cart-drawer-lines > li {
+    animation: reveal-up 280ms ease-out both;
+  }
+
+  .cart-drawer-lines > li:nth-child(2) {
+    animation-delay: 50ms;
+  }
+
+  .cart-drawer-lines > li:nth-child(3) {
+    animation-delay: 100ms;
+  }
+
+  .cart-drawer-lines > li:nth-child(4) {
+    animation-delay: 150ms;
+  }
+
+  .cart-drawer-lines > li:nth-child(n + 5) {
+    animation-delay: 200ms;
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  a:hover .category-icon-accent {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: category-icon-hop 600ms ease-out;
+  }
+}
+
+/* Coffee-to-go cup (CoffeeToGo.jsx): steam drifts up and fades, one wisp after another. */
+.coffee-steam path {
+  opacity: 0.8;
+}
+
+@keyframes steam-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  35% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .coffee-steam path {
+    animation: steam-rise 2.8s ease-in-out infinite;
+  }
+
+  .coffee-steam path:nth-child(2) {
+    animation-delay: 0.9s;
+  }
+
+  .coffee-steam path:nth-child(3) {
+    animation-delay: 1.8s;
+  }
+}
+
+/*
+ * Seasonal particles over the home banner (SeasonalParticles.jsx). Each lane spans the banner's
+ * full height, so translating it by its own height carries the particle from the top edge to the
+ * bottom; the drawing inside sways on its own, slower rhythm. Summer sparkles rise and twinkle.
+ * The component is not rendered under reduced motion.
+ */
+@keyframes season-fall {
+  from {
+    transform: translateY(-1.5rem);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes season-sway {
+  from {
+    transform: translateX(-0.6rem) rotate(-25deg);
+  }
+  to {
+    transform: translateX(0.6rem) rotate(25deg);
+  }
+}
+
+@keyframes season-twinkle {
+  from {
+    opacity: 0.25;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 0.9;
+    transform: scale(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .seasonal-particle {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    animation: season-fall linear infinite;
+  }
+
+  .seasonal-particle svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    opacity: 0.8;
+    animation: season-sway 3.2s ease-in-out infinite alternate;
+  }
+
+  .seasonal-particles[data-season='summer'] .seasonal-particle {
+    animation-direction: reverse;
+  }
+
+  .seasonal-particles[data-season='summer'] .seasonal-particle svg {
+    animation-name: season-twinkle;
+    animation-duration: 1.8s;
+  }
+
+  .seasonal-particle:nth-child(1) {
+    left: 3%;
+    width: 0.75rem;
+    animation-duration: 13s;
+    animation-delay: -2s;
+  }
+
+  .seasonal-particle:nth-child(2) {
+    left: 11%;
+    width: 1rem;
+    animation-duration: 10s;
+    animation-delay: -7s;
+  }
+
+  .seasonal-particle:nth-child(3) {
+    left: 19%;
+    width: 0.625rem;
+    animation-duration: 15s;
+    animation-delay: -4s;
+  }
+
+  .seasonal-particle:nth-child(4) {
+    left: 28%;
+    width: 0.875rem;
+    animation-duration: 11s;
+    animation-delay: -9s;
+  }
+
+  .seasonal-particle:nth-child(5) {
+    left: 36%;
+    width: 1.125rem;
+    animation-duration: 14s;
+    animation-delay: -1s;
+  }
+
+  .seasonal-particle:nth-child(6) {
+    left: 45%;
+    width: 0.75rem;
+    animation-duration: 9.5s;
+    animation-delay: -6s;
+  }
+
+  .seasonal-particle:nth-child(7) {
+    left: 53%;
+    width: 1rem;
+    animation-duration: 12.5s;
+    animation-delay: -10s;
+  }
+
+  .seasonal-particle:nth-child(8) {
+    left: 62%;
+    width: 0.625rem;
+    animation-duration: 16s;
+    animation-delay: -3s;
+  }
+
+  .seasonal-particle:nth-child(9) {
+    left: 70%;
+    width: 0.875rem;
+    animation-duration: 10.5s;
+    animation-delay: -8s;
+  }
+
+  .seasonal-particle:nth-child(10) {
+    left: 79%;
+    width: 1.125rem;
+    animation-duration: 13.5s;
+    animation-delay: -5s;
+  }
+
+  .seasonal-particle:nth-child(11) {
+    left: 87%;
+    width: 0.75rem;
+    animation-duration: 11.5s;
+    animation-delay: -11s;
+  }
+
+  .seasonal-particle:nth-child(12) {
+    left: 95%;
+    width: 0.875rem;
+    animation-duration: 15s;
+    animation-delay: -2.5s;
+  }
+}
+
+/*
+ * Opening splash (LogoSplash.jsx): the same assembly as the header intro, compressed to ~600ms so
+ * the flight into the header can start at 650ms.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .logo-splash .logo-basket {
+    transform-box: view-box;
+    transform-origin: 32px 57px;
+    animation: logo-basket-pop 300ms ease-out both;
+  }
+
+  .logo-splash .logo-produce {
+    animation: logo-produce-drop 300ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  }
+
+  .logo-splash .logo-produce-1 {
+    animation-delay: 120ms;
+  }
+
+  .logo-splash .logo-produce-2 {
+    animation-delay: 200ms;
+  }
+
+  .logo-splash .logo-produce-3 {
+    animation-delay: 280ms;
+  }
+
+  .logo-splash .logo-wordmark {
+    animation: logo-wordmark-in 250ms ease-out 100ms both;
+  }
+
+  .logo-splash .logo-swoosh {
+    stroke-dasharray: 1;
+    animation: swoosh-draw 300ms ease-in-out 300ms both;
+  }
+
+  .logo-splash .logo-tagline {
+    animation: logo-tagline-write 300ms ease-out 300ms both;
+  }
+}
+
 /*
  * Scroll-linked rather than timer-based: content already on screen renders finished (no delayed
  * first paint), re-rendered grids never replay, and browsers without scroll-driven animations or
@@ -183,6 +907,31 @@
       animation-range: entry 18% entry 78%;
     }
 
+    /* Discount badges catch a single glint as their card scrolls in. */
+    .badge-shine::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.75) 50%, transparent 70%);
+      animation: badge-shine linear both;
+      animation-timeline: view();
+      animation-range: entry 80% cover 45%;
+    }
+
+    /* Ranges end within "entry": whatever is fully on screen without scrolling is already finished. */
+    .pin-drop {
+      animation: pin-drop linear both;
+      animation-timeline: view();
+      animation-range: entry 20% entry 100%;
+    }
+
+    /* Old prices strike themselves through as the card scrolls in. */
+    .price-strike::after {
+      animation: price-strike-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 30% entry 100%;
+    }
+
     /* Requires pathLength="1" on the path so the dash spans the whole stroke. */
     .swoosh-draw {
       stroke-dasharray: 1;
@@ -190,6 +939,36 @@
       animation-timeline: view();
       animation-range: entry 40% cover 40%;
     }
+  }
+}
+
+/* Reading progress on long pages (ScrollProgress.jsx): scaled by the page scroll itself. */
+@keyframes scroll-progress {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    display: block;
+    border-radius: 0 9999px 9999px 0;
+    background: linear-gradient(90deg, theme('colors.amber.300'), theme('colors.amber.500'));
+    transform-origin: left;
+    animation: scroll-progress linear both;
+    animation-timeline: scroll(root);
+  }
+}
+
+/* Product cards (lib/cardTilt.js): lean towards the mouse, photo shifts the other way. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .card-tilt:hover {
+    transform: perspective(56rem) translateY(-2px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  }
+
+  .card-tilt:hover img {
+    --tw-translate-x: var(--parallax-x, 0px);
+    --tw-translate-y: var(--parallax-y, 0px);
   }
 }
 

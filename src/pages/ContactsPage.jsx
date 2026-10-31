@@ -4,6 +4,7 @@ import StoresBlock from '../components/home/StoresBlock';
 import PageHeader from '../components/ui/PageHeader';
 import SocialLinks from '../components/ui/SocialLinks';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { STATIC_PAGE_META } from '../lib/pageMeta';
 import { IN_CITY, STORE_CONTACTS } from '../lib/constants';
 
 const CONTACT_CARDS = [
@@ -14,21 +15,17 @@ const CONTACT_CARDS = [
 ];
 
 export default function ContactsPage() {
-  useDocumentTitle(
-    'Магазини та контакти',
-    `Адреси, графік роботи й телефони двох магазинів GURMAN ${IN_CITY}, маршрут до магазину та форма зворотного зв’язку.`,
-  );
+  useDocumentTitle(STATIC_PAGE_META.contacts.title, STATIC_PAGE_META.contacts.description);
 
   return (
     <div className="space-y-12 sm:space-y-16">
       <div>
         <PageHeader
           title="Магазини та контакти"
-          eyebrow="Завжди на зв’язку"
           breadcrumbs={[{ label: 'Магазини та контакти' }]}
           description={`Два магазини GURMAN ${IN_CITY}: адреси, графік і маршрут. Питання щодо товарів чи співпраці — телефонуйте або напишіть нам.`}
         />
-        <StoresBlock eyebrow="Адреси й маршрути" />
+        <StoresBlock />
       </div>
 
       <section aria-labelledby="contacts-heading">
@@ -37,8 +34,8 @@ export default function ContactsPage() {
         </h2>
         <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {CONTACT_CARDS.map(({ icon: Icon, title, value, href, note }) => (
-            <li key={title} className="rounded-2xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
-              <span className="grid h-11 w-11 place-items-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100">
+            <li key={title} className="rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-100">
+              <span className="grid h-11 w-11 place-items-center rounded-lg bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100">
                 <Icon className="h-5 w-5" aria-hidden="true" />
               </span>
               <h3 className="mt-3 text-sm font-medium text-slate-600">{title}</h3>
@@ -61,7 +58,7 @@ export default function ContactsPage() {
 
       <section
         aria-labelledby="contact-form-heading"
-        className="grid gap-8 rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-8 lg:grid-cols-[1fr_1.4fr]"
+        className="grid gap-8 rounded-xl bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-8 lg:grid-cols-[1fr_1.4fr]"
       >
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Зворотний зв’язок</p>

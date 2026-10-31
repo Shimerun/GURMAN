@@ -1,12 +1,14 @@
-import { ArrowLeft, MapPin, ShieldCheck, ShoppingBasket, Store, Tag, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { ArrowLeft, MapPin, ShieldCheck, Store, Tag, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import CartItem from '../components/cart/CartItem';
 import CartTotals from '../components/cart/CartTotals';
-import CheckoutDialog from '../components/cart/CheckoutDialog';
+import PrintListButton from '../components/cart/PrintListButton';
+import ShareListButton from '../components/cart/ShareListButton';
+import BasketIllustration from '../components/ui/BasketIllustration';
 import EmptyState from '../components/ui/EmptyState';
 import PageHeader from '../components/ui/PageHeader';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { STATIC_PAGE_META } from '../lib/pageMeta';
 import { useHasMounted } from '../hooks/useHasMounted';
 import { buttonClassName } from '../lib/buttonStyles';
 import { IN_CITY, PROMO_LISTING_QUERY } from '../lib/constants';
@@ -16,18 +18,6 @@ import { selectTotalItems, selectTotalPrice, selectTotalSavings, useCartStore } 
 
 const CART_CRUMBS = [{ label: 'Кошик' }];
 
-/** Opened from the cart drawer's checkout button via router state; consumed once so Back doesn't reopen it. */
-function useCheckoutDialogState() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(() => location.state?.openCheckout === true);
-
-  useEffect(() => {
-    if (location.state?.openCheckout) navigate(`${location.pathname}${location.search}`, { replace: true, state: null, preventScrollReset: true });
-  }, [location, navigate]);
-
-  return [isCheckoutOpen, setIsCheckoutOpen];
-}
 
 export default function CartPage() {
   const items = useCartStore((state) => state.items);
@@ -36,11 +26,8 @@ export default function CartPage() {
   const totalPrice = useCartStore(selectTotalPrice);
   const totalSavings = useCartStore(selectTotalSavings);
   const hasMounted = useHasMounted();
-  const [isCheckoutOpen, setIsCheckoutOpen] = useCheckoutDialogState();
 
-  useDocumentTitle('Кошик', `Кошик GURMAN: перевірте товари й суму перед покупкою в магазинах ${IN_CITY}.`);
-
-  const checkoutDialog = isCheckoutOpen && <CheckoutDialog onClose={() => setIsCheckoutOpen(false)} />;
+  useDocumentTitle(STATIC_PAGE_META.cart.title, STATIC_PAGE_META.cart.description);
 
   // Persisted cart is read synchronously, but waiting one frame matches the header badge and avoids a flash.
   if (!hasMounted) return <PageHeader title="Кошик" breadcrumbs={CART_CRUMBS} />;
@@ -50,7 +37,7 @@ export default function CartPage() {
       <>
         <PageHeader title="Кошик" breadcrumbs={CART_CRUMBS} />
         <EmptyState
-          icon={ShoppingBasket}
+          illustration={<BasketIllustration variant="empty" />}
           title="Кошик порожній"
           headingAs="h2"
           description="Почніть з акцій тижня або загляньте в каталог — кошик збережеться, навіть якщо ви закриєте сторінку."
@@ -71,7 +58,6 @@ export default function CartPage() {
             </div>
           }
         />
-        {checkoutDialog}
       </>
     );
   }
@@ -82,7 +68,7 @@ export default function CartPage() {
         <button
           type="button"
           onClick={clearCart}
-          className="inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-700"
+          className="inline-flex h-11 items-center gap-2 rounded-lg px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-700"
         >
           <Trash2 className="h-4 w-4" aria-hidden="true" />
           Очистити кошик
@@ -90,7 +76,7 @@ export default function CartPage() {
       </PageHeader>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start lg:gap-8">
-        <section aria-labelledby="cart-items-heading" className="rounded-2xl bg-white px-4 shadow-soft ring-1 ring-slate-100 sm:px-6">
+        <section aria-labelledby="cart-items-heading" className="rounded-lg bg-white px-4 shadow-soft ring-1 ring-slate-100 sm:px-6">
           <h2 id="cart-items-heading" className="sr-only">
             Товари в кошику
           </h2>
@@ -102,19 +88,18 @@ export default function CartPage() {
         </section>
 
         <aside aria-labelledby="order-summary-heading" className="space-y-3 lg:sticky lg:top-36">
-          <div className="rounded-2xl bg-white p-5 shadow-soft ring-2 ring-emerald-100 sm:p-6">
+          <div className="rounded-lg bg-white p-5 shadow-soft ring-2 ring-emerald-100 sm:p-6">
             <h2 id="order-summary-heading" className="text-lg font-bold text-slate-900">
               Підсумок
             </h2>
             <CartTotals totalPrice={totalPrice} totalSavings={totalSavings} totalItems={totalItems} className="mt-4" />
 
-            <button type="button" onClick={() => setIsCheckoutOpen(true)} aria-haspopup="dialog" className={buttonClassName({ size: 'lg', className: 'mt-5 w-full' })}>
-              Оформити демо-замовлення
-            </button>
-            <p className="mt-2 text-center text-xs text-slate-600">Демо-режим: без оплати й передачі замовлення в магазин.</p>
+            <ShareListButton className="mt-5 w-full" />
+            <PrintListButton className="mt-2 w-full" />
+            <p className="mt-2 text-center text-xs text-slate-600">Список зберігається на цьому пристрої — відкрийте його в магазині.</p>
           </div>
 
-          <div className="rounded-2xl bg-emerald-50 p-5 text-sm text-emerald-950 ring-1 ring-emerald-100">
+          <div className="rounded-lg bg-emerald-50 p-5 text-sm text-emerald-950 ring-1 ring-emerald-100">
             <p className="flex items-center gap-2 font-bold">
               <Store className="h-5 w-5 text-emerald-700" aria-hidden="true" />
               Як отримати товари
@@ -139,7 +124,6 @@ export default function CartPage() {
           </Link>
         </aside>
       </div>
-      {checkoutDialog}
     </>
   );
 }

@@ -1,12 +1,16 @@
-import { CircleCheck, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { buttonClassName } from '../../lib/buttonStyles';
+import { ROUTES } from '../../lib/routes';
 import { cn } from '../../lib/utils';
 
-const TOPICS = ['Якість товару', 'Наявність товару в магазині', 'Картка GURMAN', 'Співпраця та постачання', 'Інше'];
+const TOPICS = ['Якість товару', 'Наявність товару в магазині', 'Співпраця та постачання', 'Інше'];
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_MESSAGE_LENGTH = 10;
+// Upper bounds keep pasted junk out and match what a future backend will accept.
+const MAX_LENGTH = { name: 100, email: 254, message: 2000 };
 
 const EMPTY_FORM = { name: '', email: '', topic: TOPICS[0], message: '' };
 
@@ -26,8 +30,28 @@ function validateContactForm(values) {
   return errors;
 }
 
+const SHAKE_KEYFRAMES = [
+  { transform: 'none' },
+  { transform: 'translateX(-6px)' },
+  { transform: 'translateX(5px)' },
+  { transform: 'translateX(-3px)' },
+  { transform: 'translateX(2px)' },
+  { transform: 'none' },
+];
+
+/**
+ * A short sideways shake on each invalid field, so the problem is noticed where it is, not
+ * only in the summary. Skipped under reduced motion.
+ * @param {HTMLFormElement | null} form
+ * @param {string[]} fieldNames
+ */
+function shakeFields(form, fieldNames) {
+  if (!form || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  for (const name of fieldNames) form.querySelector(`[name="${name}"]`)?.animate(SHAKE_KEYFRAMES, { duration: 360, easing: 'ease-out' });
+}
+
 const FIELD_CLASS_NAME =
-  'mt-1.5 block w-full rounded-xl border bg-white px-3.5 text-base text-slate-800 transition-colors placeholder:text-slate-500 focus:outline-none focus:ring-2 sm:text-sm';
+  'mt-1.5 block w-full rounded-lg border bg-white px-3.5 text-base text-slate-800 transition-colors placeholder:text-slate-500 focus:outline-none focus:ring-2 sm:text-sm';
 
 /** @param {boolean} hasError */
 const getFieldClassName = (hasError) =>
@@ -65,9 +89,10 @@ export default function ContactForm() {
     const nextErrors = validateContactForm(values);
     setErrors(nextErrors);
 
-    const firstInvalidField = Object.keys(nextErrors)[0];
-    if (firstInvalidField) {
-      formRef.current?.querySelector(`[name="${firstInvalidField}"]`)?.focus();
+    const invalidFields = Object.keys(nextErrors);
+    if (invalidFields.length > 0) {
+      formRef.current?.querySelector(`[name="${invalidFields[0]}"]`)?.focus();
+      shakeFields(formRef.current, invalidFields);
       return;
     }
 
@@ -94,9 +119,13 @@ export default function ContactForm() {
         ref={successRef}
         role="status"
         tabIndex={-1}
-        className="flex flex-col items-start gap-3 rounded-2xl bg-emerald-50 p-6 ring-1 ring-emerald-100 focus:outline-none"
+        className="flex flex-col items-start gap-3 rounded-lg bg-emerald-50 p-6 ring-1 ring-emerald-100 focus:outline-none"
       >
-        <CircleCheck className="h-8 w-8 text-emerald-600" aria-hidden="true" />
+        {/* Circle and tick draw themselves (index.css `.check-draw`); static with reduced motion. */}
+        <svg viewBox="0 0 32 32" className="check-draw h-10 w-10" aria-hidden="true" focusable="false">
+          <circle cx="16" cy="16" r="13.5" pathLength="1" fill="none" strokeWidth="2.5" className="check-circle stroke-emerald-600" />
+          <path d="M10 16.5l4 4 8-8.5" pathLength="1" fill="none" strokeWidth="2.75" strokeLinecap="round" strokeLinejoin="round" className="check-tick stroke-emerald-700" />
+        </svg>
         <h3 className="text-lg font-semibold text-slate-900">Дякуємо, {submittedName}!</h3>
         <p className="text-sm text-slate-600">
           Форма заповнена правильно. Це демо-версія сайту, тому повідомлення нікуди не надіслано — для швидкої відповіді зателефонуйте на
@@ -115,7 +144,7 @@ export default function ContactForm() {
         Усі поля обов’язкові.
       </p>
       {errorEntries.length > 0 && (
-        <div role="alert" className="rounded-2xl bg-red-50 p-4 text-sm text-red-900 ring-1 ring-red-200">
+        <div role="alert" className="rounded-lg bg-red-50 p-4 text-sm text-red-900 ring-1 ring-red-200">
           <p className="font-semibold">Перевірте {errorEntries.length === 1 ? 'поле' : 'поля'}:</p>
           <ul className="mt-1 list-inside list-disc">
             {errorEntries.map(([name]) => (
@@ -133,6 +162,7 @@ export default function ContactForm() {
             id={`${fieldId}-name`}
             name="name"
             autoComplete="name"
+            maxLength={MAX_LENGTH.name}
             value={values.name}
             onChange={handleChange('name')}
             aria-invalid={Boolean(errors.name)}
@@ -151,6 +181,7 @@ export default function ContactForm() {
             type="email"
             inputMode="email"
             autoComplete="email"
+            maxLength={MAX_LENGTH.email}
             value={values.email}
             onChange={handleChange('email')}
             aria-invalid={Boolean(errors.email)}
@@ -186,6 +217,7 @@ export default function ContactForm() {
           id={`${fieldId}-message`}
           name="message"
           rows={5}
+          maxLength={MAX_LENGTH.message}
           value={values.message}
           onChange={handleChange('message')}
           aria-invalid={Boolean(errors.message)}
@@ -202,6 +234,13 @@ export default function ContactForm() {
         </button>
         <p className="text-sm text-slate-600">Демо-форма: повідомлення не надсилається на сервер.</p>
       </div>
+      <p className="text-sm text-slate-600">
+        Надсилаючи форму, ви погоджуєтеся з{' '}
+        <Link to={ROUTES.privacy} className="font-semibold text-emerald-800 underline underline-offset-2">
+          політикою конфіденційності
+        </Link>
+        .
+      </p>
     </form>
   );
 }

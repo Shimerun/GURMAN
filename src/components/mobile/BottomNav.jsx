@@ -1,45 +1,63 @@
-import { House, LayoutGrid, MapPin, ShoppingBasket, Tag } from 'lucide-react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useHasMounted } from '../../hooks/useHasMounted';
 import { PROMO_LISTING_QUERY } from '../../lib/constants';
 import { PRODUCT_FORMS, pluralize } from '../../lib/format';
 import { ROUTES, getCatalogPath, isNavLinkActive, isPromoListing } from '../../lib/routes';
 import { cn } from '../../lib/utils';
+import BrandIcon from '../ui/BrandIcon';
 import { selectTotalItems, useCartStore } from '../../store/useCartStore';
 
 /** `isActive` decides from the full location, because "Акції" and "Каталог" share the /catalog path. */
 const TABS = [
-  { id: 'home', to: ROUTES.home, label: 'Головна', icon: House, isActive: (pathname) => pathname === ROUTES.home },
+  { id: 'home', to: ROUTES.home, label: 'Головна', icon: 'home', isActive: (pathname) => pathname === ROUTES.home },
   {
     id: 'catalog',
     to: ROUTES.catalog,
     label: 'Каталог',
-    icon: LayoutGrid,
+    icon: 'catalog',
     isActive: (pathname, search) => isNavLinkActive(ROUTES.catalog, pathname, false) && !isPromoListing(pathname, search),
   },
   {
     id: 'promo',
     to: getCatalogPath(PROMO_LISTING_QUERY),
     label: 'Акції',
-    icon: Tag,
+    icon: 'tag',
     isActive: (pathname, search) => isPromoListing(pathname, search),
   },
-  { id: 'cart', to: ROUTES.cart, label: 'Кошик', icon: ShoppingBasket, isActive: (pathname) => pathname === ROUTES.cart },
-  { id: 'stores', to: ROUTES.contacts, label: 'Магазини', icon: MapPin, isActive: (pathname) => pathname === ROUTES.contacts },
+  { id: 'cart', to: ROUTES.cart, label: 'Кошик', icon: 'basket', isActive: (pathname) => pathname === ROUTES.cart },
+  { id: 'stores', to: ROUTES.contacts, label: 'Магазини', icon: 'pin', isActive: (pathname) => pathname === ROUTES.contacts },
 ];
+
+/** Positions of the sliding highlight, one per tab (it is one tab wide). */
+const HIGHLIGHT_POSITIONS = ['translate-x-0', 'translate-x-full', 'translate-x-[200%]', 'translate-x-[300%]', 'translate-x-[400%]'];
 
 /** App-style tab bar below the `md` breakpoint; SiteLayout reserves its height at the bottom of the page. */
 export default function BottomNav() {
-  const { pathname, search } = useLocation();
+  const { pathname, search, key: locationKey } = useLocation();
+  // The active icon pops only after a navigation, not on page load.
+  const [initialLocationKey] = useState(locationKey);
+  const hasNavigated = locationKey !== initialLocationKey;
+  const activeIndex = TABS.findIndex((tab) => tab.isActive(pathname, search));
   const totalItems = useCartStore(selectTotalItems);
   const hasMounted = useHasMounted();
   const cartCount = hasMounted ? totalItems : 0;
 
   return (
     <nav aria-label="Швидка навігація" className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur-md md:hidden">
-      <ul className="grid h-14 grid-cols-5">
-        {TABS.map(({ id, to, label, icon: Icon, isActive: getIsActive }) => {
-          const isActive = getIsActive(pathname, search);
+      {/* One highlight slides between tabs; it fades out on pages without a tab (e.g. "Про нас"). */}
+      <span
+        aria-hidden="true"
+        className={cn(
+          'pointer-events-none absolute left-0 top-0 flex h-14 w-1/5 justify-center pt-1 transition-[transform,opacity] duration-300 ease-out motion-reduce:transition-none',
+          activeIndex >= 0 ? HIGHLIGHT_POSITIONS[activeIndex] : 'opacity-0',
+        )}
+      >
+        <span className="h-8 w-14 rounded-full bg-emerald-50" />
+      </span>
+      <ul className="relative grid h-14 grid-cols-5">
+        {TABS.map(({ id, to, label, icon }, index) => {
+          const isActive = index === activeIndex;
           return (
             <li key={id}>
               <Link
@@ -50,8 +68,8 @@ export default function BottomNav() {
                   isActive ? 'text-emerald-800' : 'text-slate-600 hover:text-slate-900',
                 )}
               >
-                <span className="relative">
-                  <Icon className="h-6 w-6" strokeWidth={isActive ? 2.25 : 1.75} aria-hidden="true" />
+                <span className="relative" data-cart-target={id === 'cart' ? true : undefined}>
+                  <BrandIcon key={isActive ? 'active' : 'idle'} name={icon} className={cn('h-6 w-6', isActive && hasNavigated && 'animate-tab-pop')} />
                   {id === 'cart' && cartCount > 0 && (
                     <span
                       key={cartCount}

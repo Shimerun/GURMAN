@@ -1,9 +1,9 @@
 import { forwardRef } from 'react';
-import { LayoutGrid, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PROMO_LISTING_QUERY } from '../../lib/constants';
 import { PRODUCT_FORMS, pluralize } from '../../lib/format';
 import { ROUTES, getCatalogPath, getCategoryPath } from '../../lib/routes';
+import BrandIcon from '../ui/BrandIcon';
 import CategoryIcon from '../ui/CategoryIcon';
 
 /**
@@ -27,7 +27,7 @@ const MegaMenu = forwardRef(
           {isLoading ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-busy="true">
               {Array.from({ length: 8 }, (_, index) => (
-                <div key={index} className="skeleton h-16 rounded-2xl" />
+                <div key={index} className="skeleton h-16 rounded-lg" />
               ))}
             </div>
           ) : (
@@ -37,9 +37,9 @@ const MegaMenu = forwardRef(
                   <Link
                     to={getCategoryPath(category.id)}
                     onClick={onNavigate}
-                    className="flex w-full items-center gap-3 rounded-2xl p-3 text-left transition-colors hover:bg-emerald-50"
+                    className="flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-emerald-50"
                   >
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-emerald-100 text-emerald-800">
+                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-emerald-100 text-emerald-800">
                       <CategoryIcon name={category.icon} className="h-5 w-5" />
                     </span>
                     <span className="min-w-0">
@@ -56,17 +56,17 @@ const MegaMenu = forwardRef(
             <Link
               to={ROUTES.catalog}
               onClick={onNavigate}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-slate-100 px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-slate-100 px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200"
             >
-              <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+              <BrandIcon name="catalog" className="h-4 w-4" />
               Усі товари
             </Link>
             <Link
               to={getCatalogPath(PROMO_LISTING_QUERY)}
               onClick={onNavigate}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-amber-400 px-4 text-sm font-semibold text-slate-900 transition-colors hover:bg-amber-300"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-amber-400 px-4 text-sm font-semibold text-slate-900 transition-colors hover:bg-amber-300"
             >
-              <Tag className="h-4 w-4" aria-hidden="true" />
+              <BrandIcon name="tag" className="h-4 w-4" />
               Акції тижня
             </Link>
           </div>

@@ -51,9 +51,19 @@ module.exports = {
         script: ['Caveat', 'cursive'],
       },
       boxShadow: {
-        soft: '0 2px 12px -2px rgb(15 23 42 / 0.08)',
+        // Hairline lift only: cards are separated by their ring, not by floating shadows.
+        soft: '0 1px 2px rgb(15 23 42 / 0.05)',
       },
       keyframes: {
+        'basket-hop': {
+          '0%, 100%': { transform: 'none' },
+          '35%': { transform: 'translateY(-6px) rotate(-6deg)' },
+          '65%': { transform: 'translateY(1px) rotate(3deg)' },
+        },
+        'tab-pop': {
+          '0%, 100%': { transform: 'none' },
+          '40%': { transform: 'translateY(-3px) scale(1.12)' },
+        },
         'badge-pop': {
           '0%': { transform: 'scale(0.6)' },
           '60%': { transform: 'scale(1.2)' },
@@ -78,13 +88,31 @@ module.exports = {
       },
       animation: {
         'badge-pop': 'badge-pop 300ms ease-out',
+        'tab-pop': 'tab-pop 350ms ease-out',
+        'basket-hop': 'basket-hop 500ms ease-out',
         'slide-in-right': 'slide-in-right 250ms ease-out',
         'slide-in-left': 'slide-in-left 250ms ease-out',
         'fade-in': 'fade-in 200ms ease-out',
         'sheet-up': 'sheet-up 280ms cubic-bezier(0.32, 0.72, 0, 1)',
+        // Slower than the stock `ping`: a calm "live" indicator, not an alert.
+        'ping-slow': 'ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite',
       },
     },
   },
+  // Tailwind scans every word in the sources, and DaisyUI emits a component's whole CSS when a word
+  // equals its class name ("menu" of the coffee menu, `.join(',')`, <label>, <footer>…). The site
+  // only uses `select`, `skeleton` and `toggle`; every other component is blocked here. To adopt
+  // one, remove it from this list. (Tailwind core utilities `table` and `collapse` are unused too.)
+  blocklist: [
+    'alert', 'artboard', 'avatar', 'badge', 'btm-nav', 'breadcrumbs', 'btn', 'card', 'carousel', 'chat',
+    'checkbox', 'collapse', 'countdown', 'diff', 'divider', 'drawer', 'dropdown', 'file-input', 'footer',
+    'form-control', 'glass', 'hero', 'indicator', 'input', 'join', 'kbd', 'label', 'link', 'loading', 'mask',
+    'menu', 'mockup-browser', 'mockup-code', 'mockup-phone', 'mockup-window', 'modal', 'navbar', 'progress',
+    'radial-progress', 'radio', 'range', 'rating', 'stack', 'stat', 'stats', 'step', 'steps', 'swap', 'tab',
+    'table', 'tabs', 'textarea', 'timeline', 'toast', 'tooltip',
+    // State words that DaisyUI pairs with the components above (`.menu .active`, `.table .hover`).
+    'active', 'compact', 'disabled', 'focus', 'hover',
+  ],
   plugins: [require('daisyui')],
   daisyui: {
     // Keeps the stock "light" theme but swaps its violet primary for the brand green so

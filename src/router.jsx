@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import SiteLayout from './components/layout/SiteLayout';
+import { loadProductPage } from './lib/pageLoaders';
 import HomePage from './pages/HomePage';
 import RouteErrorPage from './pages/RouteErrorPage';
 
@@ -11,8 +12,10 @@ const CatalogPage = lazy(() => import('./pages/CatalogPage'));
 const CategoryPage = lazy(() => import('./pages/CategoryPage'));
 const ContactsPage = lazy(() => import('./pages/ContactsPage'));
 const DeliveryPage = lazy(() => import('./pages/DeliveryPage'));
+const FavoritesPage = lazy(() => import('./pages/FavoritesPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
-const ProductPage = lazy(() => import('./pages/ProductPage'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const ProductPage = lazy(loadProductPage);
 
 export const router = createBrowserRouter([
   {
@@ -28,9 +31,11 @@ export const router = createBrowserRouter([
           { path: 'category/:categoryId', element: <CategoryPage /> },
           { path: 'product/:productId', element: <ProductPage /> },
           { path: 'cart', element: <CartPage /> },
+          { path: 'favorites', element: <FavoritesPage /> },
           { path: 'about', element: <AboutPage /> },
           { path: 'delivery', element: <DeliveryPage /> },
           { path: 'contacts', element: <ContactsPage /> },
+          { path: 'privacy', element: <PrivacyPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

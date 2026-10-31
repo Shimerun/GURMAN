@@ -19,7 +19,7 @@ export default function PopularProducts() {
 
   return (
     <section aria-labelledby="popular-heading">
-      <SectionHeader id="popular-heading" eyebrow="Обирають найчастіше" title="Популярні товари">
+      <SectionHeader id="popular-heading" title="Популярні товари">
         <Link
           to={getCatalogPath({ sort: 'popular' })}
           className={buttonClassName({ variant: 'ghost', size: 'sm' })}

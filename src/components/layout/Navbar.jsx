@@ -1,6 +1,7 @@
-import { LayoutGrid, Menu, Phone, Search, ShoppingCart, Tag, X } from 'lucide-react';
+import { Heart, Menu, Phone, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { useAnimatedNumber } from '../../hooks/useAnimatedNumber';
 import { useHasMounted } from '../../hooks/useHasMounted';
 import { useIsScrollingDown } from '../../hooks/useIsScrollingDown';
 import { useCategories } from '../../hooks/useProducts';
@@ -9,8 +10,11 @@ import { PRODUCT_FORMS, formatPrice, pluralize } from '../../lib/format';
 import { ROUTES, getCatalogPath, isNavLinkActive, isPromoListing } from '../../lib/routes';
 import { cn } from '../../lib/utils';
 import { selectTotalItems, selectTotalPrice, useCartStore } from '../../store/useCartStore';
+import { selectFavoriteCount, useFavoritesStore } from '../../store/useFavoritesStore';
+import BrandIcon from '../ui/BrandIcon';
 import BrandLogo from '../ui/BrandLogo';
 import MegaMenu from './MegaMenu';
+import SearchBox from './SearchBox';
 
 const MEGA_MENU_ID = 'catalog-mega-menu';
 const PROMO_PATH = getCatalogPath(PROMO_LISTING_QUERY);
@@ -28,7 +32,7 @@ function DesktopNavLinks() {
           end={link.to === ROUTES.home}
           className={({ isActive }) =>
             cn(
-              'inline-flex min-h-10 items-center whitespace-nowrap rounded-full px-3.5 text-sm font-medium transition-colors',
+              'inline-flex min-h-10 items-center whitespace-nowrap rounded-lg px-3.5 text-sm font-medium transition-colors',
               isNavLinkActive(link.to, pathname, isActive) && !(link.to === ROUTES.catalog && isOnPromo)
                 ? 'bg-emerald-50 text-emerald-800'
                 : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900',
@@ -42,13 +46,14 @@ function DesktopNavLinks() {
   );
 }
 
-/** @param {{ isMobileMenuOpen: boolean, onOpenMobileMenu: () => void }} props */
-export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu }) {
+/**
+ * @param {{ isMobileMenuOpen: boolean, onOpenMobileMenu: () => void, isLogoIntroAnimated?: boolean, isLogoHidden?: boolean }} props
+ * `isLogoHidden` keeps the logo invisible while the opening splash flies its copy into place.
+ */
+export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu, isLogoIntroAnimated = true, isLogoHidden = false }) {
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const megaMenuTriggerRef = useRef(null);
   const megaMenuPanelRef = useRef(null);
-  const navigate = useNavigate();
   const { pathname, search } = useLocation();
   const { data: categories, isLoading: isCategoriesLoading } = useCategories();
 
@@ -57,7 +62,11 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu }) {
   const totalPrice = useCartStore(selectTotalPrice);
   const hasMounted = useHasMounted();
   const badgeCount = hasMounted ? totalItems : 0;
+  const favoriteCount = useFavoritesStore(selectFavoriteCount);
+  const favoriteBadgeCount = hasMounted ? favoriteCount : 0;
   const subtotal = hasMounted ? totalPrice : 0;
+  // Animated from the persisted total (not from the pre-mount 0), so page loads don't count up.
+  const animatedTotalPrice = useAnimatedNumber(totalPrice);
   const isOnPromo = isPromoListing(pathname, search);
   const isCompact = useIsScrollingDown();
 
@@ -82,16 +91,6 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu }) {
     };
   }, [isMegaMenuOpen]);
 
-  const handleSearchSubmit = (event) => {
-    event.preventDefault();
-    const query = searchQuery.trim();
-    if (!query) return;
-    navigate(getCatalogPath({ search: query }));
-    setSearchQuery('');
-    // Hides the on-screen keyboard so results are visible.
-    event.currentTarget.querySelector('input')?.blur();
-  };
-
   return (
     <header
       className={cn(
@@ -113,7 +112,7 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu }) {
           <Menu className="h-6 w-6" aria-hidden="true" />
         </button>
 
-        <BrandLogo showTagline isIntroAnimated />
+        <BrandLogo showTagline isIntroAnimated={isLogoIntroAnimated} className={isLogoHidden ? 'invisible' : undefined} />
 
         <button
           ref={megaMenuTriggerRef}
@@ -122,57 +121,51 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu }) {
           aria-expanded={isMegaMenuOpen}
           aria-controls={MEGA_MENU_ID}
           className={cn(
-            'ml-2 hidden h-11 shrink-0 items-center gap-2 rounded-full px-4 text-sm font-semibold text-white transition-colors md:flex',
+            'ml-2 hidden h-11 shrink-0 items-center gap-2 rounded-lg px-4 text-sm font-semibold text-white transition-colors md:flex',
             isMegaMenuOpen ? 'bg-emerald-900' : 'bg-emerald-700 hover:bg-emerald-800',
           )}
         >
-          {isMegaMenuOpen ? <X className="h-4 w-4" aria-hidden="true" /> : <LayoutGrid className="h-4 w-4" aria-hidden="true" />}
+          {isMegaMenuOpen ? <X className="h-4 w-4" aria-hidden="true" /> : <BrandIcon name="catalog" className="h-4 w-4" />}
           Категорії
         </button>
 
-        <form role="search" onSubmit={handleSearchSubmit} className="order-last w-full md:order-none md:w-auto md:flex-1">
-          <label className="relative block">
-            <span className="sr-only">Пошук товарів у каталозі</span>
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" aria-hidden="true" />
-            {/* text-base on mobile (16px) prevents iOS Safari from zooming into the field on focus. */}
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Знайти продукти: молоко, сир, банани…"
-              autoComplete="off"
-              enterKeyHint="search"
-              className="h-11 w-full rounded-full border border-slate-300 bg-slate-50 pl-12 pr-12 text-base text-slate-800 transition-colors placeholder:text-slate-500 hover:border-slate-400 focus:border-emerald-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600/20 md:text-sm [&::-webkit-search-cancel-button]:hidden"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                aria-label="Очистити пошук"
-                className="absolute right-1 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-800"
-              >
-                <X className="h-4 w-4" aria-hidden="true" />
-              </button>
-            )}
-          </label>
-        </form>
+        <SearchBox className="order-last w-full md:order-none md:w-auto md:flex-1" />
 
         <a
           href={STORE_CONTACTS.phoneHref}
-          className="hidden h-11 shrink-0 items-center gap-2 rounded-full px-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 xl:flex"
+          className="hidden h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 xl:flex"
         >
           <Phone className="h-4 w-4 text-emerald-700" aria-hidden="true" />
           {STORE_CONTACTS.phone}
         </a>
 
+        <Link
+          to={ROUTES.favorites}
+          aria-label={favoriteBadgeCount > 0 ? `Обране: ${pluralize(favoriteBadgeCount, PRODUCT_FORMS)}` : 'Обране'}
+          aria-current={pathname === ROUTES.favorites ? 'page' : undefined}
+          className="relative ml-auto grid h-11 w-11 shrink-0 place-items-center rounded-full text-slate-800 transition-colors hover:bg-slate-100 active:bg-slate-200 md:ml-0"
+        >
+          <Heart className={cn('h-5 w-5', favoriteBadgeCount > 0 && 'fill-red-500 text-red-500')} aria-hidden="true" />
+          {favoriteBadgeCount > 0 && (
+            <span
+              key={favoriteBadgeCount}
+              aria-hidden="true"
+              className="absolute right-0 top-0 grid h-5 min-w-5 animate-badge-pop place-items-center rounded-full bg-slate-800 px-1 text-xs font-bold leading-none text-white"
+            >
+              {favoriteBadgeCount}
+            </span>
+          )}
+        </Link>
+
         <button
           type="button"
           onClick={openCart}
+          data-cart-target
           aria-label={`Кошик: ${pluralize(badgeCount, PRODUCT_FORMS)} на суму ${formatPrice(subtotal)}`}
-          className="ml-auto flex h-11 shrink-0 items-center gap-2.5 rounded-full border border-slate-200 bg-white pl-3.5 pr-3.5 transition-colors hover:border-emerald-600 active:bg-slate-50 md:ml-0 sm:pr-4"
+          className="flex h-11 shrink-0 items-center gap-2.5 rounded-lg border border-slate-200 bg-white pl-3.5 pr-3.5 transition-colors hover:border-emerald-600 active:bg-slate-50 sm:pr-4"
         >
           <span className="relative">
-            <ShoppingCart className="h-5 w-5 text-slate-800" aria-hidden="true" />
+            <BrandIcon name="basket" className="h-5 w-5 text-slate-800" />
             {/* Keyed by count so the pop animation replays on every change. */}
             <span
               key={badgeCount}
@@ -185,7 +178,7 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu }) {
               {badgeCount}
             </span>
           </span>
-          <span className="hidden text-sm font-semibold tabular-nums text-slate-900 sm:inline">{formatPrice(subtotal)}</span>
+          <span className="hidden text-sm font-semibold tabular-nums text-slate-900 sm:inline">{formatPrice(hasMounted ? animatedTotalPrice : 0)}</span>
         </button>
       </div>
 
@@ -196,11 +189,11 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu }) {
             to={PROMO_PATH}
             aria-current={isOnPromo ? 'page' : undefined}
             className={cn(
-              'inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition-colors',
+              'inline-flex min-h-10 items-center gap-1.5 rounded-lg px-4 text-sm font-semibold transition-colors',
               isOnPromo ? 'bg-amber-400 text-slate-900' : 'bg-amber-100 text-amber-900 hover:bg-amber-200',
             )}
           >
-            <Tag className="h-4 w-4" aria-hidden="true" />
+            <BrandIcon name="tag" className="h-4 w-4" />
             Акції тижня
           </Link>
         </div>

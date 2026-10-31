@@ -1,4 +1,4 @@
-import { ArrowRight, ShoppingBasket, Store, Tag, X } from 'lucide-react';
+import { Store, Tag, X } from 'lucide-react';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
@@ -6,11 +6,14 @@ import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { buttonClassName } from '../../lib/buttonStyles';
 import { IN_CITY, PROMO_LISTING_QUERY } from '../../lib/constants';
 import { PRODUCT_FORMS, pluralize } from '../../lib/format';
-import { OPEN_CHECKOUT_STATE, ROUTES, getCatalogPath } from '../../lib/routes';
+import { ROUTES, getCatalogPath } from '../../lib/routes';
 import { selectTotalItems, selectTotalPrice, selectTotalSavings, useCartStore } from '../../store/useCartStore';
+import BasketIllustration from '../ui/BasketIllustration';
 import EmptyState from '../ui/EmptyState';
 import CartItem from './CartItem';
 import CartTotals from './CartTotals';
+import PrintListButton from './PrintListButton';
+import ShareListButton from './ShareListButton';
 
 /** Links inside close the drawer implicitly: SiteLayout closes it on every route change. */
 export default function CartDrawer() {
@@ -68,7 +71,7 @@ export default function CartDrawer() {
           {isEmpty ? (
             <EmptyState
               className="mt-8 shadow-none ring-0"
-              icon={ShoppingBasket}
+              illustration={<BasketIllustration variant="empty" />}
               title="Кошик порожній"
               description="Почніть з акцій тижня або загляньте в каталог — кошик збережеться навіть після закриття сторінки."
               action={
@@ -84,7 +87,7 @@ export default function CartDrawer() {
               }
             />
           ) : (
-            <ul className="divide-y divide-slate-100">
+            <ul className="cart-drawer-lines divide-y divide-slate-100">
               {items.map((item) => (
                 <CartItem key={item.product.id} item={item} />
               ))}
@@ -97,12 +100,12 @@ export default function CartDrawer() {
             <CartTotals totalPrice={totalPrice} totalSavings={totalSavings} />
             <p className="mt-3 flex items-start gap-2 text-xs text-slate-600">
               <Store className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
-              Купуйте ці товари в магазинах GURMAN {IN_CITY}. Оформлення працює в демо-режимі.
+              Це ваш список покупок: надішліть його собі й купуйте в магазинах GURMAN {IN_CITY}.
             </p>
-            <Link to={ROUTES.cart} state={OPEN_CHECKOUT_STATE} className={buttonClassName({ size: 'lg', className: 'mt-3 w-full' })}>
-              Оформити демо-замовлення
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
+            <div className="mt-3 flex items-start gap-2">
+              <ShareListButton className="min-w-0 flex-1" />
+              <PrintListButton isIconOnly />
+            </div>
             <div className="flex items-center justify-between gap-2 py-2">
               <Link to={ROUTES.cart} className={buttonClassName({ variant: 'ghost', size: 'sm' })}>
                 Відкрити кошик
@@ -110,7 +113,7 @@ export default function CartDrawer() {
               <button
                 type="button"
                 onClick={clearCart}
-                className="inline-flex h-11 items-center rounded-full px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-700"
+                className="inline-flex h-11 items-center rounded-lg px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-700"
               >
                 Очистити кошик
               </button>

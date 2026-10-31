@@ -1,8 +1,11 @@
 const MINUTES_IN_DAY = 24 * 60;
 
-// Store hours are local to Ukraine (IANA zone "Europe/Kyiv" covers the whole country), so "open now" must not depend on the visitor's timezone.
-const createUkraineTimeFormatter = () => {
-  const options = { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' };
+/**
+ * Business time is local to Ukraine (IANA zone "Europe/Kyiv" covers the whole country), so "open
+ * now" or the current season must not depend on the visitor's timezone.
+ * @param {Intl.DateTimeFormatOptions} options
+ */
+export const createUkraineFormatter = (options) => {
   try {
     return new Intl.DateTimeFormat('en-GB', { ...options, timeZone: 'Europe/Kyiv' });
   } catch {
@@ -11,7 +14,7 @@ const createUkraineTimeFormatter = () => {
   }
 };
 
-const ukraineTimeFormatter = createUkraineTimeFormatter();
+const ukraineTimeFormatter = createUkraineFormatter({ hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
 
 /** @param {string} time 'HH:MM' ('24:00' allowed as end of day) */
 const toMinutes = (time) => {
@@ -47,3 +50,26 @@ export function isStoreOpen(hours, date = new Date()) {
 
 /** @param {import('../services/storeService').StoreHours} hours */
 export const formatStoreHours = (hours) => (isOpenAroundTheClock(hours) ? 'Цілодобово' : `${hours.open}–${hours.close}`);
+
+/**
+ * @typedef {object} StoresOpenStatus
+ * @property {boolean} isOpen At least one store is open
+ * @property {string | null} time 'HH:MM': when the last open store closes, or when the first one opens; null when open around the clock
+ */
+
+/**
+ * Network-wide status for the header: "open until …" or "opens at …".
+ * @param {import('../services/storeService').Store[]} stores Non-empty
+ * @param {Date} [date]
+ * @returns {StoresOpenStatus}
+ */
+export function getStoresOpenStatus(stores, date = new Date()) {
+  const openStores = stores.filter((store) => isStoreOpen(store.hours, date));
+  if (openStores.length === 0) {
+    const opensAt = stores.map((store) => store.hours.open).sort()[0];
+    return { isOpen: false, time: opensAt };
+  }
+  if (openStores.some((store) => isOpenAroundTheClock(store.hours))) return { isOpen: true, time: null };
+  const closesAt = openStores.map((store) => store.hours.close).sort().at(-1);
+  return { isOpen: true, time: closesAt };
+}

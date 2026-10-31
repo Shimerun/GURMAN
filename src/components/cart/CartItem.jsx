@@ -1,9 +1,13 @@
 import { Trash2 } from 'lucide-react';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { showRemovedFromCartToast } from '../../lib/cartToasts';
 import { formatPrice } from '../../lib/format';
 import { getProductPath } from '../../lib/routes';
 import { useCartStore } from '../../store/useCartStore';
 import QuantityStepper from '../ui/QuantityStepper';
+import { THUMBNAIL_WIDTH } from '../../lib/imageSizes';
+import { withImageWidth } from '../../lib/utils';
 import SafeImage from '../ui/SafeImage';
 
 /** @param {{ item: import('../../store/useCartStore').CartItem }} props */
@@ -11,13 +15,45 @@ export default function CartItem({ item }) {
   const { product, quantity } = item;
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
+  const restoreItem = useCartStore((state) => state.restoreItem);
+  const itemRef = useRef(/** @type {HTMLLIElement | null} */ (null));
+  const isRemovingRef = useRef(false);
   const isAtStockLimit = quantity >= product.stockQty;
   const productPath = getProductPath(product.id);
 
+  // Collapses the row first so the list closes the gap smoothly, then removes it and offers undo.
+  const handleRemove = () => {
+    // A second tap while the row collapses must not remove it (and toast) twice.
+    if (isRemovingRef.current) return;
+    isRemovingRef.current = true;
+
+    const removeWithUndo = () => {
+      const index = useCartStore.getState().items.findIndex((line) => line.product.id === product.id);
+      removeItem(product.id);
+      showRemovedFromCartToast(product.title, () => restoreItem(item, index));
+    };
+
+    const row = itemRef.current;
+    if (!row || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      removeWithUndo();
+      return;
+    }
+
+    row.style.overflow = 'hidden';
+    const shrinkRow = row.animate(
+      [
+        { height: `${row.offsetHeight}px`, opacity: 1 },
+        { height: '0px', opacity: 0, paddingTop: '0px', paddingBottom: '0px' },
+      ],
+      { duration: 220, easing: 'ease-in', fill: 'forwards' },
+    );
+    shrinkRow.onfinish = removeWithUndo;
+  };
+
   return (
-    <li className="flex gap-3 py-4">
+    <li ref={itemRef} className="flex gap-3 py-4">
       <Link to={productPath} tabIndex={-1} aria-hidden="true" className="shrink-0">
-        <SafeImage src={product.image} alt="" width={80} height={80} className="h-20 w-20 rounded-xl bg-emerald-50 object-cover transition-opacity hover:opacity-90" />
+        <SafeImage src={withImageWidth(product.image, THUMBNAIL_WIDTH.cartLine)} alt="" width={80} height={80} className="h-20 w-20 rounded-lg bg-emerald-50 object-cover transition-opacity hover:opacity-90" />
       </Link>
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-start justify-between gap-1">
@@ -28,7 +64,7 @@ export default function CartItem({ item }) {
           </h3>
           <button
             type="button"
-            onClick={() => removeItem(product.id)}
+            onClick={handleRemove}
             aria-label={`Видалити «${product.title}» з кошика`}
             className="-mr-2 -mt-2 grid h-11 w-11 shrink-0 place-items-center rounded-full text-slate-500 transition-colors hover:bg-red-50 hover:text-red-700"
           >

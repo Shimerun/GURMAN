@@ -1,5 +1,6 @@
 import { Clock, CreditCard, Mail, MapPin, Phone, Store } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { BRAND_NAME, IS_DEMO_CONTENT, LEGAL_ENTITY } from '../../config/business';
 import { useCategories } from '../../hooks/useProducts';
 import { IN_CITY, NAV_LINKS, PAYMENT_METHODS, PROMO_LISTING_QUERY, STORE_CONTACTS } from '../../lib/constants';
 import { ROUTES, getCatalogPath, getCategoryPath } from '../../lib/routes';
@@ -9,6 +10,11 @@ import SocialLinks from '../ui/SocialLinks';
 const CUSTOMER_LINKS = [...NAV_LINKS, { label: 'Акції тижня', to: getCatalogPath(PROMO_LISTING_QUERY) }, { label: 'Кошик', to: ROUTES.cart }];
 
 const CURRENT_YEAR = new Date().getFullYear();
+
+// Demo builds say so; a live site names the seller instead (consumer-protection requirement).
+const OWNERSHIP_NOTE = IS_DEMO_CONTENT
+  ? 'Вигаданий бренд для демонстрації, не пов’язаний із реальними мережами.'
+  : LEGAL_ENTITY && `${LEGAL_ENTITY.name}, код ${LEGAL_ENTITY.taxId}.`;
 
 const LINK_CLASS_NAME = 'inline-flex min-h-8 items-center text-sm text-slate-300 transition-colors hover:text-white hover:underline underline-offset-4';
 
@@ -125,13 +131,13 @@ export default function Footer() {
             <div className="mt-4 flex flex-wrap gap-2">
               <Link
                 to={ROUTES.contacts}
-                className="inline-flex min-h-11 items-center rounded-full bg-amber-400 px-4 text-sm font-semibold text-slate-900 transition-colors hover:bg-amber-300"
+                className="inline-flex min-h-11 items-center rounded-lg bg-amber-400 px-4 text-sm font-semibold text-slate-900 transition-colors hover:bg-amber-300"
               >
                 Адреси магазинів
               </Link>
               <Link
                 to={ROUTES.delivery}
-                className="inline-flex min-h-11 items-center rounded-full px-4 text-sm font-semibold text-white ring-1 ring-white/30 transition-colors hover:bg-white/10"
+                className="inline-flex min-h-11 items-center rounded-lg px-4 text-sm font-semibold text-white ring-1 ring-white/30 transition-colors hover:bg-white/10"
               >
                 Як купити
               </Link>
@@ -140,8 +146,15 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col gap-3 border-t border-white/15 pt-6 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {CURRENT_YEAR} GURMAN. Вигаданий бренд для демонстрації, не пов’язаний із реальними мережами.</p>
-          <p>Ціни на сайті такі ж, як у магазинах. Наявність уточнюйте за телефоном.</p>
+          <p>
+            © {CURRENT_YEAR} {BRAND_NAME}. {OWNERSHIP_NOTE}
+          </p>
+          <p className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <span>Ціни на сайті такі ж, як у магазинах.</span>
+            <Link to={ROUTES.privacy} className="inline-flex min-h-8 items-center text-slate-300 underline underline-offset-4 transition-colors hover:text-white">
+              Політика конфіденційності
+            </Link>
+          </p>
         </div>
       </div>
     </footer>
