@@ -87,6 +87,20 @@ module.exports = {
       },
     },
   },
+  // Tailwind scans every word in the sources, and DaisyUI emits a component's whole CSS when a word
+  // equals its class name ("menu" of the coffee menu, `.join(',')`, <label>, <footer>…). The site
+  // only uses `select`, `skeleton` and `toggle`; every other component is blocked here. To adopt
+  // one, remove it from this list. (Tailwind core utilities `table` and `collapse` are unused too.)
+  blocklist: [
+    'alert', 'artboard', 'avatar', 'badge', 'btm-nav', 'breadcrumbs', 'btn', 'card', 'carousel', 'chat',
+    'checkbox', 'collapse', 'countdown', 'diff', 'divider', 'drawer', 'dropdown', 'file-input', 'footer',
+    'form-control', 'glass', 'hero', 'indicator', 'input', 'join', 'kbd', 'label', 'link', 'loading', 'mask',
+    'menu', 'mockup-browser', 'mockup-code', 'mockup-phone', 'mockup-window', 'modal', 'navbar', 'progress',
+    'radial-progress', 'radio', 'range', 'rating', 'stack', 'stat', 'stats', 'step', 'steps', 'swap', 'tab',
+    'table', 'tabs', 'textarea', 'timeline', 'toast', 'tooltip',
+    // State words that DaisyUI pairs with the components above (`.menu .active`, `.table .hover`).
+    'active', 'compact', 'disabled', 'focus', 'hover',
+  ],
   plugins: [require('daisyui')],
   daisyui: {
     // Keeps the stock "light" theme but swaps its violet primary for the brand green so

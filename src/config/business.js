@@ -81,7 +81,7 @@ export const ANALYTICS = {
 export const SITE_URL = null; // DEMO: e.g. 'https://gurman.example' once the domain is bought
 
 /** Payment accepted at the checkout counter in every store. */
-export const PAYMENT_METHODS = ['Банківська картка', 'Apple Pay / Google Pay', 'Готівка', 'Бонуси картки GURMAN'];
+export const PAYMENT_METHODS = ['Банківська картка', 'Apple Pay / Google Pay', 'Готівка'];
 
 /** DEMO: links point at the networks' home pages until the client's profiles are known. */
 export const SOCIAL_LINKS = [

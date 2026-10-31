@@ -1,9 +1,10 @@
 import { BadgeCheck, Factory, Globe, RotateCcw, Scale, Store, Tag } from 'lucide-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import FavoriteButton from '../components/products/FavoriteButton';
 import ProductGrid from '../components/products/ProductGrid';
 import ProductPurchasePanel from '../components/products/ProductPurchasePanel';
+import RecentlyViewed from '../components/products/RecentlyViewed';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import ErrorState from '../components/ui/ErrorState';
 import NotFoundState from '../components/ui/NotFoundState';
@@ -21,6 +22,7 @@ import { formatDayMonth, formatPrice, getDiscountPercent } from '../lib/format';
 import { ROUTES, getCategoryPath } from '../lib/routes';
 import { cn, withImageWidth } from '../lib/utils';
 import { isNotFoundError } from '../services/simulateNetworkLatency';
+import { useRecentlyViewedStore } from '../store/useRecentlyViewedStore';
 import { buttonClassName } from '../lib/buttonStyles';
 
 /** @typedef {import('../services/productService').Product} Product */
@@ -113,6 +115,11 @@ function ProductDetails({ product }) {
   const isOutOfStock = product.stockStatus === 'out_of_stock' || product.stockQty <= 0;
   const characteristics = Object.entries(product.characteristics);
   const packaging = getPackaging(product);
+  const addViewedProduct = useRecentlyViewedStore((state) => state.addViewedProduct);
+
+  useEffect(() => {
+    addViewedProduct(product.id);
+  }, [addViewedProduct, product.id]);
 
   return (
     // Bottom padding on phones keeps the sticky purchase bar from covering the last section.
@@ -260,6 +267,7 @@ function ProductDetails({ product }) {
       </div>
 
       <RecommendedProducts product={product} />
+      <RecentlyViewed excludeProductId={product.id} hasImageTransition={false} className="mt-12 sm:mt-16" />
     </div>
   );
 }

@@ -1,12 +1,11 @@
-import { Heart, LayoutGrid, Menu, Phone, Search, ShoppingCart, Tag, X } from 'lucide-react';
+import { Heart, LayoutGrid, Menu, Phone, ShoppingCart, Tag, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useAnimatedNumber } from '../../hooks/useAnimatedNumber';
 import { useHasMounted } from '../../hooks/useHasMounted';
 import { useIsScrollingDown } from '../../hooks/useIsScrollingDown';
-import { useTypingPlaceholder } from '../../hooks/useTypingPlaceholder';
 import { useCategories } from '../../hooks/useProducts';
-import { MOBILE_MENU_ID, NAV_LINKS, PROMO_LISTING_QUERY, SEARCH_SUGGESTIONS, STORE_CONTACTS } from '../../lib/constants';
+import { MOBILE_MENU_ID, NAV_LINKS, PROMO_LISTING_QUERY, STORE_CONTACTS } from '../../lib/constants';
 import { PRODUCT_FORMS, formatPrice, pluralize } from '../../lib/format';
 import { ROUTES, getCatalogPath, isNavLinkActive, isPromoListing } from '../../lib/routes';
 import { cn } from '../../lib/utils';
@@ -14,9 +13,9 @@ import { selectTotalItems, selectTotalPrice, useCartStore } from '../../store/us
 import { selectFavoriteCount, useFavoritesStore } from '../../store/useFavoritesStore';
 import BrandLogo from '../ui/BrandLogo';
 import MegaMenu from './MegaMenu';
+import SearchBox from './SearchBox';
 
 const MEGA_MENU_ID = 'catalog-mega-menu';
-const SEARCH_PLACEHOLDER = 'Знайти продукти: молоко, сир, банани…';
 const PROMO_PATH = getCatalogPath(PROMO_LISTING_QUERY);
 
 function DesktopNavLinks() {
@@ -52,11 +51,8 @@ function DesktopNavLinks() {
  */
 export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu, isLogoIntroAnimated = true, isLogoHidden = false }) {
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const megaMenuTriggerRef = useRef(null);
   const megaMenuPanelRef = useRef(null);
-  const navigate = useNavigate();
   const { pathname, search } = useLocation();
   const { data: categories, isLoading: isCategoriesLoading } = useCategories();
 
@@ -72,12 +68,6 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu, isLogoIntro
   const animatedTotalPrice = useAnimatedNumber(totalPrice);
   const isOnPromo = isPromoListing(pathname, search);
   const isCompact = useIsScrollingDown();
-  const searchPlaceholder = useTypingPlaceholder({
-    prefix: 'Знайти: ',
-    words: SEARCH_SUGGESTIONS,
-    fallback: SEARCH_PLACEHOLDER,
-    isPaused: isSearchFocused || searchQuery !== '',
-  });
 
   useEffect(() => {
     if (!isMegaMenuOpen) return undefined;
@@ -99,16 +89,6 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu, isLogoIntro
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isMegaMenuOpen]);
-
-  const handleSearchSubmit = (event) => {
-    event.preventDefault();
-    const query = searchQuery.trim();
-    if (!query) return;
-    navigate(getCatalogPath({ search: query }));
-    setSearchQuery('');
-    // Hides the on-screen keyboard so results are visible.
-    event.currentTarget.querySelector('input')?.blur();
-  };
 
   return (
     <header
@@ -148,34 +128,7 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu, isLogoIntro
           Категорії
         </button>
 
-        <form role="search" onSubmit={handleSearchSubmit} className="order-last w-full md:order-none md:w-auto md:flex-1">
-          <label className="relative block">
-            <span className="sr-only">Пошук товарів у каталозі</span>
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" aria-hidden="true" />
-            {/* text-base on mobile (16px) prevents iOS Safari from zooming into the field on focus. */}
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)}
-              placeholder={searchPlaceholder}
-              autoComplete="off"
-              enterKeyHint="search"
-              className="h-11 w-full rounded-full border border-slate-300 bg-slate-50 pl-12 pr-12 text-base text-slate-800 transition-colors placeholder:text-slate-500 hover:border-slate-400 focus:border-emerald-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600/20 md:text-sm [&::-webkit-search-cancel-button]:hidden"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                aria-label="Очистити пошук"
-                className="absolute right-1 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-800"
-              >
-                <X className="h-4 w-4" aria-hidden="true" />
-              </button>
-            )}
-          </label>
-        </form>
+        <SearchBox className="order-last w-full md:order-none md:w-auto md:flex-1" />
 
         <a
           href={STORE_CONTACTS.phoneHref}

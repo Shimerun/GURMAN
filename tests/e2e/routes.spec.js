@@ -62,6 +62,8 @@ test.describe('routes', () => {
       await open(page, path);
       const text = await page.locator('body').innerText();
       expect(text, path).not.toMatch(/доставк|цілодоб|24\/7|з 5:00/i);
+      // There is no loyalty card (owner decision, 2026-10-31).
+      expect(text, path).not.toMatch(/бонус|картк[аи] GURMAN|лояльн/i);
     }
   });
 

@@ -6,6 +6,7 @@ import HeroBanner from '../components/home/HeroBanner';
 import PopularProducts from '../components/home/PopularProducts';
 import StoresBlock from '../components/home/StoresBlock';
 import WeeklyDeals from '../components/home/WeeklyDeals';
+import RecentlyViewed from '../components/products/RecentlyViewed';
 import InstallBanner from '../components/mobile/InstallBanner';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
@@ -22,6 +23,7 @@ export default function HomePage() {
       <CoffeeToGo />
       <CategoryCards />
       <WeeklyDeals />
+      <RecentlyViewed />
       <PopularProducts />
       <StoresBlock />
       <ContactCta />

@@ -48,7 +48,8 @@ export default function ProductCard({ product, isImageEager = false, hasImageTra
       className="group relative flex h-full flex-col rounded-2xl bg-white p-3 shadow-soft ring-1 ring-slate-100 transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md focus-within:ring-2 focus-within:ring-emerald-600 motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:p-4">
       <div className={cn('relative overflow-hidden rounded-xl bg-emerald-50', isImageMorphing && '[view-transition-name:product-image]')}>
         {/* pointer-events-none keeps the stretched product link clickable through the badges. */}
-        <ProductBadges product={product} className="pointer-events-none absolute left-2 top-2 z-[1]" />
+        {/* right-12 keeps the badges clear of the heart: a second badge wraps below instead of hiding under it. */}
+        <ProductBadges product={product} className="pointer-events-none absolute left-2 right-12 top-2 z-[1]" />
         {/* z-10 lifts it above the stretched product link, like the cart controls. */}
         <FavoriteButton product={product} className="absolute right-0.5 top-0.5 z-10" />
         {product.stockStatus !== 'in_stock' && (

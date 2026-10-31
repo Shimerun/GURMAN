@@ -16,6 +16,23 @@ export function useProducts(params = {}) {
   return { ...query, /** @type {Product[]} */ data: query.data ?? EMPTY_LIST };
 }
 
+/** Fewer characters match too much of the catalog to be useful as suggestions. */
+export const MIN_SUGGESTION_QUERY_LENGTH = 2;
+
+/**
+ * Search-as-you-type matches, best first (in stock, promo, popular). Idle for short queries.
+ * @param {string} query already debounced by the caller
+ */
+export function useProductSuggestions(query) {
+  const search = query.trim();
+  const isEnabled = search.length >= MIN_SUGGESTION_QUERY_LENGTH;
+  const suggestionsQuery = useAsyncData(
+    () => productService.getProducts({ search, sort: 'recommended' }),
+    isEnabled ? `products:suggestions:${search.toLocaleLowerCase('uk-UA')}` : null,
+  );
+  return { ...suggestionsQuery, /** @type {Product[]} */ data: suggestionsQuery.data ?? EMPTY_LIST };
+}
+
 /** Products for a list of ids (e.g. favourites), in that order. @param {string[]} productIds */
 export function useProductsByIds(productIds) {
   const query = useAsyncData(() => productService.getProductsByIds(productIds), `products:ids:${productIds.join(',')}`);

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { sanitizeProductIds } from './productIds';
 
 /** Generous for a grocery list, small enough that a tampered entry cannot bloat every render. */
 const MAX_FAVORITES = 200;
@@ -11,16 +12,6 @@ const MAX_FAVORITES = 200;
  * @property {string[]} productIds Most recently added first
  * @property {(productId: string) => void} toggleFavorite
  */
-
-/**
- * localStorage is untrusted input (see useCartStore): keeps unique string ids only.
- * @param {unknown} productIds
- * @returns {string[]}
- */
-const sanitizeProductIds = (productIds) =>
-  Array.isArray(productIds)
-    ? [...new Set(productIds.filter((productId) => typeof productId === 'string' && productId !== ''))].slice(0, MAX_FAVORITES)
-    : [];
 
 export const useFavoritesStore = create(
   persist(
@@ -40,7 +31,7 @@ export const useFavoritesStore = create(
       version: 1,
       merge: (persistedState, currentState) => ({
         ...currentState,
-        productIds: sanitizeProductIds(/** @type {any} */ (persistedState)?.productIds),
+        productIds: sanitizeProductIds(/** @type {any} */ (persistedState)?.productIds, MAX_FAVORITES),
       }),
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ productIds: state.productIds }),

@@ -21,8 +21,8 @@ Business content: contacts, socials, payment methods, seller details (`LEGAL_ENT
 <development_standards>
   <architecture>
   - Principles: KISS, DRY, YAGNI, SOLID. High cohesion, low coupling.
-  - Data flow: components -> hooks (`useProducts`, `useStores`, built on `useAsyncData`) -> services. Components NEVER import services directly. `useAsyncData` exposes `{ data, isLoading, isFetching, error, refetch }` so it can be replaced by React Query later without touching components.
-  - State Boundaries: Server/mock data lives in the hooks layer only. Zustand holds cart items and transient UI state (`useCartStore`) and favourite product ids only (`useFavoritesStore`, products fetched via `useProductsByIds`); the city is a constant (`CITY`), not state. NEVER copy fetched data into Zustand. Derived values are selectors (`selectTotalItems`, `selectTotalPrice`), not stored fields.
+  - Data flow: components -> hooks (`useProducts`, `useStores`, built on `useAsyncData`) -> services. Components NEVER import services directly. `useAsyncData` exposes `{ data, isLoading, isFetching, error, refetch }` (a `null` query key skips fetching, e.g. `useProductSuggestions` below 2 characters) so it can be replaced by React Query later without touching components.
+  - State Boundaries: Server/mock data lives in the hooks layer only. Zustand holds cart items and transient UI state (`useCartStore`) and product-id lists only (`useFavoritesStore`, `useRecentlyViewedStore`; sanitized by `store/productIds.js`, products fetched via `useProductsByIds`); the city is a constant (`CITY`), not state. NEVER copy fetched data into Zustand. Derived values are selectors (`selectTotalItems`, `selectTotalPrice`), not stored fields.
   - Listing filters live in the URL query (`useProductFilters`), so they are shareable and survive reloads.
   - Naming: Descriptive, verb-first functions (e.g., `getProducts`, `isStoreOpen`). No abbreviations.
   - Structure: pages in `src/pages/`, routes in `src/router.jsx` + `src/lib/routes.js`, reusable UI in `src/components/ui/`, domain components in `src/components/<domain>/`.
@@ -37,12 +37,12 @@ Business content: contacts, socials, payment methods, seller details (`LEGAL_ENT
 
   <react_and_tailwind>
   - Components: Functional components only. Extract complex business logic into custom hooks.
-  - Styling: Tailwind utilities + DaisyUI components (`badge`, `toggle`, `select`, `skeleton`, `progress`).
+  - Styling: Tailwind utilities + DaisyUI components (`toggle`, `select`, `skeleton`).
   - Brand (from the logo sheet): `tailwind.config.cjs` REPLACES the stock `emerald` scale with the logo's forest green (`emerald-700` = #1F4B3A) and `amber` with the basket orange (`amber-400` = #E8A33D); `gray-50` is the cream page (#F6F4EF). Keep using `emerald-*` (primary) / `amber-*` (promo accent) classes — they are the brand. Body text `slate-800`.
   - Contrast on cream: secondary text is `slate-600` minimum (`slate-500` is only 4.3:1 on `gray-50`). Primary buttons/eyebrows use `emerald-700`. The e2e suite checks WCAG contrast and the 12px minimum on every page.
   - Fonts (self-hosted `@fontsource`, subsets imported in `src/main.jsx`): `font-display` = Unbounded 700 for the wordmark and h1/h2 headings only; `font-script` = Caveat 600 (Cyrillic only) for the "смачно щодня" tagline only. Body uses the system stack. Adding a weight or subset means adding its import.
   - Logo: `BrandLogo` (lockup, `isIntroAnimated` only in the header) and `BrandMark` (SVG basket, `isEmpty` variant). `BasketIllustration` (`empty` | `spilled` | `filled` | `loading`) is the illustration for empty cart, 404, checkout success and the lazy-page fallback. `logo-*` classes inside the mark are animation hooks for `index.css`.
-  - DaisyUI CSS trap: Tailwind scans ALL source text (identifiers, strings, comments) and DaisyUI emits a component's full CSS whenever a token equals its class name. Avoid bare words like `collapse`, `step`, `steps`, `timeline`, `card`, `tabs`, `drawer`, `modal`, `alert`, `stack` in code and comments unless you use that component; compare CSS size in `npm run build` output after changes.
+  - DaisyUI CSS trap: Tailwind scans ALL source text and DaisyUI emits a component's full CSS whenever a word equals its class name. `tailwind.config.cjs` `blocklist` therefore blocks every DaisyUI component except the three in use (`select`, `skeleton`, `toggle`); to adopt another one (e.g. `badge`, `progress`), remove it from the list first. Compare CSS size in `npm run build` output after changes (~69 kB).
   - Classes: join with `cn()` from `src/lib/utils.js`. It is a plain join (no tailwind-merge), so never pass conflicting utilities. Buttons use `buttonClassName()` from `src/lib/buttonStyles.js`.
   - Images: always `SafeImage` (lazy by default, SVG placeholder on error); `isEager` only for above-the-fold images.
   - Avoid inline styles (exception: per-frame values like drag offsets).

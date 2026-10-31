@@ -76,8 +76,8 @@ export default function PrivacyPage() {
               звернення — лише те, що ви вводите самі.
             </li>
             <li>
-              <span className="font-semibold text-slate-900">Кошик і обране:</span> зберігаються тільки у вашому браузері (localStorage) і на
-              наш сервер не надсилаються. Їх можна очистити в будь-який момент.
+              <span className="font-semibold text-slate-900">Кошик, обране й історія переглядів:</span> зберігаються тільки у вашому браузері
+              (localStorage) і на наш сервер не надсилаються. Їх можна очистити в будь-який момент.
             </li>
             {ANALYTICS.scriptSrc && (
               <li>
