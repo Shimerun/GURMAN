@@ -15,6 +15,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
  * @property {boolean} isCartOpen
  * @property {(product: Product) => void} addItem
  * @property {(productId: string) => void} removeItem
+ * @property {(item: CartItem, index: number) => void} restoreItem Puts a removed line back where it was
  * @property {(productId: string, quantity: number) => void} updateQuantity
  * @property {() => void} clearCart
  * @property {() => void} openCart
@@ -82,6 +83,15 @@ export const useCartStore = create(
         }),
 
       removeItem: (productId) => set((state) => ({ items: withoutProduct(state.items, productId) })),
+
+      // Undo after removal. If the product was added again meanwhile, that newer line wins.
+      restoreItem: (item, index) =>
+        set((state) => {
+          if (state.items.some((line) => line.product.id === item.product.id)) return state;
+          const items = [...state.items];
+          items.splice(Math.min(index, items.length), 0, item);
+          return { items };
+        }),
 
       updateQuantity: (productId, quantity) =>
         set((state) => {

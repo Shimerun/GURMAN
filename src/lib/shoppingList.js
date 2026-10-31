@@ -5,8 +5,10 @@ import { formatPrice } from './format';
 
 export const SHOPPING_LIST_TITLE = `Список покупок ${BRAND_NAME}`;
 
-/** How long a print request may take to start before we assume the browser ignored it. */
-const PRINT_START_TIMEOUT_MS = 1000;
+/** How long a print request may take to start before the visitor is told it may not have opened. */
+const PRINT_START_TIMEOUT_MS = 1500;
+/** Leaves print mode if printing never starts, so a later Ctrl+P prints the page as usual. */
+const PRINT_MODE_MAX_MS = 60_000;
 const PRINT_MODE_ATTRIBUTE = 'print';
 
 /**
@@ -87,32 +89,27 @@ export async function copyText(text) {
 /**
  * Prints the paper shopping list (index.css swaps the page for it while the `print` attribute
  * is set). Some browsers silently ignore print requests (messenger in-app browsers, iOS
- * home-screen apps), which shows up as no `beforeprint` event.
- * @returns {Promise<boolean>} false when printing never started
+ * home-screen apps), which shows up as no `beforeprint` event. Others (mobile Chrome) may start
+ * printing only after a slow preview, so print mode stays on until printing ends: switching it
+ * off early would print the normal page instead of the list.
+ * @returns {Promise<boolean>} false when printing had not started after a moment
  */
 export function printShoppingList() {
   const root = document.documentElement;
   let hasStarted = false;
-  const markStarted = () => {
-    hasStarted = true;
-  };
   const leavePrintMode = () => {
     delete root.dataset[PRINT_MODE_ATTRIBUTE];
+    window.clearTimeout(giveUpTimer);
+    window.removeEventListener('afterprint', leavePrintMode);
   };
+  const giveUpTimer = window.setTimeout(leavePrintMode, PRINT_MODE_MAX_MS);
 
   root.dataset[PRINT_MODE_ATTRIBUTE] = 'shopping-list';
-  window.addEventListener('beforeprint', markStarted, { once: true });
-  window.addEventListener('afterprint', leavePrintMode, { once: true });
+  window.addEventListener('beforeprint', () => (hasStarted = true), { once: true });
+  window.addEventListener('afterprint', leavePrintMode);
   window.print();
 
   return new Promise((resolve) => {
-    window.setTimeout(() => {
-      window.removeEventListener('beforeprint', markStarted);
-      if (!hasStarted) {
-        window.removeEventListener('afterprint', leavePrintMode);
-        leavePrintMode();
-      }
-      resolve(hasStarted);
-    }, PRINT_START_TIMEOUT_MS);
+    window.setTimeout(() => resolve(hasStarted), PRINT_START_TIMEOUT_MS);
   });
 }

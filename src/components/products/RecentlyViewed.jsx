@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useProductsByIds } from '../../hooks/useProducts';
 import { buttonClassName } from '../../lib/buttonStyles';
 import { useRecentlyViewedStore } from '../../store/useRecentlyViewedStore';
@@ -23,9 +23,12 @@ export default function RecentlyViewed({ excludeProductId, hasImageTransition = 
   const [initialIds] = useState(() => productIds.filter((id) => id !== excludeProductId).slice(0, MAX_VISIBLE));
   const { data, isLoading, isFetching, error, refetch } = useProductsByIds(initialIds);
 
-  const currentIds = new Set(productIds);
-  const products = data.filter((product) => currentIds.has(product.id));
-  const isEmpty = initialIds.length === 0 || currentIds.size === 0 || (!isLoading && !error && products.length === 0);
+  // Memoized: ProductGrid's FLIP effect runs whenever this array changes identity.
+  const products = useMemo(() => {
+    const currentIds = new Set(productIds);
+    return data.filter((product) => currentIds.has(product.id));
+  }, [data, productIds]);
+  const isEmpty = initialIds.length === 0 || productIds.length === 0 || (!isLoading && !error && products.length === 0);
   if (isEmpty) return null;
 
   return (

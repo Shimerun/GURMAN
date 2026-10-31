@@ -35,7 +35,9 @@ export function useProductSuggestions(query) {
 
 /** Products for a list of ids (e.g. favourites), in that order. @param {string[]} productIds */
 export function useProductsByIds(productIds) {
-  const query = useAsyncData(() => productService.getProductsByIds(productIds), `products:ids:${productIds.join(',')}`);
+  // Nothing to look up (no favourites, no history): no request at all.
+  const queryKey = productIds.length > 0 ? `products:ids:${productIds.join(',')}` : null;
+  const query = useAsyncData(() => productService.getProductsByIds(productIds), queryKey);
   return { ...query, /** @type {Product[]} */ data: query.data ?? EMPTY_LIST };
 }
 

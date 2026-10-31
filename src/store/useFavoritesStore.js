@@ -11,6 +11,7 @@ const MAX_FAVORITES = 200;
  * @typedef {Object} FavoritesState
  * @property {string[]} productIds Most recently added first
  * @property {(productId: string) => void} toggleFavorite
+ * @property {(productIds: string[]) => void} removeFavorites e.g. products that are no longer sold
  */
 
 export const useFavoritesStore = create(
@@ -25,6 +26,12 @@ export const useFavoritesStore = create(
             ? { productIds: state.productIds.filter((id) => id !== productId) }
             : { productIds: [productId, ...state.productIds].slice(0, MAX_FAVORITES) },
         ),
+
+      removeFavorites: (productIds) =>
+        set((state) => {
+          const removedIds = new Set(productIds);
+          return { productIds: state.productIds.filter((id) => !removedIds.has(id)) };
+        }),
     }),
     {
       name: 'gurman-favorites',

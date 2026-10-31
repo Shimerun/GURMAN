@@ -1,5 +1,5 @@
 import { Heart } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ProductGrid from '../components/products/ProductGrid';
 import EmptyState from '../components/ui/EmptyState';
@@ -17,10 +17,24 @@ const FAVORITES_CRUMBS = [{ label: 'Обране' }];
 
 /** @param {{ productIds: string[] }} props */
 function FavoriteProducts({ productIds }) {
-  // Un-hearting a card hides it at once instead of refetching the rest.
   const { data: products, isLoading, isFetching, error, refetch } = useProductsByIds(productIds);
-  const favoriteIds = new Set(useFavoritesStore((state) => state.productIds));
-  const visibleProducts = products.filter((product) => favoriteIds.has(product.id));
+  const favoriteIds = useFavoritesStore((state) => state.productIds);
+  const removeFavorites = useFavoritesStore((state) => state.removeFavorites);
+  // Un-hearting a card hides it at once instead of refetching the rest. Memoized: ProductGrid's
+  // FLIP effect runs whenever this array changes identity.
+  const visibleProducts = useMemo(() => {
+    const currentIds = new Set(favoriteIds);
+    return products.filter((product) => currentIds.has(product.id));
+  }, [products, favoriteIds]);
+
+  // Products that are no longer sold come back missing: forget them, so the header count and
+  // "Збережено N товарів" match the cards shown.
+  useEffect(() => {
+    if (isFetching || error) return;
+    const returnedIds = new Set(products.map((product) => product.id));
+    const delistedIds = productIds.filter((id) => !returnedIds.has(id));
+    if (delistedIds.length > 0) removeFavorites(delistedIds);
+  }, [products, isFetching, error, productIds, removeFavorites]);
 
   return (
     <ProductGrid

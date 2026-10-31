@@ -13,7 +13,7 @@ export default function CartItem({ item }) {
   const { product, quantity } = item;
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
-  const addItem = useCartStore((state) => state.addItem);
+  const restoreItem = useCartStore((state) => state.restoreItem);
   const itemRef = useRef(/** @type {HTMLLIElement | null} */ (null));
   const isRemovingRef = useRef(false);
   const isAtStockLimit = quantity >= product.stockQty;
@@ -26,11 +26,9 @@ export default function CartItem({ item }) {
     isRemovingRef.current = true;
 
     const removeWithUndo = () => {
+      const index = useCartStore.getState().items.findIndex((line) => line.product.id === product.id);
       removeItem(product.id);
-      showRemovedFromCartToast(product.title, () => {
-        addItem(product);
-        if (quantity > 1) updateQuantity(product.id, quantity);
-      });
+      showRemovedFromCartToast(product.title, () => restoreItem(item, index));
     };
 
     const row = itemRef.current;

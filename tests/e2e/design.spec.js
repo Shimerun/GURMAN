@@ -209,7 +209,8 @@ test.describe('page changes on phones', () => {
       window.__slides = [];
       const animate = Element.prototype.animate;
       Element.prototype.animate = function recordSlide(keyframes, options) {
-        if (this.id === 'main') window.__slides.push(keyframes[0].transform);
+        // Never `transform`: it would re-anchor the product page's fixed buy bar to <main>.
+        if (this.id === 'main') window.__slides.push(keyframes.some((frame) => 'transform' in frame) ? 'transform' : keyframes[0].left);
         return animate.call(this, keyframes, options);
       };
     });
@@ -223,7 +224,7 @@ test.describe('page changes on phones', () => {
     await expect(page.locator('#main h1')).toHaveText('Магазини та контакти');
     await page.goBack();
     await expect(page.locator('#hero-heading')).toBeVisible();
-    await expect.poll(() => page.evaluate(() => window.__slides)).toEqual(['translateX(1.5rem)', 'translateX(-1.5rem)']);
+    await expect.poll(() => page.evaluate(() => window.__slides)).toEqual(['1.5rem', '-1.5rem']);
   });
 });
 

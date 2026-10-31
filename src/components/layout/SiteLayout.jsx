@@ -41,10 +41,12 @@ function usePageSlide(mainRef) {
     if (!window.matchMedia('(max-width: 767px) and (prefers-reduced-motion: no-preference)').matches) return;
 
     const direction = navigationType === 'POP' ? -1 : 1;
+    // `left` on the relatively positioned <main>, not `transform`: a transform would make <main>
+    // the containing block of its fixed children (the product page's buy bar) while it runs.
     main.animate(
       [
-        { opacity: 0, transform: `translateX(${direction * PAGE_SLIDE_DISTANCE_REM}rem)` },
-        { opacity: 1, transform: 'none' },
+        { opacity: 0, left: `${direction * PAGE_SLIDE_DISTANCE_REM}rem` },
+        { opacity: 1, left: '0' },
       ],
       { duration: PAGE_SLIDE_DURATION_MS, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
     );
@@ -88,7 +90,7 @@ export default function SiteLayout() {
       />
 
       {isLongReadPath(pathname) && <ScrollProgress />}
-      <main ref={mainRef} id="main" tabIndex={-1} className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 focus:outline-none sm:px-6 sm:py-8 lg:px-8">
+      <main ref={mainRef} id="main" tabIndex={-1} className="relative mx-auto w-full max-w-7xl flex-1 px-4 py-6 focus:outline-none sm:px-6 sm:py-8 lg:px-8">
         <Suspense fallback={<PageFallback />}>
           <Outlet />
         </Suspense>

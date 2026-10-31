@@ -44,6 +44,8 @@ test.describe('favourites', () => {
     );
     await open(page, '/favorites');
     await expect(page.locator('#main article')).toHaveCount(1);
-    await expect(page.locator(FAVORITES_LINK)).toHaveAttribute('aria-label', 'Обране: 2 товари');
+    // 'no-such-product' is not sold: it is forgotten, so the count matches the card shown.
+    await expect(page.locator(FAVORITES_LINK)).toHaveAttribute('aria-label', 'Обране: 1 товар');
+    await expect(page.locator('#main header')).toContainText('Збережено 1 товар');
   });
 });

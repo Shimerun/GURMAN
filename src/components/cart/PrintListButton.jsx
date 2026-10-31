@@ -16,7 +16,8 @@ export default function PrintListButton({ isIconOnly = false, className }) {
   const handlePrint = async () => {
     trackEvent(ANALYTICS_EVENTS.printList);
     const hasStarted = await printShoppingList();
-    if (!hasStarted) toast.error('Цей браузер не відкриває друк. Надішліть список собі або роздрукуйте з комп’ютера.', { duration: 5000 });
+    // Hedged: a slow print preview (mobile Chrome) may still open after this.
+    if (!hasStarted) toast.error('Вікно друку не відкрилося? Цей браузер, схоже, не друкує: надішліть список собі або роздрукуйте з комп’ютера.', { duration: 6000 });
   };
 
   if (isIconOnly) {

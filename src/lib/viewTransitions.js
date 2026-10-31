@@ -15,10 +15,12 @@ export function handleSkippedViewTransitions() {
     transition.ready.catch((error) => {
       if (error?.name !== 'AbortError') throw error;
     });
-    // `finished` never rejects, so this always runs.
-    transition.finished.then(() => {
+    // `finished` rejects when the DOM update itself throws; the count must drop either way (and
+    // that rejection is React Router's to report, not an unhandled one of ours).
+    const markFinished = () => {
       runningTransitionCount -= 1;
-    });
+    };
+    transition.finished.then(markFinished, markFinished);
     return transition;
   };
 }

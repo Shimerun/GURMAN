@@ -72,6 +72,7 @@ test.describe('cart', () => {
     await page.locator(`${CART_LINES} button[aria-label^="Збільшити"]`).first().click();
     await expect.poll(() => cartBadge(page)).toBe(3);
 
+    const titlesBefore = await cartLineTitles(page);
     await page.locator(`${CART_LINES} button[aria-label^="Видалити"]`).first().click();
     await expect(page.locator(CART_LINES)).toHaveCount(1);
     await expect.poll(() => cartBadge(page)).toBe(1);
@@ -79,6 +80,8 @@ test.describe('cart', () => {
     await page.getByRole('button', { name: 'Повернути' }).click();
     await expect(page.locator(CART_LINES)).toHaveCount(2);
     await expect.poll(() => cartBadge(page)).toBe(3);
+    // Back in its old place, not appended at the end.
+    expect(await cartLineTitles(page)).toEqual(titlesBefore);
   });
 
   test('there is no checkout: the cart is a shopping list', async ({ page }) => {
@@ -186,6 +189,21 @@ test.describe('shopping list', () => {
     await expect(page.locator('.printable-shopping-list')).toBeHidden();
   });
 
+  test('a print preview that opens late (mobile Chrome) still prints the list', async ({ page }) => {
+    await page.clock.install();
+    await page.addInitScript(() => {
+      window.print = () => setTimeout(() => window.dispatchEvent(new Event('beforeprint')), 3000);
+    });
+    await addTwoProducts(page);
+    await open(page, '/cart');
+    await page.getByRole('button', { name: 'Роздрукувати список' }).click();
+    await page.clock.runFor(5000);
+
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.locator('.printable-shopping-list')).toBeVisible();
+    await expect(page.locator('#main')).toBeHidden();
+  });
+
   test('explains when the browser ignores the print request', async ({ page }) => {
     await page.addInitScript(() => {
       window.print = () => {};
@@ -193,6 +211,6 @@ test.describe('shopping list', () => {
     await addTwoProducts(page);
     await open(page, '/cart');
     await page.getByRole('button', { name: 'Роздрукувати список' }).click();
-    await expect(page.getByText('Цей браузер не відкриває друк')).toBeVisible();
+    await expect(page.getByText('Вікно друку не відкрилося?')).toBeVisible();
   });
 });

@@ -2,8 +2,14 @@ const TILT_MAX_DEG = 4;
 const PARALLAX_MAX_PX = 4;
 const TILT_PROPERTIES = ['--tilt-x', '--tilt-y', '--parallax-x', '--parallax-y'];
 
+/** @type {MediaQueryList | undefined} Created once: pointermove fires up to 120 times a second. */
+let tiltQuery;
+
 /** Mouse users who allow motion; touch screens never tilt. */
-const canTilt = () => window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)').matches;
+const canTilt = () => {
+  tiltQuery ??= window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
+  return tiltQuery.matches;
+};
 
 /**
  * Product cards lean towards the pointer and the photo shifts the other way, for a hint of
