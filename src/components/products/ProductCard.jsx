@@ -1,6 +1,7 @@
 import { ShoppingCart } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Link, useViewTransitionState } from 'react-router-dom';
+import { FEATURES } from '../../config/business';
 import { buttonClassName } from '../../lib/buttonStyles';
 import { flyToCart } from '../../lib/flyToCart';
 import { loadProductPage } from '../../lib/pageLoaders';
@@ -66,7 +67,7 @@ export default function ProductCard({ product, isImageEager = false, hasImageTra
       <div className="mt-3 flex flex-1 flex-col">
         <div className="flex items-center justify-between gap-2">
           <p className="min-w-0 truncate text-xs font-semibold text-emerald-800">{product.categoryTitle}</p>
-          <Rating rating={product.rating} reviewsCount={product.reviewsCount} isCompact className="shrink-0" />
+          {FEATURES.productRatings && <Rating rating={product.rating} reviewsCount={product.reviewsCount} isCompact className="shrink-0" />}
         </div>
 
         {/* Stretched link: its ::after covers the card, while the cart controls sit above it (z-10). */}

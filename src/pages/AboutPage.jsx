@@ -18,15 +18,16 @@ import SafeImage from '../components/ui/SafeImage';
 import SectionHeader from '../components/ui/SectionHeader';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { buttonClassName } from '../lib/buttonStyles';
-import { IN_CITY } from '../lib/constants';
+import { COMPANY_FACTS, COMPANY_MILESTONES } from '../config/business';
+import { IN_CITY, STORE_CONTACTS } from '../lib/constants';
 import { ROUTES } from '../lib/routes';
 import { cn } from '../lib/utils';
 
 const STATS = [
-  { value: '2014', label: 'рік відкриття першого магазину' },
+  { value: String(COMPANY_FACTS.foundedYear), label: 'рік відкриття першого магазину' },
   { value: '2', label: `магазини ${IN_CITY}` },
-  { value: '120+', label: 'фермерів і виробників-партнерів' },
-  { value: '7:00–22:00', label: 'щодня, без вихідних' },
+  { value: `${COMPANY_FACTS.partnerSupplierCount}+`, label: 'фермерів і виробників-партнерів' },
+  { value: STORE_CONTACTS.storeHours.replace('Щодня ', ''), label: 'щодня, без вихідних' },
 ];
 
 const VALUES = [
@@ -88,18 +89,6 @@ const GUARANTEES = [
     title: 'Прозоре маркування',
     description: 'Походження, виробник і склад вказані для кожного товару — на полиці та на сайті.',
   },
-];
-
-const MILESTONES = [
-  {
-    year: '2014',
-    title: 'Перший магазин на Грушевського',
-    description: 'Невелика крамниця з фермерськими продуктами та власною пекарнею.',
-  },
-  { year: '2017', title: 'Власна пекарня й кулінарія', description: 'Почали випікати хліб на заквасці та ліпити вареники щоранку.' },
-  { year: '2020', title: 'Картка GURMAN', description: 'Запустили програму лояльності з бонусами та персональними знижками.' },
-  { year: '2023', title: 'Другий магазин', description: 'Відкрили магазин на вулиці Гагаріна.' },
-  { year: '2026', title: 'Новий сайт', description: 'Каталог із цінами, акції тижня й адреси магазинів — в одному місці.' },
 ];
 
 /** @param {{ items: { icon: import('lucide-react').LucideIcon, title: string, description: string }[], columnsClassName: string }} props */
@@ -209,7 +198,7 @@ export default function AboutPage() {
           id="suppliers-heading"
           eyebrow="Постачальники"
           title="Звідки наші продукти"
-          description="Працюємо напряму з понад 120 господарствами та виробниками — без зайвих посередників."
+          description={`Працюємо напряму з понад ${COMPANY_FACTS.partnerSupplierCount} господарствами та виробниками — без зайвих посередників.`}
         />
         <FeatureCards items={SUPPLIERS} columnsClassName="md:grid-cols-3" />
       </section>
@@ -222,7 +211,7 @@ export default function AboutPage() {
       <section aria-labelledby="history-heading">
         <SectionHeader id="history-heading" eyebrow="Шлях GURMAN" title="Як ми зростали" />
         <ol className="relative space-y-6 border-l-2 border-emerald-100 pl-6 sm:pl-8">
-          {MILESTONES.map((milestone) => (
+          {COMPANY_MILESTONES.map((milestone) => (
             <li key={milestone.year} className="relative">
               <span
                 className="absolute -left-[2.05rem] top-1 grid h-4 w-4 place-items-center rounded-full bg-emerald-600 ring-4 ring-emerald-100 sm:-left-[2.55rem]"

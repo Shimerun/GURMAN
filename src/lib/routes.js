@@ -5,6 +5,7 @@ export const ROUTES = {
   about: '/about',
   delivery: '/delivery',
   contacts: '/contacts',
+  privacy: '/privacy',
 };
 
 /** Router state that tells the cart page to open the checkout dialog straight away. */

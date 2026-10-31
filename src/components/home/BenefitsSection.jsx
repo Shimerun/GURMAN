@@ -1,10 +1,11 @@
 import { BadgeCheck, Handshake, Sprout, Store } from 'lucide-react';
+import { COMPANY_FACTS } from '../../config/business';
 import { IN_CITY, STORE_CONTACTS } from '../../lib/constants';
 
 const BENEFITS = [
   { icon: Sprout, title: 'Свіжі продукти', description: 'Овочі на полиці за 24 години після збору, хліб — щоранку.' },
   { icon: Store, title: 'Два магазини поруч', description: `Обидва ${IN_CITY}, ${STORE_CONTACTS.storeHours.toLowerCase()}. Ціни як на сайті.` },
-  { icon: Handshake, title: 'Надійні постачальники', description: 'Понад 120 фермерів і виробників, яких перевіряємо особисто.' },
+  { icon: Handshake, title: 'Надійні постачальники', description: `Понад ${COMPANY_FACTS.partnerSupplierCount} фермерів і виробників, яких перевіряємо особисто.` },
   { icon: BadgeCheck, title: 'Гарантія якості', description: 'Не сподобався товар — замінимо або повернемо гроші.' },
 ];
 

@@ -1,6 +1,6 @@
 import { expect, open, test } from './fixtures.js';
 
-const PAGES = ['/', '/catalog', '/category/dairy', '/product/p-002', '/cart', '/about', '/delivery', '/contacts', '/nope'];
+const PAGES = ['/', '/catalog', '/category/dairy', '/product/p-002', '/cart', '/about', '/delivery', '/contacts', '/privacy', '/nope'];
 const MIN_FONT_SIZE_PX = 12;
 
 /**

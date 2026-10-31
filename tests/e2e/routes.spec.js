@@ -6,7 +6,7 @@ const NOT_FOUND_STATES = [
   ['/totally/unknown', 'Сторінку не знайдено'],
 ];
 
-const PAGES = ['/', '/catalog', '/category/dairy', '/product/p-002', '/cart', '/about', '/delivery', '/contacts'];
+const PAGES = ['/', '/catalog', '/category/dairy', '/product/p-002', '/cart', '/about', '/delivery', '/contacts', '/privacy'];
 
 test.describe('routes', () => {
   for (const [path, heading] of NOT_FOUND_STATES) {
@@ -52,5 +52,23 @@ test.describe('routes', () => {
       const text = await page.locator('body').innerText();
       expect(text, path).not.toMatch(/доставк|цілодоб|24\/7|з 5:00/i);
     }
+  });
+
+  test('privacy policy is linked from the footer and the contact form', async ({ page }) => {
+    await open(page, '/contacts');
+    await expect(page.locator('form a[href="/privacy"]')).toBeVisible();
+    await page.locator('footer a[href="/privacy"]').click();
+    await expect.poll(() => currentPath(page)).toBe('/privacy');
+    await expect(page.locator('h1')).toHaveText('Політика конфіденційності');
+    // Demo build: the template notice and the bracketed controller placeholder are visible.
+    await expect(page.locator('#main')).toContainText('Це шаблон для демо-версії сайту');
+    await expect(page.locator('#main')).toContainText('[назва ФОП або ТОВ]');
+  });
+
+  test('ratings and the rating sort are shown together or not at all', async ({ page }) => {
+    await open(page, '/catalog');
+    const ratingsShown = (await page.locator('#main article').first().getByText(/^\d,\d$/).count()) > 0;
+    const ratingSortOffered = (await page.locator('#main select option[value="rating"]').count()) > 0;
+    expect(ratingSortOffered).toBe(ratingsShown);
   });
 });

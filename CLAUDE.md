@@ -3,6 +3,7 @@ Stack: React 18 + Vite (JavaScript, JSX), react-router-dom 7, Tailwind CSS 3.4 +
 Goal: Frontend MVP for "GURMAN", a fictional supermarket chain operating only in Zhytomyr (`Житомир`, single city, no delivery): promo-first homepage, catalog, product pages, cart, stores. All brand assets and copy are original; never imitate a real retailer.
 Business facts (owner decision, 2026-10-30): two stores — вул. Михайла Грушевського, 62 and вул. Гагаріна, 13/67 — both daily 07:00–22:00 (`src/data/mockStores.json`, `STORE_CONTACTS.storeHours`). UI copy must NOT mention delivery, round-the-clock stores or bread "from 5:00" (bread is simply "щоранку"). Checkout is a demo that clears the cart.
 Data: mock JSON in `src/data/`, served only through `src/services/*Service.js`. Swapping services for a real API must require ZERO component changes.
+Business content: contacts, socials, payment methods, seller details (`LEGAL_ENTITY`), company facts/history and content switches live ONLY in `src/config/business.js` (re-exported via `src/lib/constants.js`); values marked `DEMO` are placeholders. `IS_DEMO_CONTENT = true` shows the "fictional brand" footer note, the privacy-template notice and the invented product ratings (`FEATURES.productRatings`); set it to false for a real launch. Never hard-code business facts in components.
 </project_context>
 
 <ai_persona>

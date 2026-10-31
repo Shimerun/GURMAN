@@ -1,6 +1,8 @@
 import { Send } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { buttonClassName } from '../../lib/buttonStyles';
+import { ROUTES } from '../../lib/routes';
 import { cn } from '../../lib/utils';
 
 const TOPICS = ['Якість товару', 'Наявність товару в магазині', 'Картка GURMAN', 'Співпраця та постачання', 'Інше'];
@@ -227,6 +229,13 @@ export default function ContactForm() {
         </button>
         <p className="text-sm text-slate-600">Демо-форма: повідомлення не надсилається на сервер.</p>
       </div>
+      <p className="text-sm text-slate-600">
+        Надсилаючи форму, ви погоджуєтеся з{' '}
+        <Link to={ROUTES.privacy} className="font-semibold text-emerald-800 underline underline-offset-2">
+          політикою конфіденційності
+        </Link>
+        .
+      </p>
     </form>
   );
 }

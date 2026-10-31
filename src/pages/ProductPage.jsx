@@ -14,6 +14,7 @@ import SectionHeader from '../components/ui/SectionHeader';
 import StockBadge from '../components/ui/StockBadge';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useProduct, useProducts } from '../hooks/useProducts';
+import { FEATURES } from '../config/business';
 import { IN_CITY, PROMO_VALID_UNTIL } from '../lib/constants';
 import { formatDayMonth, formatPrice, getDiscountPercent } from '../lib/format';
 import { ROUTES, getCategoryPath } from '../lib/routes';
@@ -148,7 +149,7 @@ function ProductDetails({ product }) {
             {product.categoryTitle}
           </Link>
           <h1 className="mt-1 text-2xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">{product.title}</h1>
-          <Rating rating={product.rating} reviewsCount={product.reviewsCount} size="lg" className="mt-3" />
+          {FEATURES.productRatings && <Rating rating={product.rating} reviewsCount={product.reviewsCount} size="lg" className="mt-3" />}
 
           <div className="mt-5">
             <PriceTag product={product} size="lg" />
