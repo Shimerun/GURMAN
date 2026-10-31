@@ -10,10 +10,23 @@ export function handleSkippedViewTransitions() {
 
   const startViewTransition = document.startViewTransition.bind(document);
   document.startViewTransition = (...args) => {
+    runningTransitionCount += 1;
     const transition = startViewTransition(...args);
     transition.ready.catch((error) => {
       if (error?.name !== 'AbortError') throw error;
     });
+    // `finished` never rejects, so this always runs.
+    transition.finished.then(() => {
+      runningTransitionCount -= 1;
+    });
     return transition;
   };
 }
+
+let runningTransitionCount = 0;
+
+/**
+ * True while a view transition (card → product morph, category pill glide) is animating the
+ * page, so other page-change effects can stand aside instead of doubling up.
+ */
+export const isViewTransitionRunning = () => runningTransitionCount > 0;

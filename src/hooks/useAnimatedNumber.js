@@ -5,16 +5,17 @@ const DEFAULT_DURATION_MS = 450;
 
 /**
  * Follows `target`, easing from the previously shown value instead of jumping, so a changed
- * cart total visibly "rolls" to the new sum. Starts at `target` (no count-up on mount) and
- * jumps straight to it under reduced motion. Display only: keep the real value for logic and
- * accessible labels.
+ * cart total visibly "rolls" to the new sum. Starts at `target` (no count-up on mount) unless
+ * `initialValue` is given, and jumps straight to it under reduced motion. Display only: keep the
+ * real value for logic and accessible labels.
  * @param {number} target
  * @param {number} [durationMs]
+ * @param {number} [initialValue] counts up from here on mount (e.g. 0 for a discount badge)
  */
-export function useAnimatedNumber(target, durationMs = DEFAULT_DURATION_MS) {
+export function useAnimatedNumber(target, durationMs = DEFAULT_DURATION_MS, initialValue = target) {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const [displayed, setDisplayed] = useState(target);
-  const displayedRef = useRef(target);
+  const [displayed, setDisplayed] = useState(initialValue);
+  const displayedRef = useRef(initialValue);
 
   useEffect(() => {
     if (prefersReducedMotion || displayedRef.current === target) {

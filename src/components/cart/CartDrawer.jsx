@@ -87,7 +87,7 @@ export default function CartDrawer() {
               }
             />
           ) : (
-            <ul className="divide-y divide-slate-100">
+            <ul className="cart-drawer-lines divide-y divide-slate-100">
               {items.map((item) => (
                 <CartItem key={item.product.id} item={item} />
               ))}

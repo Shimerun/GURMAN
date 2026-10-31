@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { Link, useViewTransitionState } from 'react-router-dom';
 import { FEATURES } from '../../config/business';
 import { buttonClassName } from '../../lib/buttonStyles';
+import { resetCardTilt, tiltCardTowardsPointer } from '../../lib/cardTilt';
 import { flyToCart } from '../../lib/flyToCart';
 import { vibrateOnTap } from '../../lib/haptics';
 import { loadProductPage } from '../../lib/pageLoaders';
@@ -49,10 +50,13 @@ export default function ProductCard({ product, isImageEager = false, hasImageTra
     // Warming the product-page chunk on intent keeps the image morph from catching a loading fallback.
     <article
       onPointerEnter={loadProductPage}
+      onPointerMove={tiltCardTowardsPointer}
+      onPointerLeave={resetCardTilt}
       onTouchStart={loadProductPage}
       onFocus={loadProductPage}
-      className="group relative flex h-full flex-col rounded-2xl bg-white p-3 shadow-soft ring-1 ring-slate-100 transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md focus-within:ring-2 focus-within:ring-emerald-600 motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:p-4">
-      <div className={cn('relative overflow-hidden rounded-xl bg-emerald-50', isImageMorphing && '[view-transition-name:product-image]')}>
+      className="group relative flex h-full flex-col rounded-2xl bg-white p-3 shadow-soft ring-1 ring-slate-100 card-tilt transition-[transform,box-shadow] duration-200 hover:shadow-md focus-within:ring-2 focus-within:ring-emerald-600 motion-reduce:transition-none sm:p-4">
+      {/* overflow-clip keeps the badge glint's scroll timeline on the page (hidden would make this box its scroller). */}
+      <div className={cn('relative overflow-clip rounded-xl bg-emerald-50', isImageMorphing && '[view-transition-name:product-image]')}>
         {/* pointer-events-none keeps the stretched product link clickable through the badges. */}
         {/* right-12 keeps the badges clear of the heart: a second badge wraps below instead of hiding under it. */}
         <ProductBadges product={product} className="pointer-events-none absolute left-2 right-12 top-2 z-[1]" />

@@ -1,6 +1,7 @@
 import { ArrowRight, RefreshCw, Tag } from 'lucide-react';
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useAnimatedNumber } from '../../hooks/useAnimatedNumber';
 import { useProducts } from '../../hooks/useProducts';
 import { buttonClassName } from '../../lib/buttonStyles';
 import { PROMO_LISTING_QUERY, PROMO_VALID_UNTIL } from '../../lib/constants';
@@ -23,6 +24,22 @@ function DealsSkeleton() {
         </li>
       ))}
     </ul>
+  );
+}
+
+const DISCOUNT_COUNT_UP_MS = 700;
+
+/**
+ * "−30%" that counts up from 0 when the deals arrive. Screen readers get the final value only.
+ * @param {{ percent: number }} props
+ */
+function CountingDiscount({ percent }) {
+  const displayed = useAnimatedNumber(percent, DISCOUNT_COUNT_UP_MS, 0);
+  return (
+    <>
+      <span aria-hidden="true">−{Math.round(displayed)}%</span>
+      <span className="sr-only">−{percent}%</span>
+    </>
   );
 }
 
@@ -64,7 +81,7 @@ export default function HeroDeals() {
                   <span className="relative shrink-0">
                     <SafeImage src={product.image} alt="" width={64} height={64} className="h-14 w-14 rounded-xl bg-emerald-50 object-cover sm:h-16 sm:w-16" />
                     <span className="absolute -left-1.5 -top-1.5 rounded-full bg-amber-400 px-1.5 py-0.5 text-xs font-bold leading-none text-slate-900">
-                      −{getDiscountPercent(product.price, product.oldPrice)}%
+                      <CountingDiscount percent={getDiscountPercent(product.price, product.oldPrice)} />
                     </span>
                   </span>
                   <span className="min-w-0 flex-1">
@@ -72,7 +89,7 @@ export default function HeroDeals() {
                     <span className="mt-1 flex flex-wrap items-baseline gap-x-1.5">
                       <span className="font-extrabold tabular-nums text-emerald-700">{formatPrice(product.price)}</span>
                       <span className="text-xs text-slate-500">/ {product.unit}</span>
-                      <span className="text-xs tabular-nums text-slate-500 line-through">
+                      <span className="price-strike text-xs tabular-nums text-slate-500">
                         <span className="sr-only">Звичайна ціна: </span>
                         {formatPrice(product.oldPrice ?? product.price)}
                       </span>

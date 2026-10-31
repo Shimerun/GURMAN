@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { ANALYTICS_EVENTS, trackEvent } from '../../lib/analytics';
 import { buttonClassName } from '../../lib/buttonStyles';
 import { canShareNatively, copyText, formatShoppingList, getMessengerShareLinks, shareNatively } from '../../lib/shoppingList';
+import { cn } from '../../lib/utils';
 import { selectTotalPrice, useCartStore } from '../../store/useCartStore';
 
 /** @param {'native' | 'viber' | 'telegram' | 'copy'} method */
@@ -18,11 +19,14 @@ export default function ShareListButton({ className }) {
   const items = useCartStore((state) => state.items);
   const totalPrice = useCartStore(selectTotalPrice);
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+  // Bumped on every tap: re-keys the icon so its paper-plane flight replays.
+  const [flightCount, setFlightCount] = useState(0);
   const optionsId = useId();
   const text = formatShoppingList(items, totalPrice);
   const hasNativeShare = canShareNatively();
 
   const handleShare = async () => {
+    setFlightCount((count) => count + 1);
     if (!hasNativeShare) {
       setIsOptionsOpen((isOpen) => !isOpen);
       return;
@@ -56,7 +60,7 @@ export default function ShareListButton({ className }) {
         aria-controls={isOptionsOpen ? optionsId : undefined}
         className={buttonClassName({ size: 'lg', className: 'w-full' })}
       >
-        <Send className="h-5 w-5" aria-hidden="true" />
+        <Send key={flightCount} className={cn('h-5 w-5', flightCount > 0 && 'paper-plane-flight')} aria-hidden="true" />
         Надіслати список собі
       </button>
 

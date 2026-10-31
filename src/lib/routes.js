@@ -46,6 +46,12 @@ export const getDirectionsUrl = (address) => `https://www.google.com/maps/dir/?a
  */
 export const isPromoListing = (pathname, search) => pathname === ROUTES.catalog && new URLSearchParams(search).get('promo') === '1';
 
+/** @param {string} pathname */
+export const isProductPath = (pathname) => pathname.startsWith('/product/');
+
+/** Text-heavy pages that get the reading-progress swoosh. @param {string} pathname */
+export const isLongReadPath = (pathname) => isProductPath(pathname) || [ROUTES.about, ROUTES.delivery, ROUTES.privacy].includes(pathname);
+
 /** Catalog, category and product pages all belong to the "Каталог" navigation section. */
 const isCatalogSection = (pathname) => pathname === ROUTES.catalog || pathname.startsWith('/category/') || pathname.startsWith('/product/');
 

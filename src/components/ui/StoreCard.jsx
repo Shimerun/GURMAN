@@ -30,7 +30,7 @@ export default function StoreCard({ store }) {
       </div>
       <ul className="mt-3 flex-1 space-y-2 text-sm text-slate-700">
         <li className="flex items-start gap-2">
-          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+          <MapPin className="pin-drop mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
           {fullAddress}
         </li>
         <li className="flex items-center gap-2">

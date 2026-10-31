@@ -1,6 +1,8 @@
 import { Clock, Croissant, MapPin } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { COFFEE_TO_GO } from '../../config/business';
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { buttonClassName } from '../../lib/buttonStyles';
 import { formatPrice } from '../../lib/format';
 import { ROUTES, getCategoryPath } from '../../lib/routes';
@@ -17,22 +19,81 @@ const GEMINI_LOGO_PATHS = [
   'M141.73,39.76c-62.52,0-113.39,31.39-113.39,69.96s50.86,69.96,113.39,69.96s113.39-31.39,113.39-69.96S204.25,39.76,141.73,39.76 M141.73,173.98c-59.37,0-107.68-28.82-107.68-64.25s48.3-64.25,107.68-64.25c59.37,0,107.68,28.82,107.68,64.25S201.11,173.98,141.73,173.98',
 ];
 
+const CUP_BODY_PATH = 'M39 57h66l-9 78a6 6 0 0 1-6 5H54a6 6 0 0 1-6-5z';
+// The "liquid": wider than the cup so its wavy surface can sway; at rest the waves sit above the
+// rim (y 50–54), where the clip hides them, so the full cup is solid green.
+const CUP_LIQUID_PATH = 'M26 54q7-4 14 0t14 0 14 0 14 0 14 0 14 0 14 0V142H26z';
+// One cup per page (home), so a fixed id is unique.
+const CUP_CLIP_ID = 'coffee-cup-body';
+/** Pour once most of the cup is on screen, so the whole fill is seen. */
+const POUR_VISIBLE_RATIO = 0.9;
+
 /**
- * Takeaway cup in the logo's style with the white Gemini logo on the green body; the steam drifts
- * up (`.coffee-steam`, still under reduced motion).
+ * 'waiting' (empty, lid off) → 'pouring' (CSS plays the fill, lid and beans) once the cup is in
+ * view; 'done' from the start under reduced motion, where the cup is simply shown full.
+ * @param {import('react').RefObject<SVGSVGElement | null>} cupRef
+ */
+function useCoffeePour(cupRef) {
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const [pourState, setPourState] = useState(/** @type {'waiting' | 'pouring' | 'done'} */ (prefersReducedMotion ? 'done' : 'waiting'));
+
+  useEffect(() => {
+    const cup = cupRef.current;
+    if (pourState !== 'waiting' || !cup) return undefined;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.intersectionRatio < POUR_VISIBLE_RATIO) return;
+        setPourState('pouring');
+        observer.disconnect();
+      },
+      { threshold: POUR_VISIBLE_RATIO },
+    );
+    observer.observe(cup);
+    return () => observer.disconnect();
+  }, [cupRef, pourState]);
+
+  return pourState;
+}
+
+/**
+ * Takeaway cup in the logo's style with the white Gemini logo on the green body. When it comes
+ * into view the empty cup fills up with a swaying surface, the lid drops on and the beans bounce
+ * (`.coffee-cup[data-pour]` in index.css); the steam drifts up all the time (`.coffee-steam`).
  */
 function CoffeeCupIllustration() {
+  const cupRef = useRef(/** @type {SVGSVGElement | null} */ (null));
+  const pourState = useCoffeePour(cupRef);
+
   return (
-    <svg viewBox="0 0 140 150" className="mx-auto h-40 w-auto sm:h-48 lg:h-60 xl:h-64" aria-hidden="true" focusable="false">
+    <svg
+      ref={cupRef}
+      viewBox="0 0 140 150"
+      data-pour={pourState}
+      className="coffee-cup mx-auto h-40 w-auto sm:h-48 lg:h-60 xl:h-64"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <defs>
+        <clipPath id={CUP_CLIP_ID}>
+          <path d={CUP_BODY_PATH} />
+        </clipPath>
+      </defs>
       <g className="coffee-steam" fill="none" strokeWidth="4" strokeLinecap="round">
         <path d="M58 34c-7-8 7-13 0-22" className="stroke-amber-300" />
         <path d="M72 30c-7-8 7-13 0-22" className="stroke-emerald-300" />
         <path d="M86 34c-7-8 7-13 0-22" className="stroke-amber-300" />
       </g>
       {/* A wide cup body leaves room for the Gemini logo at a readable size. */}
-      <rect x="44" y="38" width="56" height="9" rx="4.5" className="fill-emerald-800" />
-      <rect x="34" y="45" width="76" height="12" rx="6" className="fill-emerald-800" />
-      <path d="M39 57h66l-9 78a6 6 0 0 1-6 5H54a6 6 0 0 1-6-5z" className="fill-emerald-700" />
+      <g className="coffee-lid">
+        <rect x="44" y="38" width="56" height="9" rx="4.5" className="fill-emerald-800" />
+        <rect x="34" y="45" width="76" height="12" rx="6" className="fill-emerald-800" />
+      </g>
+      <path d={CUP_BODY_PATH} className="fill-emerald-100" />
+      <g clipPath={`url(#${CUP_CLIP_ID})`}>
+        <g className="coffee-fill">
+          <path d={CUP_LIQUID_PATH} className="coffee-liquid fill-emerald-700" />
+        </g>
+      </g>
       <path d="M41.5 70.5h61M46.3 112h51.4" fill="none" strokeWidth="1.8" strokeLinecap="round" className="stroke-amber-400" />
       {/* The logo's oval (227×140 source units, centred at 141.73, 109.72) scaled to 54 units wide on the cup. */}
       <g transform="translate(72 91.25) scale(0.2381) translate(-141.73 -109.72)" className="fill-white">
@@ -41,15 +102,19 @@ function CoffeeCupIllustration() {
         ))}
       </g>
       {/* Coffee beans at the foot of the cup. */}
-      <g className="fill-amber-800">
-        <ellipse cx="22" cy="132" rx="7" ry="9.5" transform="rotate(-30 22 132)" />
-        <ellipse cx="118" cy="128" rx="7" ry="9.5" transform="rotate(25 118 128)" />
-        <ellipse cx="106" cy="141" rx="6" ry="8" transform="rotate(70 106 141)" />
-      </g>
-      <g fill="none" strokeWidth="1.6" strokeLinecap="round" className="stroke-amber-950">
-        <path d="M18 125c3 4 5 10 8 14" />
-        <path d="M121 121c-3 4-4 10-6 14" />
-        <path d="M100 138c3 1 8 3 12 5" />
+      <g className="coffee-beans">
+        <g>
+          <ellipse cx="22" cy="132" rx="7" ry="9.5" transform="rotate(-30 22 132)" className="fill-amber-800" />
+          <path d="M18 125c3 4 5 10 8 14" fill="none" strokeWidth="1.6" strokeLinecap="round" className="stroke-amber-950" />
+        </g>
+        <g>
+          <ellipse cx="118" cy="128" rx="7" ry="9.5" transform="rotate(25 118 128)" className="fill-amber-800" />
+          <path d="M121 121c-3 4-4 10-6 14" fill="none" strokeWidth="1.6" strokeLinecap="round" className="stroke-amber-950" />
+        </g>
+        <g>
+          <ellipse cx="106" cy="141" rx="6" ry="8" transform="rotate(70 106 141)" className="fill-amber-800" />
+          <path d="M100 138c3 1 8 3 12 5" fill="none" strokeWidth="1.6" strokeLinecap="round" className="stroke-amber-950" />
+        </g>
       </g>
     </svg>
   );
@@ -58,7 +123,9 @@ function CoffeeCupIllustration() {
 /** Home-page block for the coffee-to-go corner in both stores. */
 export default function CoffeeToGo() {
   return (
-    <section aria-labelledby="coffee-heading" className="overflow-hidden rounded-3xl bg-amber-50 p-6 ring-1 ring-amber-200 sm:p-10">
+    // overflow-clip, not -hidden: a hidden-overflow box is a scroll container, which would freeze
+    // the cup's scroll-driven fill (its view timeline would track this box instead of the page).
+    <section aria-labelledby="coffee-heading" className="overflow-clip rounded-3xl bg-amber-50 p-6 ring-1 ring-amber-200 sm:p-10">
       <div className="grid items-center gap-8 lg:grid-cols-[1.4fr_1fr]">
         <div>
           <SectionHeader

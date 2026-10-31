@@ -5,7 +5,8 @@ import { cn } from '../../lib/utils';
 
 const BADGE_CLASSES = {
   // `badge-shine` (index.css) sweeps a glint across it once as the card scrolls into view.
-  sale: 'badge-shine relative overflow-hidden bg-amber-400 text-slate-900',
+  // overflow-clip, not -hidden: a hidden-overflow box is a scroll container, which freezes the glint's scroll timeline.
+  sale: 'badge-shine relative overflow-clip bg-amber-400 text-slate-900',
   popular: 'bg-emerald-700 text-white',
 };
 
