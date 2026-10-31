@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { buttonClassName } from '../../lib/buttonStyles';
 import { STORE_CONTACTS } from '../../lib/constants';
 import { flyToCart } from '../../lib/flyToCart';
+import { vibrateOnTap } from '../../lib/haptics';
 import { formatPrice } from '../../lib/format';
 import { ROUTES, getCategoryPath } from '../../lib/routes';
 import { selectItemQuantity, useCartStore } from '../../store/useCartStore';
@@ -81,6 +82,7 @@ export default function ProductPurchasePanel({ product }) {
     if (!canAdd) return;
 
     flyToCart(event.currentTarget);
+    vibrateOnTap();
     if (quantityInCart === 0) {
       addItem(product);
       if (quantityToAdd > 1) updateQuantity(product.id, quantityToAdd);

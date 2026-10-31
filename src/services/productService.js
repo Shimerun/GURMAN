@@ -1,5 +1,3 @@
-import mockCategories from '../data/mockCategories.json';
-import mockProducts from '../data/mockProducts.json';
 import { getDiscountPercent } from '../lib/format';
 import { ServiceError, simulateNetworkLatency } from './simulateNetworkLatency';
 
@@ -89,49 +87,91 @@ const SORT_COMPARATORS = {
 
 export const PRODUCT_SORTS = /** @type {ProductSort[]} */ (Object.keys(SORT_COMPARATORS));
 
-const categoryById = new Map(mockCategories.map((category) => [category.id, category]));
-
-const popularProductIds = new Set(
-  [...mockProducts]
-    .sort((a, b) => b.popularity - a.popularity)
-    .slice(0, POPULAR_BADGE_COUNT)
-    .map((product) => product.id),
-);
+/**
+ * @typedef {Object} Catalog
+ * @property {Product[]} products
+ * @property {Map<string, Product>} productById
+ * @property {Category[]} categories
+ */
 
 /** @param {string} description */
 const getFirstSentence = (description) => description.match(/^.+?[.!?](?=\s|$)/)?.[0] ?? description;
 
-/** @type {Product[]} */
-const products = mockProducts.map((product) => {
-  const category = categoryById.get(product.category);
-  const { [STORAGE_CONDITIONS_KEY]: storageConditions, [SHELF_LIFE_KEY]: shelfLife, ...characteristics } = product.characteristics;
+/**
+ * Derives the UI-ready catalog (denormalized titles, badges, storage, counts) from the raw records.
+ * @param {any[]} rawProducts
+ * @param {any[]} rawCategories
+ * @returns {Catalog}
+ */
+function buildCatalog(rawProducts, rawCategories) {
+  const categoryById = new Map(rawCategories.map((category) => [category.id, category]));
+  const popularProductIds = new Set(
+    [...rawProducts]
+      .sort((a, b) => b.popularity - a.popularity)
+      .slice(0, POPULAR_BADGE_COUNT)
+      .map((product) => product.id),
+  );
 
-  /** @type {ProductBadge[]} */
-  const badges = [];
-  if (product.isPromo) badges.push('sale');
-  if (popularProductIds.has(product.id)) badges.push('popular');
+  /** @type {Product[]} */
+  const products = rawProducts.map((product) => {
+    const category = categoryById.get(product.category);
+    const { [STORAGE_CONDITIONS_KEY]: storageConditions, [SHELF_LIFE_KEY]: shelfLife, ...characteristics } = product.characteristics;
 
-  return {
-    ...product,
-    categoryTitle: category?.title ?? '',
-    shortDescription: getFirstSentence(product.description),
-    characteristics,
-    storage: { conditions: storageConditions ?? category?.storage ?? '', shelfLife: shelfLife ?? null },
-    badges,
-  };
-});
+    /** @type {ProductBadge[]} */
+    const badges = [];
+    if (product.isPromo) badges.push('sale');
+    if (popularProductIds.has(product.id)) badges.push('popular');
 
-const productById = new Map(products.map((product) => [product.id, product]));
+    return {
+      ...product,
+      categoryTitle: category?.title ?? '',
+      shortDescription: getFirstSentence(product.description),
+      characteristics,
+      storage: { conditions: storageConditions ?? category?.storage ?? '', shelfLife: shelfLife ?? null },
+      badges,
+    };
+  });
 
-/** @type {Category[]} */
-const categories = mockCategories.map((category) => {
-  const categoryProducts = products.filter((product) => product.category === category.id);
-  return {
-    ...category,
-    productCount: categoryProducts.length,
-    availableCount: categoryProducts.filter(isAvailable).length,
-  };
-});
+  /** @type {Category[]} */
+  const categories = rawCategories.map((category) => {
+    const categoryProducts = products.filter((product) => product.category === category.id);
+    return {
+      ...category,
+      productCount: categoryProducts.length,
+      availableCount: categoryProducts.filter(isAvailable).length,
+    };
+  });
+
+  return { products, productById: new Map(products.map((product) => [product.id, product])), categories };
+}
+
+/** @type {Promise<Catalog> | undefined} */
+let catalogPromise;
+
+/**
+ * The mock catalog is a separate chunk, fetched on first use like a real API response, so its
+ * ~65 kB stay out of the entry bundle. A failed load is not cached: the next call (a retry) tries again.
+ * @param {string} operation
+ * @returns {Promise<Catalog>}
+ */
+function loadCatalog(operation) {
+  catalogPromise ??= Promise.all([import('../data/mockProducts.json'), import('../data/mockCategories.json')])
+    .then(([productsModule, categoriesModule]) => buildCatalog(productsModule.default, categoriesModule.default))
+    .catch((error) => {
+      catalogPromise = undefined;
+      throw new ServiceError(`${SERVICE}.${operation}: could not load the catalog`, { service: SERVICE, operation, code: 'NETWORK', cause: error });
+    });
+  return catalogPromise;
+}
+
+/**
+ * Network latency and the catalog download run in parallel, as one simulated round-trip.
+ * @param {string} operation
+ */
+async function fetchCatalog(operation) {
+  const [catalog] = await Promise.all([loadCatalog(operation), simulateNetworkLatency({ service: SERVICE, operation })]);
+  return catalog;
+}
 
 /**
  * @param {ProductQueryParams} [params]
@@ -147,7 +187,7 @@ async function getProducts({ search = '', category, onlyPromo = false, inStockOn
     });
   }
 
-  await simulateNetworkLatency({ service: SERVICE, operation: 'getProducts' });
+  const { products } = await fetchCatalog('getProducts');
 
   const normalizedSearch = search.trim().toLocaleLowerCase(LOCALE);
 
@@ -169,7 +209,7 @@ async function getProducts({ search = '', category, onlyPromo = false, inStockOn
 
 /** @returns {Promise<Category[]>} */
 async function getCategories() {
-  await simulateNetworkLatency({ service: SERVICE, operation: 'getCategories' });
+  const { categories } = await fetchCatalog('getCategories');
   return [...categories];
 }
 
@@ -178,7 +218,7 @@ async function getCategories() {
  * @returns {Promise<Category>}
  */
 async function getCategoryById(categoryId) {
-  await simulateNetworkLatency({ service: SERVICE, operation: 'getCategoryById' });
+  const { categories } = await fetchCatalog('getCategoryById');
 
   const category = categories.find((candidate) => candidate.id === categoryId);
   if (!category) {
@@ -196,9 +236,9 @@ async function getCategoryById(categoryId) {
  * @returns {Promise<Product>}
  */
 async function getProductById(productId) {
-  await simulateNetworkLatency({ service: SERVICE, operation: 'getProductById' });
+  const { productById } = await fetchCatalog('getProductById');
 
-  const product = products.find((candidate) => candidate.id === productId);
+  const product = productById.get(productId);
   if (!product) {
     throw new ServiceError(`${SERVICE}.getProductById: product "${productId}" not found`, {
       service: SERVICE,
@@ -223,7 +263,7 @@ async function getProductsByIds(productIds) {
     });
   }
 
-  await simulateNetworkLatency({ service: SERVICE, operation: 'getProductsByIds' });
+  const { productById } = await fetchCatalog('getProductsByIds');
 
   return productIds.map((productId) => productById.get(productId)).filter((product) => product !== undefined);
 }

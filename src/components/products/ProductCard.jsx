@@ -1,9 +1,11 @@
 import { ShoppingCart } from 'lucide-react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useViewTransitionState } from 'react-router-dom';
 import { FEATURES } from '../../config/business';
 import { buttonClassName } from '../../lib/buttonStyles';
 import { flyToCart } from '../../lib/flyToCart';
+import { vibrateOnTap } from '../../lib/haptics';
 import { loadProductPage } from '../../lib/pageLoaders';
 import { getProductPath } from '../../lib/routes';
 import { cn } from '../../lib/utils';
@@ -29,12 +31,16 @@ export default function ProductCard({ product, isImageEager = false, hasImageTra
   const productPath = getProductPath(product.id);
   // Only the card being opened (or returned to) may carry the shared name: names must be unique per page.
   const isImageMorphing = useViewTransitionState(productPath) && hasImageTransition;
+  // Set only by this card's own controls, so cards already in the cart on page load don't animate.
+  const [cartControlMotion, setCartControlMotion] = useState(/** @type {'expand' | 'collapse' | null} */ (null));
 
   // The add button is only rendered when the product isn't in the cart yet,
   // so this toast fires exactly once per first add.
   /** @param {import('react').MouseEvent<HTMLButtonElement>} event */
   const handleAddToCart = (event) => {
     flyToCart(event.currentTarget);
+    vibrateOnTap();
+    setCartControlMotion('expand');
     addItem(product);
     toast.success(`«${product.title}» у кошику`);
   };
@@ -93,12 +99,21 @@ export default function ProductCard({ product, isImageEager = false, hasImageTra
               <QuantityStepper
                 quantity={quantity}
                 maxQuantity={product.stockQty}
-                onChange={(nextQuantity) => updateQuantity(product.id, nextQuantity)}
+                onChange={(nextQuantity) => {
+                  if (nextQuantity === 0) setCartControlMotion('collapse');
+                  updateQuantity(product.id, nextQuantity);
+                }}
                 productTitle={product.title}
                 unit={product.unit}
+                className={cartControlMotion === 'expand' ? 'cart-control-expand' : undefined}
               />
             ) : (
-              <button type="button" onClick={handleAddToCart} disabled={isOutOfStock} className={buttonClassName({ size: 'sm', className: 'w-full' })}>
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                disabled={isOutOfStock}
+                className={buttonClassName({ size: 'sm', className: cn('w-full', cartControlMotion === 'collapse' && 'cart-control-collapse') })}
+              >
                 <ShoppingCart className="h-4 w-4" aria-hidden="true" />
                 {isOutOfStock ? 'Немає' : 'У кошик'}
                 <span className="sr-only">: {product.title}</span>

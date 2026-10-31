@@ -53,7 +53,7 @@ export default function CategoryCards() {
                 <span className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/65 to-slate-950/20" aria-hidden="true" />
                 <span className="relative mt-auto flex w-full flex-col">
                   <span className="hidden h-10 w-10 place-items-center rounded-xl bg-white/15 backdrop-blur-sm sm:grid">
-                    <CategoryIcon name={category.icon} className="h-5 w-5" />
+                    <CategoryIcon name={category.icon} className="h-6 w-6" />
                   </span>
                   <span className="mt-3 flex items-center justify-between gap-2">
                     <span className="text-base font-bold leading-tight sm:text-lg">{category.title}</span>

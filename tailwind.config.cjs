@@ -54,6 +54,10 @@ module.exports = {
         soft: '0 2px 12px -2px rgb(15 23 42 / 0.08)',
       },
       keyframes: {
+        'tab-pop': {
+          '0%, 100%': { transform: 'none' },
+          '40%': { transform: 'translateY(-3px) scale(1.12)' },
+        },
         'badge-pop': {
           '0%': { transform: 'scale(0.6)' },
           '60%': { transform: 'scale(1.2)' },
@@ -78,6 +82,7 @@ module.exports = {
       },
       animation: {
         'badge-pop': 'badge-pop 300ms ease-out',
+        'tab-pop': 'tab-pop 350ms ease-out',
         'slide-in-right': 'slide-in-right 250ms ease-out',
         'slide-in-left': 'slide-in-left 250ms ease-out',
         'fade-in': 'fade-in 200ms ease-out',

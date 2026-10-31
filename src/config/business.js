@@ -16,6 +16,11 @@ export const FEATURES = {
    * invented, so they follow the demo switch; enable on a public site only with real reviews.
    */
   productRatings: IS_DEMO_CONTENT,
+  /**
+   * Seasonal particles over the home banner (snow, petals, sparkles, leaves). The season follows
+   * the calendar automatically; off for visitors who prefer reduced motion.
+   */
+  seasonalDecor: true,
 };
 
 export const BRAND_NAME = 'GURMAN';

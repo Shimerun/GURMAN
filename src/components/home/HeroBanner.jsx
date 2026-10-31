@@ -5,6 +5,7 @@ import { buttonClassName } from '../../lib/buttonStyles';
 import { ROUTES, getCatalogPath } from '../../lib/routes';
 import SafeImage from '../ui/SafeImage';
 import HeroDeals from './HeroDeals';
+import SeasonalParticles from './SeasonalParticles';
 
 // size 'sm' on phones (two buttons share a row), the 'lg' look from `sm` up.
 const HERO_BUTTON_CLASS_NAME = 'sm:h-12 sm:px-6 sm:text-base';
@@ -32,6 +33,7 @@ export default function HeroBanner() {
           className="absolute inset-0 -z-10 bg-emerald-950/85 lg:bg-transparent lg:bg-gradient-to-r lg:from-emerald-950 lg:via-emerald-950/90 lg:to-emerald-950/25"
           aria-hidden="true"
         />
+        <SeasonalParticles />
 
         {/* Phones get a compact banner (no badge or lead, smaller title, buttons in one row) so the
             weekly deals below are on the first screen too, as on desktop. */}

@@ -2,6 +2,7 @@ import { Heart } from 'lucide-react';
 import { useHasMounted } from '../../hooks/useHasMounted';
 import { ANALYTICS_EVENTS, trackEvent } from '../../lib/analytics';
 import { buttonClassName } from '../../lib/buttonStyles';
+import { vibrateOnTap } from '../../lib/haptics';
 import { cn } from '../../lib/utils';
 import { selectIsFavorite, useFavoritesStore } from '../../store/useFavoritesStore';
 
@@ -16,7 +17,10 @@ export default function FavoriteButton({ product, isLabeled = false, className }
   const isFavorite = useHasMounted() && isStoredFavorite;
 
   const handleClick = () => {
-    if (!isFavorite) trackEvent(ANALYTICS_EVENTS.addFavorite);
+    if (!isFavorite) {
+      trackEvent(ANALYTICS_EVENTS.addFavorite);
+      vibrateOnTap();
+    }
     toggleFavorite(product.id);
   };
 
