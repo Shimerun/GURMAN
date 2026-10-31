@@ -64,6 +64,26 @@ test.describe('pages generated for crawlers', () => {
     expect((await readHead(request, '/about')).title).toBe('Про нас — GURMAN');
   });
 
+  test("each page's largest image is preloaded with exactly the candidates its <img> uses", async ({ page, request }) => {
+    for (const [path, imageSelector] of [
+      ['/', '#main section[aria-labelledby="hero-heading"] img'],
+      ['/product/p-002', '#main img[alt="Сир твердий «Гауда» 45%"]'],
+    ]) {
+      const html = await (await request.get(path)).text();
+      const preload = html.match(/<link rel="preload" as="image"[^>]*>/)?.[0];
+      expect(preload, path).toBeTruthy();
+      const preloadSrcSet = preload.match(/imagesrcset="([^"]*)"/)[1].replaceAll('&amp;', '&');
+      expect(preload).toContain('crossorigin="anonymous"');
+
+      await page.goto(path);
+      const image = page.locator(imageSelector).first();
+      // A phone-sized candidate exists, so phones no longer download the largest file.
+      expect(await image.getAttribute('srcset'), path).toContain(' 480w');
+      expect(await image.getAttribute('srcset'), path).toBe(preloadSrcSet);
+      expect(await image.getAttribute('crossorigin')).toBe('anonymous');
+    }
+  });
+
   test('robots.txt allows crawling', async ({ request }) => {
     const response = await request.get('/robots.txt');
     expect(response.ok()).toBe(true);
