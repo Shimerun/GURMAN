@@ -396,6 +396,39 @@ img[data-image-state='loading'] {
   }
 }
 
+/* Coffee-to-go cup (CoffeeToGo.jsx): steam drifts up and fades, one wisp after another. */
+.coffee-steam path {
+  opacity: 0.8;
+}
+
+@keyframes steam-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  35% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .coffee-steam path {
+    animation: steam-rise 2.8s ease-in-out infinite;
+  }
+
+  .coffee-steam path:nth-child(2) {
+    animation-delay: 0.9s;
+  }
+
+  .coffee-steam path:nth-child(3) {
+    animation-delay: 1.8s;
+  }
+}
+
 /*
  * Opening splash (LogoSplash.jsx): the same assembly as the header intro, compressed to ~600ms so
  * the flight into the header can start at 650ms.

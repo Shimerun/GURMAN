@@ -40,6 +40,17 @@ test.describe('routes', () => {
     await expect(page.locator('ul[aria-label="Активні фільтри"] button')).toHaveCount(1);
   });
 
+  test('home page shows the coffee-to-go menu with prices and links', async ({ page }) => {
+    await open(page, '/');
+    const coffee = page.locator('section[aria-labelledby="coffee-heading"]');
+    await expect(coffee.locator('h2')).toContainText('кава');
+    const drinks = coffee.locator('ul[aria-label="Меню кави"] li');
+    expect(await drinks.count()).toBeGreaterThan(0);
+    await expect(drinks.first()).toContainText(/\d+\s?грн/);
+    await expect(coffee.locator('a[href="/category/bakery"]')).toBeVisible();
+    await expect(coffee.locator('a[href="/contacts"]')).toBeVisible();
+  });
+
   test('store data: two stores, 07:00–22:00, no delivery or 24/7 copy', async ({ page }) => {
     await open(page, '/contacts');
     const stores = page.locator('#stores article');

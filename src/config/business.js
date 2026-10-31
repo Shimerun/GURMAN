@@ -36,6 +36,32 @@ export const STORE_CONTACTS = {
   storeHours: 'Щодня 07:00–22:00',
 };
 
+/**
+ * @typedef {object} CoffeeDrink
+ * @property {string} name
+ * @property {number} price  UAH
+ */
+
+/**
+ * Coffee to go, brewed in both stores during opening hours.
+ * Drinks, prices and the coffee brand come from the owner (2026-10-31).
+ */
+export const COFFEE_TO_GO = {
+  hours: STORE_CONTACTS.storeHours,
+  /** @type {CoffeeDrink[]} */
+  menu: [
+    { name: 'Еспресо', price: 20 },
+    { name: 'Американо', price: 20 },
+    { name: 'Американо з молоком', price: 25 },
+    { name: 'Капучино', price: 30 },
+    { name: 'Лате', price: 35 },
+    { name: 'Флет вайт', price: 30 },
+    { name: 'Шоколад', price: 30 },
+  ],
+  /** Coffee brand brewed in the stores; its logo is on the cup illustration. */
+  brand: 'Gemini',
+};
+
 /** Payment accepted at the checkout counter in every store. */
 export const PAYMENT_METHODS = ['Банківська картка', 'Apple Pay / Google Pay', 'Готівка', 'Бонуси картки GURMAN'];
 
@@ -78,8 +104,6 @@ export const COMPANY_MILESTONES = [
     title: 'Перший магазин на Грушевського',
     description: 'Невелика крамниця з фермерськими продуктами та власною пекарнею.',
   },
-  { year: '2017', title: 'Власна пекарня й кулінарія', description: 'Почали випікати хліб на заквасці та ліпити вареники щоранку.' },
-  { year: '2020', title: 'Картка GURMAN', description: 'Запустили програму лояльності з бонусами та персональними знижками.' },
   { year: '2023', title: 'Другий магазин', description: 'Відкрили магазин на вулиці Гагаріна.' },
   { year: '2026', title: 'Новий сайт', description: 'Каталог із цінами, акції тижня й адреси магазинів — в одному місці.' },
 ];

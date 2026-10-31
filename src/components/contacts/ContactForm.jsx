@@ -5,7 +5,7 @@ import { buttonClassName } from '../../lib/buttonStyles';
 import { ROUTES } from '../../lib/routes';
 import { cn } from '../../lib/utils';
 
-const TOPICS = ['Якість товару', 'Наявність товару в магазині', 'Картка GURMAN', 'Співпраця та постачання', 'Інше'];
+const TOPICS = ['Якість товару', 'Наявність товару в магазині', 'Співпраця та постачання', 'Інше'];
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_MESSAGE_LENGTH = 10;

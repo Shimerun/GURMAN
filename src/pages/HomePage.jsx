@@ -1,5 +1,6 @@
 import BenefitsSection from '../components/home/BenefitsSection';
 import CategoryCards from '../components/home/CategoryCards';
+import CoffeeToGo from '../components/home/CoffeeToGo';
 import ContactCta from '../components/home/ContactCta';
 import HeroBanner from '../components/home/HeroBanner';
 import PopularProducts from '../components/home/PopularProducts';
@@ -18,6 +19,7 @@ export default function HomePage() {
         <BenefitsSection />
         <InstallBanner />
       </div>
+      <CoffeeToGo />
       <CategoryCards />
       <WeeklyDeals />
       <PopularProducts />
