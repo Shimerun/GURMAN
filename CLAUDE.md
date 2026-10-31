@@ -52,6 +52,7 @@ Business content: contacts, socials, payment methods, seller details (`LEGAL_ENT
   <motion>
   - No animation libraries. Use CSS (scroll-linked `animation-timeline: view()` inside `@supports`, so unsupported browsers just show the final state) or the Web Animations API. Every effect must be disabled or reduced to its final state under `prefers-reduced-motion`; never hide above-the-fold content behind an animation.
   - Reuse before adding: `.scroll-reveal` (cards entering), `.swoosh-draw` (logo swoosh under `SectionHeader`), `useIsScrollingDown` (compact mobile header), `useAnimatedNumber` (rolling totals), `useFlipAnimation` (list reordering, items need `data-flip-key`), `useTypingPlaceholder`, `flyToCart` (targets `[data-cart-target]`), `showRemovedFromCartToast` (undo), `SafeImage` fade (`data-image-state`).
+  - Opening splash (`LogoSplash`, `src/lib/logoSplash.js`): first home-page visit per session only, ~1.15s, skipped by any tap/key/scroll and under reduced motion; it replaces the header logo's intro and lands on the header logo (FLIP). e2e tests skip it by default — opt in with `test.use({ showLogoSplash: true })`.
   - View transitions: product card → product page via react-router `viewTransition` + `useViewTransitionState`. A `view-transition-name` must be unique per page: only the card being opened carries `product-image`; grids on a product page pass `hasImageTransition={false}`. `src/lib/pageLoaders.js` prefetches the product chunk on card intent so the transition never captures the Suspense fallback.
   </motion>
 
@@ -61,6 +62,14 @@ Business content: contacts, socials, payment methods, seller details (`LEGAL_ENT
   - Edge Cases: Handle empty, loading (skeletons on first load only; dim stale data on refetch), error-with-retry and not-found states explicitly in the UI.
   - `VITE_MOCK_FAILURE_RATE` (0..1) simulates network failures to exercise error UI.
   </error_handling>
+
+  <security>
+  - Security headers (CSP, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, HSTS) are defined once in `vite.config.js` (`SECURITY_HEADERS`): served by `vite preview` (so e2e runs under the real CSP) and emitted as `dist/_headers` for Netlify/Cloudflare Pages. Other hosts (e.g. Vercel) need the same values in their own config.
+  - CSP: no inline scripts, no `eval`, no `dangerouslySetInnerHTML`. Any new external host (analytics, maps, API, image CDN) must be added to the CSP or the browser blocks it.
+  - localStorage is untrusted input: the cart store sanitizes every rehydrated line (`sanitizeCartItems`) so stale or tampered data can never blank the site. Cart prices are a snapshot; a real backend must re-price on the server.
+  - External links use `target="_blank" rel="noopener noreferrer"`; images send `referrerPolicy="no-referrer"`.
+  - `npm audit --omit=dev` must stay at 0 (runtime). Remaining advisories are dev-only build tooling (Vite 5 dev server); keep the dev server on localhost.
+  </security>
 
   <performance>
   - Complexity: Default to O(1)/O(N) structures (Sets/Maps over nested arrays).

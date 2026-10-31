@@ -383,28 +383,6 @@ img[data-image-state='loading'] {
   }
 }
 
-/* Loyalty card: tilts toward the pointer with a moving glare (values set by LoyaltyBlock). */
-.loyalty-tilt {
-  transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
-  transition: transform 250ms ease-out;
-}
-
-.loyalty-glare {
-  background: radial-gradient(circle at var(--glare-x, 50%) var(--glare-y, 50%), rgb(255 255 255 / 0.45), transparent 50%);
-  opacity: 0;
-  transition: opacity 250ms ease-out;
-}
-
-.loyalty-tilt:hover .loyalty-glare {
-  opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .loyalty-tilt {
-    transform: none;
-  }
-}
-
 /* Logo hover: the orange hops and the leaf sways (pointer devices only). */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .brand-logo:hover .logo-orange {
@@ -415,6 +393,47 @@ img[data-image-state='loading'] {
     transform-box: fill-box;
     transform-origin: 50% 100%;
     animation: logo-leaf-sway 700ms ease-in-out;
+  }
+}
+
+/*
+ * Opening splash (LogoSplash.jsx): the same assembly as the header intro, compressed to ~600ms so
+ * the flight into the header can start at 650ms.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .logo-splash .logo-basket {
+    transform-box: view-box;
+    transform-origin: 32px 57px;
+    animation: logo-basket-pop 300ms ease-out both;
+  }
+
+  .logo-splash .logo-produce {
+    animation: logo-produce-drop 300ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  }
+
+  .logo-splash .logo-produce-1 {
+    animation-delay: 120ms;
+  }
+
+  .logo-splash .logo-produce-2 {
+    animation-delay: 200ms;
+  }
+
+  .logo-splash .logo-produce-3 {
+    animation-delay: 280ms;
+  }
+
+  .logo-splash .logo-wordmark {
+    animation: logo-wordmark-in 250ms ease-out 100ms both;
+  }
+
+  .logo-splash .logo-swoosh {
+    stroke-dasharray: 1;
+    animation: swoosh-draw 300ms ease-in-out 300ms both;
+  }
+
+  .logo-splash .logo-tagline {
+    animation: logo-tagline-write 300ms ease-out 300ms both;
   }
 }
 

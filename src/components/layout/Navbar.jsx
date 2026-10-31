@@ -45,8 +45,11 @@ function DesktopNavLinks() {
   );
 }
 
-/** @param {{ isMobileMenuOpen: boolean, onOpenMobileMenu: () => void }} props */
-export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu }) {
+/**
+ * @param {{ isMobileMenuOpen: boolean, onOpenMobileMenu: () => void, isLogoIntroAnimated?: boolean, isLogoHidden?: boolean }} props
+ * `isLogoHidden` keeps the logo invisible while the opening splash flies its copy into place.
+ */
+export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu, isLogoIntroAnimated = true, isLogoHidden = false }) {
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -125,7 +128,7 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu }) {
           <Menu className="h-6 w-6" aria-hidden="true" />
         </button>
 
-        <BrandLogo showTagline isIntroAnimated />
+        <BrandLogo showTagline isIntroAnimated={isLogoIntroAnimated} className={isLogoHidden ? 'invisible' : undefined} />
 
         <button
           ref={megaMenuTriggerRef}

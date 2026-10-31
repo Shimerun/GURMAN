@@ -3,10 +3,58 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 const THIRTY_DAYS_IN_SECONDS = 60 * 60 * 24 * 30;
+const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365;
+
+/** Product photos are hotlinked from here until the client's own images are hosted with the site. */
+const IMAGE_HOST = 'https://images.unsplash.com';
+
+/**
+ * Security headers for the production site. The build has no inline scripts, so scripts are
+ * locked to our origin; styles allow 'unsafe-inline' only because react-hot-toast injects a
+ * <style> tag at runtime. A new external host (analytics, maps, API) must be added here, or the
+ * browser blocks it — the e2e suite runs under this policy and fails on any violation.
+ */
+const SECURITY_HEADERS = {
+  'Content-Security-Policy': [
+    "default-src 'self'",
+    "script-src 'self'",
+    "style-src 'self' 'unsafe-inline'",
+    `img-src 'self' data: ${IMAGE_HOST}`,
+    "font-src 'self'",
+    // The service worker fetches (and caches) product photos itself.
+    `connect-src 'self' ${IMAGE_HOST}`,
+    "manifest-src 'self'",
+    "worker-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+  ].join('; '),
+  'X-Frame-Options': 'DENY',
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
+  'Cross-Origin-Opener-Policy': 'same-origin',
+  // Only honoured over HTTPS; harmless on the local http preview.
+  'Strict-Transport-Security': `max-age=${ONE_YEAR_IN_SECONDS}; includeSubDomains`,
+};
+
+/** Emits `_headers` (Netlify / Cloudflare Pages format) so static hosting serves SECURITY_HEADERS. */
+const securityHeadersFile = () => ({
+  name: 'gurman-security-headers-file',
+  apply: 'build',
+  generateBundle() {
+    const lines = Object.entries(SECURITY_HEADERS).map(([name, value]) => `  ${name}: ${value}`);
+    this.emitFile({ type: 'asset', fileName: '_headers', source: ['/*', ...lines, ''].join('\n') });
+  },
+});
 
 export default defineConfig({
+  // The local preview serves the same headers, so e2e tests run under the production CSP.
+  preview: { headers: SECURITY_HEADERS },
   plugins: [
     react(),
+    securityHeadersFile(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icon.svg', 'apple-touch-icon.png'],
@@ -34,7 +82,7 @@ export default defineConfig({
         navigateFallback: '/index.html',
         runtimeCaching: [
           {
-            urlPattern: ({ url }) => url.origin === 'https://images.unsplash.com',
+            urlPattern: ({ url }) => url.origin === IMAGE_HOST,
             handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'gurman-images',

@@ -18,8 +18,17 @@ test.describe('motion', () => {
 
   test('adding to cart throws an orange into the header cart', async ({ page }) => {
     await open(page, '/catalog');
+    // The flight lasts ~650ms; on a loaded machine polling can miss it, so record its creation instead.
+    await page.evaluate(() => {
+      window.__cartFlyers = 0;
+      new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          for (const node of mutation.addedNodes) if (node.classList?.contains('cart-flyer')) window.__cartFlyers += 1;
+        }
+      }).observe(document.body, { childList: true });
+    });
     await page.locator('#main article button', { hasText: 'У кошик' }).first().click();
-    await expect(page.locator('.cart-flyer')).toHaveCount(1);
+    await expect.poll(() => page.evaluate(() => window.__cartFlyers)).toBe(1);
     await expect(page.locator('.cart-flyer')).toHaveCount(0);
     await expect.poll(() => cartBadge(page)).toBe(1);
   });
@@ -78,9 +87,17 @@ test.describe('motion', () => {
 
   test('contact form shakes invalid fields and draws the success tick', async ({ page }) => {
     await open(page, '/contacts');
+    // The shake lasts ~360ms; record which fields started one instead of racing to observe it.
+    await page.evaluate(() => {
+      window.__shakenFields = new Set();
+      const animate = Element.prototype.animate;
+      Element.prototype.animate = function recordAnimate(...args) {
+        if (this.name) window.__shakenFields.add(this.name);
+        return animate.apply(this, args);
+      };
+    });
     await page.getByRole('button', { name: 'Надіслати' }).click();
-    const shaking = await page.locator('form [name="name"], form [name="email"], form [name="message"]').evaluateAll((fields) => fields.filter((field) => field.getAnimations().length > 0).length);
-    expect(shaking).toBe(3);
+    await expect.poll(() => page.evaluate(() => [...window.__shakenFields].sort())).toEqual(['email', 'message', 'name']);
 
     await page.getByLabel('Ім’я').fill('Олена');
     await page.getByLabel('Електронна пошта').fill('olena@example.com');

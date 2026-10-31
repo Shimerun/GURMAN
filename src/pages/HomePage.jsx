@@ -2,7 +2,6 @@ import BenefitsSection from '../components/home/BenefitsSection';
 import CategoryCards from '../components/home/CategoryCards';
 import ContactCta from '../components/home/ContactCta';
 import HeroBanner from '../components/home/HeroBanner';
-import LoyaltyBlock from '../components/home/LoyaltyBlock';
 import PopularProducts from '../components/home/PopularProducts';
 import StoresBlock from '../components/home/StoresBlock';
 import WeeklyDeals from '../components/home/WeeklyDeals';
@@ -23,7 +22,6 @@ export default function HomePage() {
       <WeeklyDeals />
       <PopularProducts />
       <StoresBlock />
-      <LoyaltyBlock />
       <ContactCta />
     </div>
   );

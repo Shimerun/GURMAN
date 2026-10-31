@@ -1,14 +1,21 @@
 import { test as base, expect } from '@playwright/test';
+import { LOGO_SPLASH_SEEN_KEY } from '../../src/lib/logoSplash.js';
 
 const PLACEHOLDER_IMAGE = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 4"><rect width="4" height="4" fill="#d6e8dc"/></svg>';
 
 /**
  * Every test gets a page that:
  * - serves product photos locally instead of hitting Unsplash (deterministic, offline-safe);
- * - fails the test on any console error or uncaught exception.
+ * - fails the test on any console error or uncaught exception;
+ * - skips the once-per-session opening logo splash unless a test opts in with
+ *   `test.use({ showLogoSplash: true })`.
  */
 export const test = base.extend({
-  page: async ({ page }, use) => {
+  showLogoSplash: [false, { option: true }],
+  page: async ({ page, showLogoSplash }, use) => {
+    if (!showLogoSplash) {
+      await page.addInitScript((key) => window.sessionStorage.setItem(key, '1'), LOGO_SPLASH_SEEN_KEY);
+    }
     const problems = [];
     page.on('console', (message) => {
       if (message.type() === 'error') problems.push(message.text());

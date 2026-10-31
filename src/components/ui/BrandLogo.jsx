@@ -12,20 +12,18 @@ const TONE_CLASSES = {
 /**
  * Logo lockup linking home: basket mark, the GURMAN wordmark with its orange swoosh, the
  * handwritten "смачно щодня" tagline and, optionally, the "продуктовий магазин" subtitle.
- * @param {{ tone?: keyof typeof TONE_CLASSES, showTagline?: boolean, showSubtitle?: boolean, isIntroAnimated?: boolean, className?: string }} props
+ * @param {{ tone?: keyof typeof TONE_CLASSES, showTagline?: boolean, showSubtitle?: boolean, isIntroAnimated?: boolean, isDecorative?: boolean, className?: string }} props
  * `showTagline` is hidden on the narrowest screens, where the header has no room for it.
  * `isIntroAnimated` plays the one-off assembly animation on mount (header only: it stays mounted
  * across routes, so the intro runs once per visit).
+ * `isDecorative` renders an identical, non-interactive copy (the opening splash flies it into the header).
  */
-export default function BrandLogo({ tone = 'light', showTagline = false, showSubtitle = false, isIntroAnimated = false, className }) {
+export default function BrandLogo({ tone = 'light', showTagline = false, showSubtitle = false, isIntroAnimated = false, isDecorative = false, className }) {
   const toneClasses = TONE_CLASSES[tone];
+  const wrapperClassName = cn('flex min-h-11 shrink-0 items-center gap-2 rounded-xl', !isDecorative && 'brand-logo', isIntroAnimated && 'logo-intro', className);
 
-  return (
-    <Link
-      to={ROUTES.home}
-      aria-label={`GURMAN — продуктовий магазин у місті ${CITY}, на головну`}
-      className={cn('brand-logo flex min-h-11 shrink-0 items-center gap-2 rounded-xl', isIntroAnimated && 'logo-intro', className)}
-    >
+  const lockup = (
+    <>
       <BrandMark tone={tone} className="h-11 w-11" />
       <span className="flex flex-col items-start" aria-hidden="true">
         {showTagline && <span className={cn('logo-tagline -mb-0.5 hidden -rotate-2 font-script text-base font-semibold leading-none min-[400px]:block', toneClasses.tagline)}>смачно щодня</span>}
@@ -38,6 +36,20 @@ export default function BrandLogo({ tone = 'light', showTagline = false, showSub
         </span>
         {showSubtitle && <span className={cn('mt-1.5 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.18em]', toneClasses.subtitle)}>продуктовий магазин</span>}
       </span>
+    </>
+  );
+
+  if (isDecorative) {
+    return (
+      <div aria-hidden="true" className={wrapperClassName}>
+        {lockup}
+      </div>
+    );
+  }
+
+  return (
+    <Link to={ROUTES.home} aria-label={`GURMAN — продуктовий магазин у місті ${CITY}, на головну`} className={wrapperClassName}>
+      {lockup}
     </Link>
   );
 }

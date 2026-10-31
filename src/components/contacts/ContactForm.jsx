@@ -9,6 +9,8 @@ const TOPICS = ['Якість товару', 'Наявність товару в
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_MESSAGE_LENGTH = 10;
+// Upper bounds keep pasted junk out and match what a future backend will accept.
+const MAX_LENGTH = { name: 100, email: 254, message: 2000 };
 
 const EMPTY_FORM = { name: '', email: '', topic: TOPICS[0], message: '' };
 
@@ -160,6 +162,7 @@ export default function ContactForm() {
             id={`${fieldId}-name`}
             name="name"
             autoComplete="name"
+            maxLength={MAX_LENGTH.name}
             value={values.name}
             onChange={handleChange('name')}
             aria-invalid={Boolean(errors.name)}
@@ -178,6 +181,7 @@ export default function ContactForm() {
             type="email"
             inputMode="email"
             autoComplete="email"
+            maxLength={MAX_LENGTH.email}
             value={values.email}
             onChange={handleChange('email')}
             aria-invalid={Boolean(errors.email)}
@@ -213,6 +217,7 @@ export default function ContactForm() {
           id={`${fieldId}-message`}
           name="message"
           rows={5}
+          maxLength={MAX_LENGTH.message}
           value={values.message}
           onChange={handleChange('message')}
           aria-invalid={Boolean(errors.message)}

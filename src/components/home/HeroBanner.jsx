@@ -6,6 +6,9 @@ import { ROUTES, getCatalogPath } from '../../lib/routes';
 import SafeImage from '../ui/SafeImage';
 import HeroDeals from './HeroDeals';
 
+// size 'sm' on phones (two buttons share a row), the 'lg' look from `sm` up.
+const HERO_BUTTON_CLASS_NAME = 'sm:h-12 sm:px-6 sm:text-base';
+
 const HERO_FACTS = [
   { icon: Clock, label: STORE_CONTACTS.storeHours },
   { icon: Sprout, label: 'Свіжий хліб щоранку' },
@@ -30,30 +33,33 @@ export default function HeroBanner() {
           aria-hidden="true"
         />
 
-        <div className="flex flex-col justify-center p-6 sm:p-10 lg:max-w-2xl lg:p-12">
-          <p className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/25 sm:text-sm">
+        {/* Phones get a compact banner (no badge or lead, smaller title, buttons in one row) so the
+            weekly deals below are on the first screen too, as on desktop. */}
+        <div className="flex flex-col justify-center p-5 sm:p-10 lg:max-w-2xl lg:p-12">
+          <p className="hidden w-fit items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/25 sm:inline-flex sm:text-sm">
             <MapPin className="h-4 w-4 text-amber-300" aria-hidden="true" />
             {CITY} · 2 магазини
           </p>
-          <p className="mt-5 -rotate-2 font-script text-3xl font-semibold leading-none text-amber-300" aria-hidden="true">
+          <p className="-rotate-2 font-script text-2xl font-semibold leading-none text-amber-300 sm:mt-5 sm:text-3xl" aria-hidden="true">
             смачно щодня
           </p>
-          <h1 id="hero-heading" className="mt-2 font-display text-[1.75rem] font-bold leading-[1.15] tracking-tight sm:text-4xl">
+          <h1 id="hero-heading" className="mt-1.5 font-display text-[1.375rem] font-bold leading-[1.2] tracking-tight sm:mt-2 sm:text-4xl sm:leading-[1.15]">
             Свіжі продукти щодня — у магазинах поруч із домом
           </h1>
-          <p className="mt-4 max-w-lg text-base leading-relaxed text-emerald-50 sm:text-lg">
+          <p className="mt-4 hidden max-w-lg text-lg leading-relaxed text-emerald-50 sm:block">
             Фермерські овочі, хліб із власної пекарні та знижки тижня. Обирайте товари на сайті — купуйте в найближчому магазині GURMAN.
           </p>
 
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link to={getCatalogPath(PROMO_LISTING_QUERY)} className={buttonClassName({ variant: 'accent', size: 'lg' })}>
-              <Tag className="h-5 w-5" aria-hidden="true" />
+          <div className="mt-4 grid grid-cols-2 gap-2 sm:mt-7 sm:flex sm:flex-wrap sm:gap-3">
+            <Link to={getCatalogPath(PROMO_LISTING_QUERY)} className={buttonClassName({ variant: 'accent', size: 'sm', className: HERO_BUTTON_CLASS_NAME })}>
+              <Tag className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
               Акції тижня
             </Link>
-            <Link to={ROUTES.catalog} className={buttonClassName({ variant: 'onDark', size: 'lg' })}>
-              <LayoutGrid className="h-5 w-5" aria-hidden="true" />
-              Перейти до каталогу
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            <Link to={ROUTES.catalog} className={buttonClassName({ variant: 'onDark', size: 'sm', className: HERO_BUTTON_CLASS_NAME })}>
+              <LayoutGrid className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
+              <span className="sm:hidden">Каталог</span>
+              <span className="hidden sm:inline">Перейти до каталогу</span>
+              <ArrowRight className="hidden h-4 w-4 sm:block" aria-hidden="true" />
             </Link>
           </div>
 

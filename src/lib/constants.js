@@ -14,7 +14,6 @@ export const SECTION_IDS = {
   categories: 'categories',
   promo: 'promo',
   stores: 'stores',
-  loyalty: 'loyalty',
 };
 
 export const NAV_LINKS = [

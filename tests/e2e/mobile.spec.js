@@ -6,6 +6,15 @@ const ROUTES = ['/', '/catalog', '/category/dairy', '/product/p-002', '/cart', '
 const STICKY_BAR = 'div.fixed:has(button:text("У кошик"))';
 
 test.describe('mobile', () => {
+  test('first screen shows a compact banner and the weekly deals, as on desktop', async ({ page }) => {
+    await open(page, '/');
+    const fold = await page.locator('nav[aria-label="Швидка навігація"]').evaluate((nav) => nav.getBoundingClientRect().top);
+    const bannerHeight = await page.locator('section[aria-labelledby="hero-heading"] > div').first().evaluate((el) => el.getBoundingClientRect().height);
+    expect(bannerHeight).toBeLessThan(260);
+    const firstDeal = await page.locator('aside[aria-labelledby="hero-deals-heading"] li').first().evaluate((el) => el.getBoundingClientRect().bottom);
+    expect(firstDeal).toBeLessThanOrEqual(fold);
+  });
+
   test('menu opens, navigates and closes', async ({ page }) => {
     await open(page, '/');
     const trigger = page.locator('header button[aria-label="Відкрити меню"]');

@@ -1,13 +1,15 @@
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { shouldPlayLogoSplash } from '../../lib/logoSplash';
 import { TOAST_OPTIONS } from '../../lib/toastOptions';
 import { useCartStore } from '../../store/useCartStore';
 import CartDrawer from '../cart/CartDrawer';
 import BottomNav from '../mobile/BottomNav';
 import BasketIllustration from '../ui/BasketIllustration';
 import Footer from './Footer';
+import LogoSplash from './LogoSplash';
 import MobileMenu from './MobileMenu';
 import Navbar from './Navbar';
 import TopStrip from './TopStrip';
@@ -17,6 +19,10 @@ export default function SiteLayout() {
   const isMobile = useIsMobile();
   const closeCart = useCartStore((state) => state.closeCart);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // Decided once per page load: the splash replaces the header logo's own intro animation.
+  const [hasLogoSplash] = useState(shouldPlayLogoSplash);
+  const [isLogoSplashActive, setIsLogoSplashActive] = useState(hasLogoSplash);
+  const endLogoSplash = useCallback(() => setIsLogoSplashActive(false), []);
 
   // Any navigation (including to the current URL) dismisses overlays, so links inside them need no extra wiring.
   useEffect(() => {
@@ -35,7 +41,12 @@ export default function SiteLayout() {
       </a>
 
       <TopStrip />
-      <Navbar isMobileMenuOpen={isMobileMenuOpen} onOpenMobileMenu={() => setIsMobileMenuOpen(true)} />
+      <Navbar
+        isMobileMenuOpen={isMobileMenuOpen}
+        onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
+        isLogoIntroAnimated={!hasLogoSplash}
+        isLogoHidden={isLogoSplashActive}
+      />
 
       <main id="main" tabIndex={-1} className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 focus:outline-none sm:px-6 sm:py-8 lg:px-8">
         <Suspense fallback={<PageFallback />}>
@@ -55,6 +66,7 @@ export default function SiteLayout() {
         containerClassName={isMobile ? '!top-[calc(env(safe-area-inset-top)+0.75rem)]' : undefined}
       />
       <ScrollRestoration getKey={getScrollRestorationKey} />
+      {isLogoSplashActive && <LogoSplash onDone={endLogoSplash} />}
     </div>
   );
 }

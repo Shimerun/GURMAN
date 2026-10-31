@@ -36,6 +36,8 @@ export default function SafeImage({ src, alt, isEager = false, ...imageProps }) 
       decoding="async"
       // CORS mode lets the service worker cache real (non-opaque) responses.
       crossOrigin="anonymous"
+      // Image hosts don't need to know which page (or search query) the visitor is on.
+      referrerPolicy="no-referrer"
       onLoad={handleLoad}
       onError={handleError}
       data-image-state={imageState}
