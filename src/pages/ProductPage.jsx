@@ -1,6 +1,7 @@
 import { BadgeCheck, Factory, Globe, RotateCcw, Scale, Store, Tag } from 'lucide-react';
 import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import FavoriteButton from '../components/products/FavoriteButton';
 import ProductGrid from '../components/products/ProductGrid';
 import ProductPurchasePanel from '../components/products/ProductPurchasePanel';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
@@ -142,12 +143,15 @@ function ProductDetails({ product }) {
         </div>
 
         <div className="min-w-0">
-          <Link
-            to={getCategoryPath(product.category)}
-            className="inline-flex min-h-8 items-center text-sm font-semibold text-emerald-800 underline-offset-4 transition-colors hover:underline"
-          >
-            {product.categoryTitle}
-          </Link>
+          <div className="flex items-center justify-between gap-3">
+            <Link
+              to={getCategoryPath(product.category)}
+              className="inline-flex min-h-8 items-center text-sm font-semibold text-emerald-800 underline-offset-4 transition-colors hover:underline"
+            >
+              {product.categoryTitle}
+            </Link>
+            <FavoriteButton product={product} isLabeled className="shrink-0" />
+          </div>
           <h1 className="mt-1 text-2xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">{product.title}</h1>
           {FEATURES.productRatings && <Rating rating={product.rating} reviewsCount={product.reviewsCount} size="lg" className="mt-3" />}
 

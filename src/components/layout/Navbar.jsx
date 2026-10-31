@@ -1,4 +1,4 @@
-import { LayoutGrid, Menu, Phone, Search, ShoppingCart, Tag, X } from 'lucide-react';
+import { Heart, LayoutGrid, Menu, Phone, Search, ShoppingCart, Tag, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAnimatedNumber } from '../../hooks/useAnimatedNumber';
@@ -11,6 +11,7 @@ import { PRODUCT_FORMS, formatPrice, pluralize } from '../../lib/format';
 import { ROUTES, getCatalogPath, isNavLinkActive, isPromoListing } from '../../lib/routes';
 import { cn } from '../../lib/utils';
 import { selectTotalItems, selectTotalPrice, useCartStore } from '../../store/useCartStore';
+import { selectFavoriteCount, useFavoritesStore } from '../../store/useFavoritesStore';
 import BrandLogo from '../ui/BrandLogo';
 import MegaMenu from './MegaMenu';
 
@@ -64,6 +65,8 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu, isLogoIntro
   const totalPrice = useCartStore(selectTotalPrice);
   const hasMounted = useHasMounted();
   const badgeCount = hasMounted ? totalItems : 0;
+  const favoriteCount = useFavoritesStore(selectFavoriteCount);
+  const favoriteBadgeCount = hasMounted ? favoriteCount : 0;
   const subtotal = hasMounted ? totalPrice : 0;
   // Animated from the persisted total (not from the pre-mount 0), so page loads don't count up.
   const animatedTotalPrice = useAnimatedNumber(totalPrice);
@@ -182,12 +185,30 @@ export default function Navbar({ isMobileMenuOpen, onOpenMobileMenu, isLogoIntro
           {STORE_CONTACTS.phone}
         </a>
 
+        <Link
+          to={ROUTES.favorites}
+          aria-label={favoriteBadgeCount > 0 ? `Обране: ${pluralize(favoriteBadgeCount, PRODUCT_FORMS)}` : 'Обране'}
+          aria-current={pathname === ROUTES.favorites ? 'page' : undefined}
+          className="relative ml-auto grid h-11 w-11 shrink-0 place-items-center rounded-full text-slate-800 transition-colors hover:bg-slate-100 active:bg-slate-200 md:ml-0"
+        >
+          <Heart className={cn('h-5 w-5', favoriteBadgeCount > 0 && 'fill-red-500 text-red-500')} aria-hidden="true" />
+          {favoriteBadgeCount > 0 && (
+            <span
+              key={favoriteBadgeCount}
+              aria-hidden="true"
+              className="absolute right-0 top-0 grid h-5 min-w-5 animate-badge-pop place-items-center rounded-full bg-slate-800 px-1 text-xs font-bold leading-none text-white"
+            >
+              {favoriteBadgeCount}
+            </span>
+          )}
+        </Link>
+
         <button
           type="button"
           onClick={openCart}
           data-cart-target
           aria-label={`Кошик: ${pluralize(badgeCount, PRODUCT_FORMS)} на суму ${formatPrice(subtotal)}`}
-          className="ml-auto flex h-11 shrink-0 items-center gap-2.5 rounded-full border border-slate-200 bg-white pl-3.5 pr-3.5 transition-colors hover:border-emerald-600 active:bg-slate-50 md:ml-0 sm:pr-4"
+          className="flex h-11 shrink-0 items-center gap-2.5 rounded-full border border-slate-200 bg-white pl-3.5 pr-3.5 transition-colors hover:border-emerald-600 active:bg-slate-50 sm:pr-4"
         >
           <span className="relative">
             <ShoppingCart className="h-5 w-5 text-slate-800" aria-hidden="true" />

@@ -26,6 +26,22 @@
   }
 }
 
+/* Printing shows the page content only, not the app shell. "Роздрукувати список" swaps the page
+   for the paper shopping list (PrintableShoppingList) while html[data-print] is set. */
+@media print {
+  #root > div > :not(main) {
+    display: none !important;
+  }
+
+  html[data-print='shopping-list'] #root > div > main {
+    display: none !important;
+  }
+
+  html[data-print='shopping-list'] #root > div > .printable-shopping-list {
+    display: block !important;
+  }
+}
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;

@@ -6,7 +6,7 @@ const NOT_FOUND_STATES = [
   ['/totally/unknown', 'Сторінку не знайдено'],
 ];
 
-const PAGES = ['/', '/catalog', '/category/dairy', '/product/p-002', '/cart', '/about', '/delivery', '/contacts', '/privacy'];
+const PAGES = ['/', '/catalog', '/category/dairy', '/product/p-002', '/cart', '/favorites', '/about', '/delivery', '/contacts', '/privacy'];
 
 test.describe('routes', () => {
   for (const [path, heading] of NOT_FOUND_STATES) {
@@ -63,6 +63,17 @@ test.describe('routes', () => {
       const text = await page.locator('body').innerText();
       expect(text, path).not.toMatch(/доставк|цілодоб|24\/7|з 5:00/i);
     }
+  });
+
+  test('header shows whether the stores are open right now, and flips at closing time', async ({ page }) => {
+    // 21:59 in Kyiv (UTC+2 in November).
+    await page.clock.install({ time: new Date('2026-11-02T19:59:00Z') });
+    await open(page, '/');
+    const strip = page.locator('body > #root > div > div').first();
+    await expect(strip).toContainText('Відкрито зараз · до 22:00');
+
+    await page.clock.runFor(2 * 60_000);
+    await expect(strip).toContainText('Зачинено · відкриємося о 07:00');
   });
 
   test('privacy policy is linked from the footer and the contact form', async ({ page }) => {

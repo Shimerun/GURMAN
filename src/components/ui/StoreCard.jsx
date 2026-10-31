@@ -1,4 +1,5 @@
 import { Clock, MapPin, Navigation, Phone } from 'lucide-react';
+import { ANALYTICS_EVENTS, trackEvent } from '../../lib/analytics';
 import { CITY } from '../../lib/constants';
 import { buttonClassName } from '../../lib/buttonStyles';
 import { getDirectionsUrl } from '../../lib/routes';
@@ -47,6 +48,7 @@ export default function StoreCard({ store }) {
       <div className="mt-4 grid grid-cols-2 gap-2">
         <a
           href={getDirectionsUrl(fullAddress)}
+          onClick={() => trackEvent(ANALYTICS_EVENTS.directions, { store: store.name })}
           target="_blank"
           rel="noopener noreferrer"
           className={buttonClassName({ size: 'sm', className: 'w-full' })}
@@ -55,7 +57,11 @@ export default function StoreCard({ store }) {
           Маршрут
           <span className="sr-only">до {store.name} (відкриється в новій вкладці)</span>
         </a>
-        <a href={`tel:${store.phone.replace(/\s/g, '')}`} className={buttonClassName({ variant: 'secondary', size: 'sm', className: 'w-full' })}>
+        <a
+          href={`tel:${store.phone.replace(/\s/g, '')}`}
+          onClick={() => trackEvent(ANALYTICS_EVENTS.call, { store: store.name })}
+          className={buttonClassName({ variant: 'secondary', size: 'sm', className: 'w-full' })}
+        >
           <Phone className="h-4 w-4" aria-hidden="true" />
           Дзвінок
           <span className="sr-only">у {store.name}</span>

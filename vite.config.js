@@ -1,12 +1,17 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { ANALYTICS, SITE_URL } from './src/config/business.js';
 
 const THIRTY_DAYS_IN_SECONDS = 60 * 60 * 24 * 30;
 const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365;
 
 /** Product photos are hotlinked from here until the client's own images are hosted with the site. */
 const IMAGE_HOST = 'https://images.unsplash.com';
+
+/** Plausible's origin, allowed only once analytics is configured (least privilege). */
+const ANALYTICS_HOST = ANALYTICS.scriptSrc ? new URL(ANALYTICS.scriptSrc).origin : null;
+const withAnalyticsHost = (sources) => [...sources, ANALYTICS_HOST].filter(Boolean).join(' ');
 
 /**
  * Security headers for the production site. The build has no inline scripts, so scripts are
@@ -17,12 +22,12 @@ const IMAGE_HOST = 'https://images.unsplash.com';
 const SECURITY_HEADERS = {
   'Content-Security-Policy': [
     "default-src 'self'",
-    "script-src 'self'",
+    `script-src ${withAnalyticsHost(["'self'"])}`,
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: ${IMAGE_HOST}`,
     "font-src 'self'",
     // The service worker fetches (and caches) product photos itself.
-    `connect-src 'self' ${IMAGE_HOST}`,
+    `connect-src ${withAnalyticsHost(["'self'", IMAGE_HOST])}`,
     "manifest-src 'self'",
     "worker-src 'self'",
     "object-src 'none'",
@@ -49,12 +54,24 @@ const securityHeadersFile = () => ({
   },
 });
 
+/** Link previews need absolute URLs: prefixes the Open Graph image (and adds og:url) once SITE_URL is known. */
+const absoluteSocialMeta = () => ({
+  name: 'gurman-absolute-social-meta',
+  transformIndexHtml(html) {
+    if (!SITE_URL) return html;
+    return html
+      .replace('content="/og-image.png"', `content="${SITE_URL}/og-image.png"`)
+      .replace('<meta property="og:type"', `<meta property="og:url" content="${SITE_URL}/" />\n    <meta property="og:type"`);
+  },
+});
+
 export default defineConfig({
   // The local preview serves the same headers, so e2e tests run under the production CSP.
   preview: { headers: SECURITY_HEADERS },
   plugins: [
     react(),
     securityHeadersFile(),
+    absoluteSocialMeta(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icon.svg', 'apple-touch-icon.png'],
@@ -79,6 +96,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // Only fetched by link-preview crawlers, never by the app.
+        globIgnores: ['og-image.png'],
         navigateFallback: '/index.html',
         runtimeCaching: [
           {

@@ -6,6 +6,7 @@ import { shouldPlayLogoSplash } from '../../lib/logoSplash';
 import { TOAST_OPTIONS } from '../../lib/toastOptions';
 import { useCartStore } from '../../store/useCartStore';
 import CartDrawer from '../cart/CartDrawer';
+import PrintableShoppingList from '../cart/PrintableShoppingList';
 import BottomNav from '../mobile/BottomNav';
 import BasketIllustration from '../ui/BasketIllustration';
 import Footer from './Footer';
@@ -55,6 +56,7 @@ export default function SiteLayout() {
       </main>
 
       <Footer />
+      <PrintableShoppingList />
       <BottomNav />
       <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
       <CartDrawer />

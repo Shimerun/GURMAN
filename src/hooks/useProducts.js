@@ -16,6 +16,12 @@ export function useProducts(params = {}) {
   return { ...query, /** @type {Product[]} */ data: query.data ?? EMPTY_LIST };
 }
 
+/** Products for a list of ids (e.g. favourites), in that order. @param {string[]} productIds */
+export function useProductsByIds(productIds) {
+  const query = useAsyncData(() => productService.getProductsByIds(productIds), `products:ids:${productIds.join(',')}`);
+  return { ...query, /** @type {Product[]} */ data: query.data ?? EMPTY_LIST };
+}
+
 /** @param {string} productId */
 export function useProduct(productId) {
   const query = useAsyncData(() => productService.getProductById(productId), `product:${productId}`);

@@ -2,14 +2,12 @@ export const ROUTES = {
   home: '/',
   catalog: '/catalog',
   cart: '/cart',
+  favorites: '/favorites',
   about: '/about',
   delivery: '/delivery',
   contacts: '/contacts',
   privacy: '/privacy',
 };
-
-/** Router state that tells the cart page to open the checkout dialog straight away. */
-export const OPEN_CHECKOUT_STATE = { openCheckout: true };
 
 /** @typedef {{ search?: string, onlyPromo?: boolean, sort?: string }} ListingQuery */
 

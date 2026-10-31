@@ -1,7 +1,7 @@
 import { FileWarning } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageHeader from '../components/ui/PageHeader';
-import { BRAND_NAME, IS_DEMO_CONTENT, LEGAL_ENTITY, PRIVACY_POLICY_UPDATED } from '../config/business';
+import { ANALYTICS, BRAND_NAME, IS_DEMO_CONTENT, LEGAL_ENTITY, PRIVACY_POLICY_UPDATED } from '../config/business';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { STORE_CONTACTS } from '../lib/constants';
 import { formatDayMonth } from '../lib/format';
@@ -76,9 +76,15 @@ export default function PrivacyPage() {
               звернення — лише те, що ви вводите самі.
             </li>
             <li>
-              <span className="font-semibold text-slate-900">Кошик:</span> зберігається тільки у вашому браузері (localStorage) і на наш
-              сервер не надсилається. Його можна очистити в будь-який момент.
+              <span className="font-semibold text-slate-900">Кошик і обране:</span> зберігаються тільки у вашому браузері (localStorage) і на
+              наш сервер не надсилаються. Їх можна очистити в будь-який момент.
             </li>
+            {ANALYTICS.scriptSrc && (
+              <li>
+                <span className="font-semibold text-slate-900">Статистика відвідувань:</span> знеособлені дані через сервіс Plausible
+                Analytics — які сторінки відкривають, звідки переходять, тип пристрою. Без cookie і без ідентифікації конкретної людини.
+              </li>
+            )}
             <li>
               <span className="font-semibold text-slate-900">Технічні дані:</span> сервер, на якому розміщено сайт, може фіксувати
               IP-адресу, тип браузера та час запиту для захисту від атак і збоїв.
@@ -103,6 +109,12 @@ export default function PrivacyPage() {
             Ми не продаємо й не передаємо ваші дані третім особам, окрім випадків, прямо передбачених законом. Технічно дані можуть
             зберігатися в постачальника хостингу, який не має права використовувати їх для власних цілей.
           </p>
+          {ANALYTICS.scriptSrc && (
+            <p>
+              Статистику відвідувань обробляє Plausible Analytics (ЄС): IP-адреса не зберігається, а лише використовується для
+              знеособленого підрахунку унікальних відвідувачів за добу.
+            </p>
+          )}
           {IS_DEMO_CONTENT && (
             <p>
               У демо-версії фото товарів завантажуються із сервісу Unsplash: ваш браузер звертається до його серверів, тож вони бачать

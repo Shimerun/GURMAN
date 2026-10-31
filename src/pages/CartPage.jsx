@@ -1,9 +1,9 @@
 import { ArrowLeft, MapPin, ShieldCheck, Store, Tag, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import CartItem from '../components/cart/CartItem';
 import CartTotals from '../components/cart/CartTotals';
-import CheckoutDialog from '../components/cart/CheckoutDialog';
+import PrintListButton from '../components/cart/PrintListButton';
+import ShareListButton from '../components/cart/ShareListButton';
 import BasketIllustration from '../components/ui/BasketIllustration';
 import EmptyState from '../components/ui/EmptyState';
 import PageHeader from '../components/ui/PageHeader';
@@ -17,18 +17,6 @@ import { selectTotalItems, selectTotalPrice, selectTotalSavings, useCartStore } 
 
 const CART_CRUMBS = [{ label: 'Кошик' }];
 
-/** Opened from the cart drawer's checkout button via router state; consumed once so Back doesn't reopen it. */
-function useCheckoutDialogState() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(() => location.state?.openCheckout === true);
-
-  useEffect(() => {
-    if (location.state?.openCheckout) navigate(`${location.pathname}${location.search}`, { replace: true, state: null, preventScrollReset: true });
-  }, [location, navigate]);
-
-  return [isCheckoutOpen, setIsCheckoutOpen];
-}
 
 export default function CartPage() {
   const items = useCartStore((state) => state.items);
@@ -37,11 +25,8 @@ export default function CartPage() {
   const totalPrice = useCartStore(selectTotalPrice);
   const totalSavings = useCartStore(selectTotalSavings);
   const hasMounted = useHasMounted();
-  const [isCheckoutOpen, setIsCheckoutOpen] = useCheckoutDialogState();
 
   useDocumentTitle('Кошик', `Кошик GURMAN: перевірте товари й суму перед покупкою в магазинах ${IN_CITY}.`);
-
-  const checkoutDialog = isCheckoutOpen && <CheckoutDialog onClose={() => setIsCheckoutOpen(false)} />;
 
   // Persisted cart is read synchronously, but waiting one frame matches the header badge and avoids a flash.
   if (!hasMounted) return <PageHeader title="Кошик" breadcrumbs={CART_CRUMBS} />;
@@ -72,7 +57,6 @@ export default function CartPage() {
             </div>
           }
         />
-        {checkoutDialog}
       </>
     );
   }
@@ -109,10 +93,9 @@ export default function CartPage() {
             </h2>
             <CartTotals totalPrice={totalPrice} totalSavings={totalSavings} totalItems={totalItems} className="mt-4" />
 
-            <button type="button" onClick={() => setIsCheckoutOpen(true)} aria-haspopup="dialog" className={buttonClassName({ size: 'lg', className: 'mt-5 w-full' })}>
-              Оформити демо-замовлення
-            </button>
-            <p className="mt-2 text-center text-xs text-slate-600">Демо-режим: без оплати й передачі замовлення в магазин.</p>
+            <ShareListButton className="mt-5 w-full" />
+            <PrintListButton className="mt-2 w-full" />
+            <p className="mt-2 text-center text-xs text-slate-600">Список зберігається на цьому пристрої — відкрийте його в магазині.</p>
           </div>
 
           <div className="rounded-2xl bg-emerald-50 p-5 text-sm text-emerald-950 ring-1 ring-emerald-100">
@@ -140,7 +123,6 @@ export default function CartPage() {
           </Link>
         </aside>
       </div>
-      {checkoutDialog}
     </>
   );
 }

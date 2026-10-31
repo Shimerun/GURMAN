@@ -2,7 +2,7 @@ import { cartBadge, currentPath, expect, open, test, waitForData } from './fixtu
 
 test.use({ viewport: { width: 375, height: 800 }, isMobile: true, hasTouch: true });
 
-const ROUTES = ['/', '/catalog', '/category/dairy', '/product/p-002', '/cart', '/about', '/delivery', '/contacts'];
+const ROUTES = ['/', '/catalog', '/category/dairy', '/product/p-002', '/cart', '/favorites', '/about', '/delivery', '/contacts'];
 const STICKY_BAR = 'div.fixed:has(button:text("У кошик"))';
 
 test.describe('mobile', () => {

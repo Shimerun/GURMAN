@@ -62,6 +62,24 @@ export const COFFEE_TO_GO = {
   brand: 'Gemini',
 };
 
+/**
+ * Visitor statistics via Plausible Analytics (no cookies, so no consent banner). Off while
+ * `scriptSrc` is null. To enable: add the site in Plausible, open Site installation and copy the
+ * script URL from the snippet (https://plausible.io/js/pa-….js). The CSP in vite.config.js then
+ * allows that host automatically. Goals to create in Plausible: see `ANALYTICS_EVENTS` in lib/analytics.js.
+ * @type {{ scriptSrc: string | null }}
+ */
+export const ANALYTICS = {
+  scriptSrc: null, // DEMO: not set up yet
+};
+
+/**
+ * Public address of the site, without a trailing slash. Link previews (Open Graph) need absolute
+ * image URLs; null keeps them relative, which most messengers still resolve.
+ * @type {string | null}
+ */
+export const SITE_URL = null; // DEMO: e.g. 'https://gurman.example' once the domain is bought
+
 /** Payment accepted at the checkout counter in every store. */
 export const PAYMENT_METHODS = ['Банківська картка', 'Apple Pay / Google Pay', 'Готівка', 'Бонуси картки GURMAN'];
 

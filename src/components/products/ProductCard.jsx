@@ -14,6 +14,7 @@ import QuantityStepper from '../ui/QuantityStepper';
 import Rating from '../ui/Rating';
 import SafeImage from '../ui/SafeImage';
 import StockBadge from '../ui/StockBadge';
+import FavoriteButton from './FavoriteButton';
 
 /**
  * @param {{ product: import('../../services/productService').Product, isImageEager?: boolean, hasImageTransition?: boolean }} props
@@ -48,6 +49,8 @@ export default function ProductCard({ product, isImageEager = false, hasImageTra
       <div className={cn('relative overflow-hidden rounded-xl bg-emerald-50', isImageMorphing && '[view-transition-name:product-image]')}>
         {/* pointer-events-none keeps the stretched product link clickable through the badges. */}
         <ProductBadges product={product} className="pointer-events-none absolute left-2 top-2 z-[1]" />
+        {/* z-10 lifts it above the stretched product link, like the cart controls. */}
+        <FavoriteButton product={product} className="absolute right-0.5 top-0.5 z-10" />
         {product.stockStatus !== 'in_stock' && (
           <StockBadge status={product.stockStatus} className="pointer-events-none absolute bottom-2 left-2 z-[1] shadow-sm" />
         )}

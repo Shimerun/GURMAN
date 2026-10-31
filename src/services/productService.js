@@ -121,6 +121,8 @@ const products = mockProducts.map((product) => {
   };
 });
 
+const productById = new Map(products.map((product) => [product.id, product]));
+
 /** @type {Category[]} */
 const categories = mockCategories.map((category) => {
   const categoryProducts = products.filter((product) => product.category === category.id);
@@ -207,4 +209,23 @@ async function getProductById(productId) {
   return product;
 }
 
-export const productService = { getProducts, getCategories, getCategoryById, getProductById };
+/**
+ * Products in the order of `productIds`; ids that no longer exist (delisted products) are skipped.
+ * @param {string[]} productIds
+ * @returns {Promise<Product[]>}
+ */
+async function getProductsByIds(productIds) {
+  if (!Array.isArray(productIds) || productIds.some((productId) => typeof productId !== 'string')) {
+    throw new ServiceError(`${SERVICE}.getProductsByIds: expected an array of product id strings`, {
+      service: SERVICE,
+      operation: 'getProductsByIds',
+      code: 'INVALID_INPUT',
+    });
+  }
+
+  await simulateNetworkLatency({ service: SERVICE, operation: 'getProductsByIds' });
+
+  return productIds.map((productId) => productById.get(productId)).filter((product) => product !== undefined);
+}
+
+export const productService = { getProducts, getProductsByIds, getCategories, getCategoryById, getProductById };
